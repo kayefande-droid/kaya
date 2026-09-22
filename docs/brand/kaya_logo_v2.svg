@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!--
+    KAYA — hand-carved mark. Design intent: looks cut from inked linoleum,
+    printed slightly off-register, worn at the corners. No gradients, no
+    glow, no perfect symmetry — human hands wobble.
+  -->
+  <filter id="rough">
+    <feTurbulence type="fractalNoise" baseFrequency="0.028 0.035" numOctaves="3" seed="7" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="7" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  <filter id="grain">
+    <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="11" result="n"/>
+    <feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0.6 0.6 0.6 0 0"/>
+    <feComposite operator="in" in2="SourceGraphic"/>
+  </filter>
+
+  <!-- paper base: warm off-white, slightly uneven -->
+  <rect width="512" height="512" rx="118" fill="#F3EEE3"/>
+  <rect width="512" height="512" rx="118" fill="none" stroke="#171512" stroke-width="7" filter="url(#rough)"/>
+
+  <!-- ink blob behind the mark, off-register fill -->
+  <path filter="url(#rough)"
+        d="M258 96 L400 176 L396 336 L252 416 L112 332 L118 172 Z"
+        fill="#171512"/>
+
+  <!-- carved K strokes (negative space, carved out of the blob) -->
+  <g stroke="#F3EEE3" stroke-linecap="round" fill="none" filter="url(#rough)">
+    <path d="M204 172 L198 340" stroke-width="26"/>
+    <path d="M204 258 L292 176" stroke-width="24"/>
+    <path d="M212 246 L302 336" stroke-width="24"/>
+  </g>
+
+  <!-- speed tick, like a knife nick -->
+  <path d="M188 372 L282 368" stroke="#E5462F" stroke-width="14" stroke-linecap="round"
+        fill="none" filter="url(#rough)"/>
+
+  <!-- node dots: hand-punched, uneven sizes -->
+  <g fill="#171512">
+    <circle cx="150" cy="140" r="10"/>
+    <circle cx="356" cy="152" r="8"/>
+    <circle cx="138" cy="330" r="8"/>
+    <circle cx="368" cy="344" r="11"/>
+    <circle cx="260" cy="106" r="6"/>
+    <circle cx="254" cy="398" r="7"/>
+  </g>
+
+  <!-- red misprint ghost of the shield edge -->
+  <path d="M258 96 L400 176 L396 336 L252 416 L112 332 L118 172 Z"
+        fill="none" stroke="#E5462F" stroke-width="4" opacity="0.5"
+        transform="translate(6,-4) rotate(0.6 256 256)" filter="url(#rough)"/>
+
+  <!-- stamped wordmark, letter-spaced like rubber type -->
+  <text x="256" y="472" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif"
+        font-size="58" font-weight="700" letter-spacing="14" fill="#171512"
+        filter="url(#rough)">KAYA</text>
+</svg>

@@ -1,12 +1,19 @@
-# Kaya ⚡ — the fast lane for mobile FPS
+# Kaya — the fast lane for mobile FPS
 
 <p align="center">
-  <img src="docs/kaya_logo.png" alt="Kaya logo" width="120"/>
+  <img src="docs/brand/kaya_logo_v2.png" alt="Kaya logo — hand-carved ink mark" width="130"/>
 </p>
 
 <p align="center">
-  <img src="docs/kaya_flyer.png" alt="Kaya — game booster app UI on phone mockups" width="760"/>
+  <em>drawn by hand, printed slightly off-register — like all good posters</em>
 </p>
+
+<p align="center">
+  <img src="docs/brand/kaya_flyer_v2.png" alt="Kaya gig-poster flyer: two inked phone mockups on torn paper" width="760"/>
+</p>
+
+> 🌍 **Website:** the landing page lives in [`site/`](site/index.html) and deploys on Render via the included `render.yaml` blueprint — see [Deploying the website](#deploying-the-website) below.
+> 🔎 **Search:** the page ships with Google Search Console verification, Open Graph cards and `SoftwareApplication` structured data so Kaya shows its name, price (free), and download link directly in web search.
 
 > ### 📲 Download & Install
 > **[⬇️ Kaya-arm64.apk — recommended (small & fast)](https://github.com/kayefande-droid/kaya/releases/latest/download/Kaya-arm64.apk)** · [⬇️ Kaya.apk — universal](https://github.com/kayefande-droid/kaya/releases/latest/download/Kaya.apk)
@@ -88,6 +95,19 @@ adb shell settings put global private_dns_specifier one.one.one.one
 - **Usage access** — background traffic sampling for the Tuning screen.
 - **Accessibility** — only for the controller→touch bridge; window content is never read (`canRetrieveWindowContent=false`).
 - **Nearby devices / Bluetooth** — gamepad detection.
+
+## Deploying the website
+
+The site is plain HTML/CSS (no build step) in `site/`, with a Render blueprint at the repo root.
+
+1. **Deploy on Render:** dashboard → **New + → Blueprint** → pick `kayefande-droid/kaya` → Render reads `render.yaml` and publishes `site/` as a static site (e.g. `https://kaya-booster.onrender.com`).
+2. **Google Search Console:** [search.google.com/search-console](https://search.google.com/search-console) → *Add property → URL prefix* → your Render URL → verification method **HTML tag** → copy the `content="..."` token and paste it over `REPLACE_WITH_YOUR_GSC_TOKEN` in `site/index.html` → commit & push → click **Verify** back in Search Console.
+3. **Let the app appear in web search:** the page already includes:
+   - `SoftwareApplication` JSON-LD (name, free price, download URL, screenshot) — this is what powers rich app results;
+   - Open Graph + Twitter card tags so shared links render the flyer;
+   - `robots.txt` + `sitemap.xml` pointing at the live URL.
+   After verification, use Search Console's **URL Inspection → Request indexing** to speed up first inclusion.
+4. If Render assigns a different domain, update the canonical URL, OG tags, sitemap URL and the JSON-LD `screenshot` link to match.
 
 ## Roadmap
 

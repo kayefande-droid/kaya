@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+  <title>Kaya — the fast lane for mobile FPS</title>
+  <meta name="description" content="Kaya is a free, open-source Android game booster for CODM, PUBG Mobile and Free Fire. Smart DNS steering, boost locks, controller bridge. Zero servers, zero ads, zero accounts."/>
+  <meta name="theme-color" content="#0E0D0B"/>
+  <link rel="canonical" href="https://kaya-booster.onrender.com/"/>
+  <link rel="icon" type="image/png" href="/assets/kaya-icon.png"/>
+
+  <!-- ============ Google Search Console verification ============
+       Replace the content below with YOUR token from
+       https://search.google.com/search-console → add property → HTML tag -->
+  <meta name="google-site-verification" content="REPLACE_WITH_YOUR_GSC_TOKEN"/>
+
+  <!-- Open Graph / Twitter: how Kaya appears in search shares & social cards -->
+  <meta property="og:type" content="website"/>
+  <meta property="og:site_name" content="Kaya"/>
+  <meta property="og:title" content="Kaya — the fast lane for mobile FPS"/>
+  <meta property="og:description" content="Free, open-source Android game booster. Smart DNS steering, boost locks, controller bridge. Zero servers, zero ads."/>
+  <meta property="og:url" content="https://kaya-booster.onrender.com/"/>
+  <meta property="og:image" content="/assets/kaya-flyer.png"/>
+  <meta property="og:image:alt" content="Hand-drawn Kaya poster: two inked phone mockups on torn paper"/>
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="Kaya — the fast lane for mobile FPS"/>
+  <meta name="twitter:description" content="Free, open-source Android game booster. Zero servers, zero ads."/>
+  <meta name="twitter:image" content="/assets/kaya-flyer.png"/>
+
+  <!-- Structured data: this is what lets the app show its info on web search -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Kaya",
+    "operatingSystem": "Android 8.0+",
+    "applicationCategory": "GameApplication",
+    "description": "Open-source Android game booster: on-device Smart Anycast DNS steering, Wi-Fi low-latency locks, background mitigation and a controller-to-touch bridge. No servers, no accounts.",
+    "softwareVersion": "1.0.2",
+    "fileSize": "18MB",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "author": { "@type": "Person", "name": "kayefande-droid", "url": "https://github.com/kayefande-droid" },
+    "downloadUrl": "https://github.com/kayefande-droid/kaya/releases/latest/download/Kaya-arm64.apk",
+    "installUrl": "https://github.com/kayefande-droid/kaya/releases/latest/download/Kaya-arm64.apk",
+    "releaseNotes": "https://github.com/kayefande-droid/kaya/releases",
+    "screenshot": "https://kaya-booster.onrender.com/assets/kaya-flyer.png"
+  }
+  </script>
+
+  <link rel="stylesheet" href="/styles.css"/>
+</head>
+<body>
+
+  <header class="topbar">
+    <a class="brand" href="/">
+      <img src="/assets/kaya-icon.png" alt="Kaya logo" width="44" height="44"/>
+      <span>KAYA</span>
+    </a>
+    <nav>
+      <a href="#how">How it works</a>
+      <a href="#download">Download</a>
+      <a href="https://github.com/kayefande-droid/kaya" target="_blank" rel="noopener">Source</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ================= hero ================= -->
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="overline">hand-built · open source · free forever</p>
+        <h1>The fast lane<br/>for mobile FPS.</h1>
+        <p class="lede">
+          Kaya races public DNS resolvers from <em>your</em> phone, holds the radio
+          at full performance and launches the game — so matchmaking stops
+          wandering through somebody else's continent.
+        </p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="https://github.com/kayefande-droid/kaya/releases/latest/download/Kaya-arm64.apk">⬇ Download for Android — 18 MB</a>
+          <a class="btn" href="#download">Other devices</a>
+        </div>
+        <p class="fineprint">Android 8.0+ · no account · no ads · SHA-256 checksums published with every release</p>
+      </div>
+      <figure class="hero-art">
+        <img src="/assets/kaya-flyer.png" alt="Hand-drawn Kaya poster with two phone mockups on torn paper" width="620"/>
+        <figcaption>drawn, not generated — every wobble is intentional</figcaption>
+      </figure>
+    </section>
+
+    <!-- ================= how it works ================= -->
+    <section id="how" class="sheet">
+      <h2>What it actually does</h2>
+      <div class="cards">
+        <article class="card">
+          <h3><span class="num">01</span> Smart DNS steering</h3>
+          <p>A local engine intercepts matchmaker lookups for CODM, PUBG Mobile,
+          Free Fire and friends, races Cloudflare / Google / Quad9 from your own
+          connection, and answers with the fastest edge. No middle server — the
+          trick is <em>which</em> resolver answers, not where your packets detour.</p>
+        </article>
+        <article class="card">
+          <h3><span class="num">02</span> Boost locks</h3>
+          <p>Wi-Fi low-latency mode plus a CPU wake lock while you play, so the
+          radio stops dozing between frames. Battery guidance included, honestly
+          labelled.</p>
+        </article>
+        <article class="card">
+          <h3><span class="num">03</span> Controller bridge</h3>
+          <p>PS4 / Xbox / V8 Bluetooth pads project presses as on-screen taps for
+          games with no controller support. Key events are consumed before the
+          game ever sees them.</p>
+        </article>
+      </div>
+      <p class="honesty">
+        <strong>What Kaya can't do:</strong> beat physics, fix your ISP's peering,
+        or add bandwidth. Everything else a "booster" promises is a VPN with
+        extra steps — Kaya just doesn't lie to you.
+      </p>
+    </section>
+
+    <!-- ================= download ================= -->
+    <section id="download" class="sheet dark">
+      <h2>Get Kaya</h2>
+      <div class="dl-grid">
+        <a class="dl" href="https://github.com/kayefande-droid/kaya/releases/latest/download/Kaya-arm64.apk">
+          <span class="dl-title">Kaya-arm64.apk</span>
+          <span class="dl-sub">recommended · ~18 MB · every phone since 2016</span>
+        </a>
+        <a class="dl" href="https://github.com/kayefande-droid/kaya/releases/latest/download/Kaya.apk">
+          <span class="dl-title">Kaya.apk</span>
+          <span class="dl-sub">universal · ~48 MB · older 32-bit devices</span>
+        </a>
+      </div>
+      <ol class="steps">
+        <li>Download the APK in Chrome — allow "install unknown apps" when asked.</li>
+        <li>If Play Protect asks, tap <strong>More details → Install anyway</strong>.</li>
+        <li>Open Kaya → tap <strong>BOOST</strong> → accept the VPN prompt once.</li>
+        <li>Tuning → <strong>Battery: Unrestricted</strong>. Then play.</li>
+      </ol>
+      <p class="fineprint">Permalinks always serve the newest release. Verify against
+      <a href="https://github.com/kayefande-droid/kaya/releases" target="_blank" rel="noopener">SHA256SUMS.txt</a> if you like.</p>
+    </section>
+
+    <!-- ================= faq ================= -->
+    <section class="sheet">
+      <h2>Questions people actually ask</h2>
+      <div class="faq">
+        <details open>
+          <summary>Is it really free? What's the catch?</summary>
+          <p>No catch, no ads, no accounts. It's open source — read every line
+          before you install it. That's the whole business model: there isn't one.</p>
+        </details>
+        <details>
+          <summary>Will this get me banned?</summary>
+          <p>Kaya changes how your phone <em>resolves names</em> and holds radio
+          locks. It doesn't inject, modify or read game traffic — the same class
+          of thing a custom DNS setting does. Still: always check your game's
+          current rules; some publishers are stricter than others.</p>
+        </details>
+        <details>
+          <summary>Why does Play Protect warn me?</summary>
+          <p>Because Kaya isn't distributed through the Play Store — Google shows
+          that card for every sideloaded app, even famous ones. The APK is signed
+          with Kaya's own key and checksummed per release.</p>
+        </details>
+        <details>
+          <summary>How much ping will I save?</summary>
+          <p>Honest answer: it depends on your ISP. Where the resolver chain
+          detours through Europe (common on some African carriers), the gain is
+          real and noticeable. Where your network already routes cleanly, expect
+          little. The app shows you measured numbers, not marketing ones.</p>
+        </details>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>
+      Kaya — hand-built for players who measure. ·
+      <a href="https://github.com/kayefande-droid/kaya" target="_blank" rel="noopener">GitHub</a> ·
+      <a href="https://github.com/kayefande-droid/kaya/releases" target="_blank" rel="noopener">Releases</a> ·
+      MIT licensed
+    </p>
+  </footer>
+</body>
+</html>
