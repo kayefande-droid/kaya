@@ -15,6 +15,9 @@ android/app/.cxx/
 *.jks
 *.keystore
 
+# Keep the Gradle wrapper jar — CI needs it to build without flutter create
+!android/gradle/wrapper/gradle-wrapper.jar
+
 # IDE
 .idea/
 *.iml

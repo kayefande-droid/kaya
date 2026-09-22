@@ -25,11 +25,6 @@ jobs:
           channel: stable
           cache: true
 
-      # Regenerates any missing android build files (wrapper jar, local.properties)
-      # without touching the hand-written sources we ship.
-      - name: Scaffold missing Flutter android files
-        run: flutter create . --platforms=android --org com.kaya --project-name kaya
-
       - run: flutter pub get
       - run: flutter analyze || true
       - run: flutter build apk --release
