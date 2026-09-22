@@ -1,7 +1,11 @@
 # Kaya ⚡ — the fast lane for mobile FPS
 
 <p align="center">
-  <img src="docs/kaya_flyer.svg" alt="Kaya — game booster app UI on phone mockups" width="760"/>
+  <img src="docs/kaya_logo.png" alt="Kaya logo" width="120"/>
+</p>
+
+<p align="center">
+  <img src="docs/kaya_flyer.png" alt="Kaya — game booster app UI on phone mockups" width="760"/>
 </p>
 
 > ### 📲 Download & Install

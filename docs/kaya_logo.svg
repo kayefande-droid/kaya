@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Kaya app logo: hand-cut shield + fast-lane K on obsidian -->
+  <rect width="512" height="512" rx="110" fill="#0A0A0C"/>
+  <path d="M256 84 L432 178 L432 334 L256 428 L80 334 L80 178 Z"
+        fill="#131318" stroke="#00E56A" stroke-width="11" stroke-linejoin="round"/>
+  <g stroke="#00E56A" stroke-width="23" stroke-linecap="round" fill="none">
+    <path d="M212 190 L212 322"/>
+    <path d="M212 256 L308 190"/>
+    <path d="M219 246 L317 322"/>
+  </g>
+  <g fill="#7DFFB2">
+    <circle cx="158" cy="152" r="8"/>
+    <circle cx="368" cy="162" r="7"/>
+    <circle cx="146" cy="338" r="7"/>
+    <circle cx="377" cy="352" r="8.5"/>
+    <circle cx="256" cy="120" r="5.5"/>
+    <circle cx="256" cy="392" r="6.5"/>
+  </g>
+  <path d="M182 366 L276 366" stroke="#00B354" stroke-width="10" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Kaya launcher foreground: hand-cut shield + fast-lane K, scaled to the
+     adaptive-icon safe zone (content inside the central 66dp circle). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- shield -->
+    <path
+        android:fillColor="#131318"
+        android:strokeColor="#00E56A"
+        android:strokeWidth="2.4"
+        android:pathData="M54,26 L82,41 L82,67 L54,82 L26,67 L26,41 Z" />
+
+    <!-- fast-lane K -->
+    <path
+        android:strokeColor="#00E56A"
+        android:strokeWidth="4.6"
+        android:strokeLineCap="round"
+        android:pathData="M43,38 L43,70" />
+    <path
+        android:strokeColor="#00E56A"
+        android:strokeWidth="4.6"
+        android:strokeLineCap="round"
+        android:pathData="M43,54 L63,38" />
+    <path
+        android:strokeColor="#00E56A"
+        android:strokeWidth="4.6"
+        android:strokeLineCap="round"
+        android:pathData="M44.5,52 L64,70" />
+
+    <!-- cheetah node dots (uneven on purpose) -->
+    <path
+        android:fillColor="#7DFFB2"
+        android:pathData="M33,34 m-1.6,0 a1.6,1.6 0 1,1 3.2,0 a1.6,1.6 0 1,1 -3.2,0" />
+    <path
+        android:fillColor="#7DFFB2"
+        android:pathData="M75,36 m-1.4,0 a1.4,1.4 0 1,1 2.8,0 a1.4,1.4 0 1,1 -2.8,0" />
+    <path
+        android:fillColor="#7DFFB2"
+        android:pathData="M31,70 m-1.4,0 a1.4,1.4 0 1,1 2.8,0 a1.4,1.4 0 1,1 -2.8,0" />
+    <path
+        android:fillColor="#7DFFB2"
+        android:pathData="M77,72 m-1.7,0 a1.7,1.7 0 1,1 3.4,0 a1.7,1.7 0 1,1 -3.4,0" />
+    <path
+        android:fillColor="#7DFFB2"
+        android:pathData="M54,29.5 m-1.1,0 a1.1,1.1 0 1,1 2.2,0 a1.1,1.1 0 1,1 -2.2,0" />
+    <path
+        android:fillColor="#7DFFB2"
+        android:pathData="M54,78 m-1.3,0 a1.3,1.3 0 1,1 2.6,0 a1.3,1.3 0 1,1 -2.6,0" />
+
+    <!-- speed tick -->
+    <path
+        android:strokeColor="#00B354"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M38,75.5 L57,75.5" />
+</vector>
