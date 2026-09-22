@@ -1,17 +1,36 @@
-services:
-  # Render Blueprint — deploy with: Render dashboard → New + → Blueprint →
-  # point it at github.com/kayefande-droid/kaya and it picks this file up.
-  - type: web
-    name: kaya-booster
-    runtime: static
-    rootDir: site
-    buildCommand: echo "static site - nothing to build"
-    staticPublishPath: .
-    headers:
-      - path: /*
-        name: X-Content-Type-Options
-        value: nosniff
-    routes:
-      - type: rewrite
-        source: /
-        destination: /index.html
+# Exported from Render on 2026-09-22T20:13:28Z
+version: "1"
+projects:
+- name: My project
+  environments:
+  - name: Production
+    services:
+    - type: web
+      name: CamAnime
+      runtime: python
+      repo: https://github.com/kayefande-droid/CamAnime
+      plan: free
+      region: oregon
+      buildCommand: pip install -r requirements.txt
+      startCommand: gunicorn app:app
+      autoDeployTrigger: "off"
+    - type: web
+      name: la-maliva-vista-hotel
+      runtime: python
+      repo: https://github.com/kayefande-droid/la-maliva-vista-hotel
+      plan: free
+      envVars:
+      - key: MAIL_FROM
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PORT
+        sync: false
+      - key: SMTP_HOST
+        sync: false
+      region: oregon
+      buildCommand: '    pip install -r requirements_render.txt     '
+      startCommand: gunicorn app:app
+      autoDeployTrigger: commit
