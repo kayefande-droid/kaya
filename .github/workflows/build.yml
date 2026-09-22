@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "17"
@@ -26,21 +26,69 @@ jobs:
           flutter-version: 3.44.0 # pinned: verified locally against Gradle 8.7 + AGP 8.6.1
           cache: true
 
+      # Restore the real release signing key from repo secrets when present.
+      # Without it the build falls back to debug signing (still installs fine).
+      - name: Restore release signing key
+        env:
+          KAYA_KEYSTORE_B64: ${{ secrets.KAYA_KEYSTORE_B64 }}
+          KAYA_STORE_PASS: ${{ secrets.KAYA_STORE_PASS }}
+          KAYA_KEY_PASS: ${{ secrets.KAYA_KEY_PASS }}
+        run: |
+          if [ -n "$KAYA_KEYSTORE_B64" ]; then
+            echo "$KAYA_KEYSTORE_B64" | base64 -d > android/app/kaya-release.jks
+            printf 'storePassword=%s\nkeyPassword=%s\nkeyAlias=kaya\nstoreFile=kaya-release.jks\n' \
+              "${KAYA_STORE_PASS:-kayaboost2026}" "${KAYA_KEY_PASS:-kayaboost2026}" > android/key.properties
+            echo "signed release build: yes"
+          else
+            echo "signed release build: no (debug fallback)"
+          fi
+
       - run: flutter pub get
       - run: flutter analyze || true
+
+      # Universal APK (every device) — the default download.
       - run: flutter build apk --release
 
-      - name: Rename artifact
-        run: cp build/app/outputs/flutter-apk/app-release.apk Kaya.apk
+      # Per-ABI APKs — arm64 is ~60% smaller and downloads much faster.
+      - run: flutter build apk --release --split-per-abi
+
+      - name: Collect artifacts + checksums
+        run: |
+          cp build/app/outputs/flutter-apk/app-release.apk Kaya.apk
+          cp build/app/outputs/flutter-apk/app-arm64-v8a-release.apk Kaya-arm64.apk
+          sha256sum Kaya.apk Kaya-arm64.apk > SHA256SUMS.txt
+          ls -la Kaya.apk Kaya-arm64.apk
 
       - uses: actions/upload-artifact@v4
         with:
           name: Kaya-apk
-          path: Kaya.apk
+          path: |
+            Kaya.apk
+            Kaya-arm64.apk
+            SHA256SUMS.txt
 
-      - name: Attach APK to GitHub Release (tag pushes)
+      - name: Publish to GitHub Releases (tag pushes)
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
-          files: Kaya.apk
+          files: |
+            Kaya.apk
+            Kaya-arm64.apk
+            SHA256SUMS.txt
           tag_name: ${{ github.ref_name }}
+          body: |
+            ## ⚡ Kaya ${{ github.ref_name }}
+
+            **Which download?**
+            - `Kaya-arm64.apk` — **recommended**: ~60% smaller & much faster to download (every phone sold since ~2016)
+            - `Kaya.apk` — universal fallback (older 32-bit devices)
+
+            **Install:** download → open → allow "install unknown apps" for your browser when asked.
+            First launch: tap **BOOST** → accept the VPN prompt once → Tuning → Battery: Unrestricted.
+
+            **Play Protect note:** Kaya is an open-source booster you built/installed outside the Play Store.
+            If Play Protect shows an "unknown developer" prompt, tap **More details → Install anyway**.
+            Verify the file against `SHA256SUMS.txt` if you want to be certain.
+
+            Zero servers. Zero accounts. The DNS engine runs on your device.
+          fail_on_unmatched_files: true

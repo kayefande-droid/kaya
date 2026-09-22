@@ -9,7 +9,11 @@
 </p>
 
 > ### 📲 Download & Install
-> **[⬇️ Download the latest Kaya APK](https://github.com/kayefande-droid/kaya/releases/latest/download/Kaya.apk)** — direct from GitHub Releases, no ads, no accounts, no tracking.
+> **[⬇️ Kaya-arm64.apk — recommended (small & fast)](https://github.com/kayefande-droid/kaya/releases/latest/download/Kaya-arm64.apk)** · [⬇️ Kaya.apk — universal](https://github.com/kayefande-droid/kaya/releases/latest/download/Kaya.apk)
+>
+> Direct from GitHub Releases — no ads, no accounts, no tracking. arm64 works on every phone sold since ~2016; the universal APK covers older 32-bit devices. SHA-256 checksums ship alongside each release (`SHA256SUMS.txt`).
+>
+> **Play Protect:** since Kaya installs outside the Play Store, Android may show an "unknown developer" prompt — tap **More details → Install anyway**. The APK is signed with Kaya's own release key.
 >
 > After installing: allow the **one-time VPN consent**, then set **Battery → Unrestricted** for Kaya (the Tuning screen walks you through it).
 
