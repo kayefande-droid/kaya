@@ -1,0 +1,50 @@
+name: Build Kaya APK
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      # Regenerates any missing android build files (wrapper jar, local.properties)
+      # without touching the hand-written sources we ship.
+      - name: Scaffold missing Flutter android files
+        run: flutter create . --platforms=android --org com.kaya --project-name kaya
+
+      - run: flutter pub get
+      - run: flutter analyze || true
+      - run: flutter build apk --release
+
+      - name: Rename artifact
+        run: cp build/app/outputs/flutter-apk/app-release.apk Kaya.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Kaya-apk
+          path: Kaya.apk
+
+      - name: Attach APK to GitHub Release (tag pushes)
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: Kaya.apk
+          tag_name: ${{ github.ref_name }}

@@ -1,0 +1,175 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1500" font-family="Segoe UI, Montserrat, Arial, sans-serif">
+  <!-- ============ KAYA phone-mockup flyer (hand-designed, no photos) ============ -->
+  <!-- top panel: warm cream, bottom panel: light mint, matching the studio style -->
+  <rect x="0" y="0" width="1200" height="750" rx="56" fill="#FBE9D0"/>
+  <rect x="0" y="735" width="1200" height="765" rx="56" fill="#CFE8DF"/>
+
+  <!-- hand-drawn doodles -->
+  <g stroke="#E08A3C" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.65">
+    <path d="M70 120 l26 -18 8 26 22 -30"/>
+    <circle cx="150" cy="96" r="7"/>
+  </g>
+  <g stroke="#3E8F72" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.6">
+    <path d="M980 1400 l30 -20 10 28 24 -34"/>
+    <circle cx="1060" cy="1372" r="7"/>
+  </g>
+  <text x="84" y="196" font-size="30" font-weight="800" fill="#0A0A0C" opacity="0.85" letter-spacing="2">KAYA · GAME BOOSTER</text>
+  <text x="86" y="232" font-size="17" fill="#7A5A34" letter-spacing="1">the fast lane for mobile FPS — drawn, built &amp; shipped by one hand</text>
+
+  <!-- ================= PHONE 1 (back, left, tilted) : HOME DASHBOARD ================= -->
+  <g transform="translate(120,300) rotate(-6)">
+    <rect x="-14" y="-14" width="380" height="780" rx="56" fill="#4A4A52"/>
+    <rect x="0" y="0" width="352" height="752" rx="46" fill="#0A0A0C"/>
+    <rect x="0" y="0" width="352" height="752" rx="46" fill="none" stroke="#2A2A32" stroke-width="2"/>
+    <!-- status bar -->
+    <text x="26" y="40" fill="#F4F6F4" font-size="17" font-weight="700">9:41</text>
+    <rect x="132" y="18" width="88" height="26" rx="13" fill="#15151B"/>
+    <circle cx="150" cy="31" r="3" fill="#00E56A"/><circle cx="164" cy="31" r="3" fill="#00E56A"/><circle cx="178" cy="31" r="3" fill="#3A3A44"/>
+    <rect x="288" y="24" width="20" height="12" rx="3" fill="#F4F6F4"/>
+    <rect x="314" y="22" width="7" height="16" rx="2" fill="#F4F6F4"/>
+    <!-- header -->
+    <g transform="translate(26,64)">
+      <path d="M12 2 L38 15 L38 44 L12 57 L-14 44 L-14 15 Z" fill="#131318" stroke="#00E56A" stroke-width="2.4"/>
+      <path d="M4 20 L4 40 M4 30 L16 20 M5 29 L17 40" stroke="#00E56A" stroke-width="3.4" stroke-linecap="round" fill="none"/>
+      <circle cx="26" cy="10" r="2.4" fill="#7DFFB2"/><circle cx="-2" cy="14" r="2" fill="#7DFFB2"/>
+      <text x="52" y="24" fill="#F4F6F4" font-size="22" font-weight="900" letter-spacing="4">KAYA</text>
+      <text x="52" y="42" fill="#5C6360" font-size="10" letter-spacing="2.5">FAST LANE</text>
+    </g>
+    <!-- status pill -->
+    <rect x="238" y="70" width="88" height="26" rx="13" fill="#00E56A" opacity="0.16" stroke="#00E56A"/>
+    <circle cx="252" cy="83" r="4" fill="#00E56A"/>
+    <text x="262" y="88" fill="#00E56A" font-size="10" font-weight="800" letter-spacing="1.5">FAST LANE</text>
+
+    <!-- boost pulse button -->
+    <circle cx="176" cy="238" r="88" fill="#131318" stroke="#00E56A" stroke-width="3"/>
+    <circle cx="176" cy="238" r="102" fill="none" stroke="#00E56A" stroke-width="2" opacity="0.35"/>
+    <circle cx="176" cy="238" r="116" fill="none" stroke="#00E56A" stroke-width="1.2" opacity="0.16"/>
+    <circle cx="176" cy="238" r="130" fill="none" stroke="#00E56A" stroke-width="0.8" opacity="0.07"/>
+    <!-- bolt -->
+    <path d="M186 190 L162 244 L178 244 L170 286 L196 232 L180 232 Z" fill="#00E56A"/>
+    <text x="176" y="312" fill="#7DFFB2" font-size="13" font-weight="800" letter-spacing="2" text-anchor="middle">FAST LANE LIVE</text>
+
+    <!-- ping chips -->
+    <g font-weight="800">
+      <rect x="30" y="352" width="86" height="30" rx="10" fill="#00E56A" opacity="0.14" stroke="#00E56A"/>
+      <text x="73" y="372" fill="#00E56A" font-size="13" text-anchor="middle">18 ms</text>
+      <rect x="124" y="352" width="86" height="30" rx="10" fill="#7DFFB2" opacity="0.12" stroke="#7DFFB2"/>
+      <text x="167" y="372" fill="#7DFFB2" font-size="13" text-anchor="middle">34 ms</text>
+      <rect x="218" y="352" width="86" height="30" rx="10" fill="#FFC24B" opacity="0.12" stroke="#FFC24B"/>
+      <text x="261" y="372" fill="#FFC24B" font-size="13" text-anchor="middle">112 ms</text>
+    </g>
+
+    <!-- live latency card -->
+    <rect x="26" y="402" width="300" height="92" rx="18" fill="#131318" stroke="#26262F"/>
+    <text x="44" y="426" fill="#5C6360" font-size="10" font-weight="800" letter-spacing="2">LIVE LATENCY</text>
+    <polyline points="44,478 68,466 92,472 116,452 140,460 164,444 188,452 212,438 236,446 260,430 284,440 308,426"
+      fill="none" stroke="#00E56A" stroke-width="2.6" stroke-linecap="round"/>
+    <polygon points="44,478 68,466 92,472 116,452 140,460 164,444 188,452 212,438 236,446 260,430 284,440 308,426 308,482 44,482"
+      fill="#00E56A" opacity="0.12"/>
+
+    <!-- dns feed rows -->
+    <rect x="26" y="508" width="300" height="44" rx="14" fill="#1C1C24" stroke="#00E56A" opacity="0.9"/>
+    <text x="44" y="536" fill="#F4F6F4" font-size="13" font-weight="600">codm.activision.com</text>
+    <text x="308" y="536" fill="#00E56A" font-size="12" text-anchor="end">Cloudflare</text>
+    <rect x="26" y="560" width="300" height="44" rx="14" fill="#131318" stroke="#26262F"/>
+    <text x="44" y="588" fill="#9BA3A0" font-size="13" font-weight="600">pubgmobile.com</text>
+    <text x="308" y="588" fill="#7DFFB2" font-size="12" text-anchor="end">Quad9</text>
+
+    <!-- bottom nav -->
+    <rect x="26" y="668" width="300" height="58" rx="20" fill="#131318" stroke="#26262F"/>
+    <path d="M64 684 l6 12 -8 0 10 14 -14 -10 7 0 -8 -14 Z" fill="#00E56A"/>
+    <rect x="140" y="688" width="14" height="14" rx="3" fill="#3A3A44"/>
+    <rect x="160" y="688" width="14" height="14" rx="3" fill="#3A3A44"/>
+    <rect x="140" y="708" width="14" height="14" rx="3" fill="#3A3A44"/>
+    <rect x="160" y="708" width="14" height="14" rx="3" fill="#3A3A44"/>
+    <circle cx="242" cy="697" r="7" fill="none" stroke="#3A3A44" stroke-width="2.4"/>
+    <circle cx="242" cy="697" r="13" fill="none" stroke="#3A3A44" stroke-width="1.4" opacity="0.6"/>
+    <g stroke="#3A3A44" stroke-width="2.4" stroke-linecap="round">
+      <path d="M300 692 l14 0 M300 702 l9 0"/>
+    </g>
+  </g>
+
+  <!-- ================= PHONE 2 (front, right, tilted other way) : GAMES + CONTROLLER ================= -->
+  <g transform="translate(620,820) rotate(5)">
+    <rect x="-14" y="-14" width="380" height="780" rx="56" fill="#3A3A42"/>
+    <rect x="0" y="0" width="352" height="752" rx="46" fill="#0A0A0C"/>
+    <rect x="0" y="0" width="352" height="752" rx="46" fill="none" stroke="#2A2A32" stroke-width="2"/>
+    <text x="26" y="40" fill="#F4F6F4" font-size="17" font-weight="700">9:41</text>
+    <rect x="132" y="18" width="88" height="26" rx="13" fill="#15151B"/>
+    <rect x="288" y="24" width="20" height="12" rx="3" fill="#F4F6F4"/>
+    <rect x="314" y="22" width="7" height="16" rx="2" fill="#F4F6F4"/>
+    <text x="26" y="86" fill="#F4F6F4" font-size="24" font-weight="900" letter-spacing="1">Games</text>
+    <rect x="26" y="104" width="300" height="36" rx="12" fill="#1C1C24"/>
+    <circle cx="48" cy="122" r="7" fill="none" stroke="#5C6360" stroke-width="2.4"/>
+    <path d="M53 127 l7 7" stroke="#5C6360" stroke-width="2.4" stroke-linecap="round"/>
+    <text x="70" y="128" fill="#5C6360" font-size="13">Search installed apps</text>
+
+    <!-- game cards -->
+    <g>
+      <rect x="26" y="158" width="222" height="96" rx="18" fill="#131318" stroke="#26262F"/>
+      <rect x="42" y="174" width="44" height="44" rx="12" fill="#1C1C24"/>
+      <text x="64" y="204" fill="#00E56A" font-size="20" font-weight="900" text-anchor="middle">C</text>
+      <text x="100" y="192" fill="#F4F6F4" font-size="14" font-weight="700">COD Mobile</text>
+      <text x="100" y="212" fill="#5C6360" font-size="11">FPS · matched in SA</text>
+      <rect x="42" y="224" width="70" height="22" rx="8" fill="#00E56A" opacity="0.16" stroke="#00E56A"/>
+      <path d="M52 228 l-4 8 4 0 -3 7 8 -9 -4 0 3 -6 Z" fill="#00E56A"/>
+      <text x="64" y="239" fill="#00E56A" font-size="10" font-weight="800">BOOSTED</text>
+      <circle cx="222" cy="230" r="18" fill="#00E56A"/>
+      <path d="M217 222 l-6 8 4 0 -2 8 8 -10 -4 0 3 -6 Z" fill="#0A0A0C"/>
+
+      <rect x="26" y="266" width="222" height="96" rx="18" fill="#131318" stroke="#26262F"/>
+      <rect x="42" y="282" width="44" height="44" rx="12" fill="#1C1C24"/>
+      <text x="64" y="312" fill="#FFC24B" font-size="20" font-weight="900" text-anchor="middle">P</text>
+      <text x="100" y="300" fill="#F4F6F4" font-size="14" font-weight="700">PUBG Mobile</text>
+      <text x="100" y="320" fill="#5C6360" font-size="11">Battle royale</text>
+      <rect x="42" y="332" width="52" height="22" rx="8" fill="#1C1C24" stroke="#26262F"/>
+      <path d="M52 336 l-4 8 4 0 -3 7 8 -9 -4 0 3 -6 Z" fill="#9BA3A0"/>
+      <text x="64" y="347" fill="#9BA3A0" font-size="10" font-weight="800">BOOST</text>
+      <circle cx="222" cy="338" r="18" fill="#00E56A"/>
+      <path d="M217 330 l-6 8 4 0 -2 8 8 -10 -4 0 3 -6 Z" fill="#0A0A0C"/>
+    </g>
+
+    <!-- controller bridge card -->
+    <rect x="26" y="378" width="300" height="150" rx="18" fill="#131318" stroke="#26262F"/>
+    <text x="44" y="404" fill="#F4F6F4" font-size="14" font-weight="800">Controller bridge</text>
+    <rect x="44" y="418" width="120" height="42" rx="10" fill="#1C1C24"/>
+    <text x="58" y="436" fill="#9BA3A0" font-size="11" font-weight="700">DUALSHOCK 4</text>
+    <circle cx="60" cy="450" r="6" fill="#00E56A"/><circle cx="76" cy="450" r="6" fill="#00E56A"/>
+    <rect x="84" y="446" width="14" height="7" rx="2" fill="#00E56A"/>
+    <rect x="180" y="418" width="120" height="42" rx="10" fill="#1C1C24"/>
+    <text x="194" y="436" fill="#9BA3A0" font-size="11" font-weight="700">XBOX WIRELESS</text>
+    <circle cx="196" cy="450" r="6" fill="#00E56A"/><circle cx="212" cy="450" r="6" fill="#00E56A"/>
+    <rect x="220" y="446" width="14" height="7" rx="2" fill="#00E56A"/>
+    <text x="44" y="484" fill="#5C6360" font-size="11">Presses projected as taps for games</text>
+    <text x="44" y="500" fill="#5C6360" font-size="11">without native controller support.</text>
+    <text x="44" y="516" fill="#7DFFB2" font-size="11" font-weight="800">BRIDGE ARMED ✓</text>
+
+    <!-- stats strip -->
+    <rect x="26" y="544" width="300" height="72" rx="18" fill="#131318" stroke="#26262F"/>
+    <text x="44" y="570" fill="#5C6360" font-size="9.5" font-weight="800" letter-spacing="1.5">PACKETS RELAYED</text>
+    <text x="44" y="596" fill="#F4F6F4" font-size="20" font-weight="900">48,211</text>
+    <text x="196" y="570" fill="#5C6360" font-size="9.5" font-weight="800" letter-spacing="1.5">DNS STEERED</text>
+    <text x="196" y="596" fill="#00E56A" font-size="20" font-weight="900">126</text>
+
+    <!-- bottom nav -->
+    <rect x="26" y="668" width="300" height="58" rx="20" fill="#131318" stroke="#26262F"/>
+    <path d="M64 684 l6 12 -8 0 10 14 -14 -10 7 0 -8 -14 Z" fill="#3A3A44"/>
+    <rect x="140" y="688" width="14" height="14" rx="3" fill="#00E56A"/>
+    <rect x="160" y="688" width="14" height="14" rx="3" fill="#3A3A44"/>
+    <rect x="140" y="708" width="14" height="14" rx="3" fill="#3A3A44"/>
+    <rect x="160" y="708" width="14" height="14" rx="3" fill="#3A3A44"/>
+    <circle cx="242" cy="697" r="7" fill="#00E56A"/>
+    <circle cx="242" cy="697" r="13" fill="none" stroke="#00E56A" stroke-width="1.4" opacity="0.4"/>
+    <g stroke="#3A3A44" stroke-width="2.4" stroke-linecap="round">
+      <path d="M300 692 l14 0 M300 702 l9 0"/>
+    </g>
+  </g>
+
+  <!-- caption chips -->
+  <g>
+    <rect x="560" y="240" width="270" height="44" rx="22" fill="#0A0A0C"/>
+    <text x="695" y="268" fill="#FBE9D0" font-size="15" font-weight="800" text-anchor="middle" letter-spacing="1">ONE TAP. WHOLE NEW ROUTE.</text>
+    <rect x="60" y="1150" width="250" height="44" rx="22" fill="#0A0A0C"/>
+    <text x="185" y="1178" fill="#CFE8DF" font-size="15" font-weight="800" text-anchor="middle" letter-spacing="1">ZERO SERVERS. ZERO MS ADDED.</text>
+  </g>
+</svg>

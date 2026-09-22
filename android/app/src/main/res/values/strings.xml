@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Kaya</string>
+    <string name="tile_label">Kaya Boost</string>
+    <string name="accessibility_label">Kaya Controller Mapping</string>
+    <string name="notif_channel_boost">Kaya Boost</string>
+    <string name="notif_channel_vpn">Kaya Fast Lane</string>
+    <string name="notif_boost_title">Kaya Boost Active</string>
+    <string name="notif_boost_text">Holding Wi-Fi at full performance. Tap to stop.</string>
+    <string name="notif_vpn_title">Kaya Fast Lane Active</string>
+    <string name="notif_vpn_text">Smart DNS steering is on. Tap to stop.</string>
+</resources>

@@ -1,0 +1,10 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  errors:
+    avoid_print: ignore
+
+linter:
+  rules:
+    prefer_const_constructors: true
+    avoid_unnecessary_containers: true
