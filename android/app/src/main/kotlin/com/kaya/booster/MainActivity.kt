@@ -144,6 +144,24 @@ class MainActivity : FlutterActivity() {
                     KayaMediaButtonService.stop(this)
                     finishOnMain(result) { true }
                 }
+                "getAppIcon" -> {
+                    val pkg = call.argument<String>("package") ?: ""
+                    bg.execute {
+                        val bytes = runCatching {
+                            val drawable = packageManager.getApplicationIcon(pkg)
+                            val bmp = android.graphics.Bitmap.createBitmap(
+                                96, 96, android.graphics.Bitmap.Config.ARGB_8888,
+                            )
+                            val canvas = android.graphics.Canvas(bmp)
+                            drawable.setBounds(0, 0, 96, 96)
+                            drawable.draw(canvas)
+                            val stream = java.io.ByteArrayOutputStream()
+                            bmp.compress(android.graphics.Bitmap.CompressFormat.PNG, 90, stream)
+                            stream.toByteArray()
+                        }.getOrNull()
+                        runOnUiThread { result.success(bytes) }
+                    }
+                }
                 "pingProbe" -> {
                     val host = call.argument<String>("host") ?: return@setMethodCallHandler
                     val port = call.argument<Int>("port") ?: 80

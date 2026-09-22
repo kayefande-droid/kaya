@@ -54,6 +54,10 @@ class KayaBridge {
         .toList();
   }
 
+  /// Convenience accessor used by widgets outside the main screens.
+  static KayaBridge get shared => _shared;
+  static final KayaBridge _shared = KayaBridge();
+
   Future<bool> launchApp(String packageName) async =>
       await _invoke<bool>('launchApp', {'package': packageName}) ?? false;
 
@@ -102,6 +106,9 @@ class KayaBridge {
       await _invoke<bool>('controllerBridgeStop') ?? false;
 
   // ---- probes ----------------------------------------------------------------
+  Future<Uint8List?> getAppIcon(String packageName) async =>
+      _invoke<Uint8List>('getAppIcon', {'package': packageName});
+
   Future<int?> pingProbe(String host, int port) async =>
       _invoke<int>('pingProbe', {'host': host, 'port': port});
   Future<int?> dnsProbe(String server, String domain) async =>

@@ -100,7 +100,7 @@ class KayaBoostService : Service() {
         return Notification.Builder(this, MainApplication.CHANNEL_BOOST)
             .setContentTitle(title)
             .setContentText(text)
-            .setSmallIcon(R.drawable.ic_kaya_tile)
+            .setSmallIcon(R.drawable.ic_notif_kaya) // plain PNG: safe on every OEM
             .setOngoing(true)
             .setContentIntent(open)
             .addAction(Notification.Action.Builder(null, "Stop", stop).build())

@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 
 import 'native/kaya_bridge.dart';
 import 'state/app_state.dart';
+import 'state/theme_state.dart';
 import 'ui/games_screen.dart';
 import 'ui/home_screen.dart';
-import 'ui/kaya_logo.dart';
+import 'ui/kaya_backdrop.dart';
 import 'ui/network_screen.dart';
 import 'ui/theme.dart';
 import 'ui/tuning_screen.dart';
@@ -19,14 +20,22 @@ class KayaApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Kaya',
-      debugShowCheckedModeBanner: false,
-      theme: KayaTheme.dark(),
-      home: const KayaShell(),
+    return AnimatedBuilder(
+      animation: themeState,
+      builder: (context, _) {
+        return MaterialApp(
+          title: 'Kaya',
+          debugShowCheckedModeBanner: false,
+          theme: KayaTheme.dark(accent: themeState.accent),
+          home: const KayaShell(),
+        );
+      },
     );
   }
 }
+
+/// Global theme state (single-shell app; a ChangeNotifier is plenty).
+final ThemeState themeState = ThemeState();
 
 class KayaShell extends StatefulWidget {
   const KayaShell({super.key});
@@ -36,8 +45,15 @@ class KayaShell extends StatefulWidget {
 }
 
 class _KayaShellState extends State<KayaShell> {
-  late final AppState state = AppState(KayaBridge())..loadLibrary();
+  late final AppState state = AppState(KayaBridge.shared)..loadLibrary();
   int _tab = 0;
+
+  static const _destinations = [
+    (Icons.bolt_rounded, 'Boost'),
+    (Icons.sports_esports_rounded, 'Games'),
+    (Icons.lan_rounded, 'Network'),
+    (Icons.tune_rounded, 'Tuning'),
+  ];
 
   @override
   void dispose() {
@@ -47,58 +63,117 @@ class _KayaShellState extends State<KayaShell> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: AnimatedBuilder(
-        animation: state,
-        builder: (context, _) {
-          return IndexedStack(
-            index: _tab,
-            children: [
-              HomeScreen(
-                state: state,
-                onOpenLibrary: () => setState(() => _tab = 1),
+    return AnimatedBuilder(
+      animation: Listenable.merge([state, themeState]),
+      builder: (context, _) {
+        final active = state.engineOn || state.boostOn;
+        return Scaffold(
+          extendBody: true,
+          backgroundColor: Colors.transparent,
+          body: KayaBackdrop(
+            accent: themeState.accent,
+            boostActive: active,
+            child: SafeArea(
+              bottom: false,
+              child: IndexedStack(
+                index: _tab,
+                children: [
+                  HomeScreen(state: state, onOpenLibrary: () => setState(() => _tab = 1)),
+                  GamesScreen(state: state),
+                  NetworkScreen(state: state),
+                  TuningScreen(state: state),
+                ],
               ),
-              GamesScreen(state: state),
-              NetworkScreen(state: state),
-              TuningScreen(state: state),
-            ],
-          );
-        },
-      ),
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: _tab,
-        onDestinationSelected: (i) => setState(() => _tab = i),
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.bolt_rounded),
-            selectedIcon: Icon(Icons.bolt_rounded),
-            label: 'Boost',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.sports_esports_rounded),
-            selectedIcon: Icon(Icons.sports_esports_rounded),
-            label: 'Games',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.lan_rounded),
-            selectedIcon: Icon(Icons.lan_rounded),
-            label: 'Network',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.tune_rounded),
-            selectedIcon: Icon(Icons.tune_rounded),
-            label: 'Tuning',
-          ),
-        ],
-      ),
-      floatingActionButton: _tab == 0
-          ? null
-          : FloatingActionButton(
-              backgroundColor: KayaColors.slate,
-              foregroundColor: KayaColors.lane,
-              onPressed: () => setState(() => _tab = 0),
-              child: const KayaLogo(size: 30),
             ),
+          ),
+          bottomNavigationBar: NavigationBar(
+            selectedIndex: _tab,
+            onDestinationSelected: (i) => setState(() => _tab = i),
+            backgroundColor: KayaColors.charcoal.withValues(alpha: 0.96),
+            destinations: [
+              for (final (icon, label) in _destinations)
+                NavigationDestination(
+                  icon: Icon(icon),
+                  selectedIcon: Icon(icon),
+                  label: label,
+                ),
+            ],
+          ),
+          endDrawer: Drawer(
+            backgroundColor: KayaColors.charcoal,
+            width: 300,
+            child: SafeArea(
+              child: ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                    child: Text(
+                      'THEME',
+                      style: TextStyle(
+                        color: KayaColors.inkFaint,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 2,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                  for (final option in AccentOption.values)
+                    ListTile(
+                      leading: Container(
+                        width: 28,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: option.accent,
+                          border: Border.all(
+                            color: themeState.option == option
+                                ? KayaColors.ink
+                                : Colors.transparent,
+                            width: 2.5,
+                          ),
+                        ),
+                      ),
+                      title: Text(option.label),
+                      trailing: themeState.option == option
+                          ? const Icon(Icons.check_rounded, color: KayaColors.ink)
+                          : null,
+                      onTap: () {
+                        themeState.option = option;
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  const Divider(height: 32),
+                  ListTile(
+                    leading: const Icon(Icons.open_in_new_rounded),
+                    title: const Text('Project website'),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      state.bridge.toast('Open kaya-booster.onrender.com in your browser');
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.verified_user_rounded),
+                    title: const Text('Safety & checksums'),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      state.bridge.toast('SHA256SUMS.txt ships with every GitHub release');
+                    },
+                  ),
+                  const AboutListTile(
+                    icon: Icon(Icons.info_outline_rounded),
+                    applicationName: 'Kaya',
+                    applicationVersion: '1.0.3',
+                    aboutBoxChildren: [
+                      Text('Zero servers. Zero accounts. Hand-built.'),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 
 import '../native/kaya_bridge.dart';
 import '../state/app_state.dart';
+import '../widgets/app_icon.dart';
 import 'theme.dart';
 import 'widgets.dart';
 
@@ -123,23 +124,7 @@ class _GameCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Container(
-                  width: 38,
-                  height: 38,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: KayaColors.slate,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    app.label.isEmpty ? '?' : app.label[0].toUpperCase(),
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w900,
-                      color: KayaColors.laneSoft,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
+                AppIcon(packageName: app.packageName, label: app.label, size: 40),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(

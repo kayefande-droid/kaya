@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
+  <!-- notification icon: white fast-lane K, alpha only -->
+  <g stroke="#FFFFFF" stroke-width="9" stroke-linecap="round" fill="none">
+    <path d="M32 22 L32 74"/>
+    <path d="M32 48 L62 22"/>
+    <path d="M35 45 L65 74"/>
+  </g>
+</svg>

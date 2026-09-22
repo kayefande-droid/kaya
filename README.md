@@ -1,15 +1,15 @@
 # Kaya — the fast lane for mobile FPS
 
 <p align="center">
-  <img src="docs/brand/kaya_logo_v2.png" alt="Kaya logo — hand-carved ink mark" width="130"/>
+  <img src="docs/brand/kaya_logo_v3.png" alt="Kaya logo — engineered shield and K monogram" width="130"/>
 </p>
 
 <p align="center">
-  <em>drawn by hand, printed slightly off-register — like all good posters</em>
+  <strong>created by <a href="https://github.com/kayefande-droid">kayefande</a></strong>
 </p>
 
 <p align="center">
-  <img src="docs/brand/kaya_flyer_v2.png" alt="Kaya gig-poster flyer: two inked phone mockups on torn paper" width="760"/>
+  <img src="docs/brand/kaya_flyer_v3.png" alt="Kaya flyer: studio product shot of a phone running the real Kaya app UI" width="760"/>
 </p>
 
 > 🌍 **Website:** the landing page lives in [`site/`](site/index.html) and deploys on Render via the included `render.yaml` blueprint — see [Deploying the website](#deploying-the-website) below.
@@ -27,6 +27,8 @@
 **Kaya** is a game booster & launcher for Android, built for mobile FPS players
 (CODM, PUBG Mobile, Free Fire…) who want lower matchmaking latency — with
 **zero servers, zero accounts, zero subscriptions**.
+
+> Built with taste by **kayefande** — no templates, no generated filler.
 
 It is a **Flutter app with a hand-written native Android core**: a real
 `VpnService`-based DNS steering engine, Wi-Fi low-latency locks, a background

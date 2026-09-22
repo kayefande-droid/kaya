@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 /// Kaya's hand-tuned visual identity.
 ///
-/// Dark obsidian surfaces, one neon "fast lane" green, hand-drawn feeling
+/// Dark obsidian surfaces, one neon "fast lane" accent, hand-drawn feeling
 /// shapes (soft corners, thin strokes, dotted trims) — designed to feel like
 /// it came off a sketchbook, not a template.
 abstract final class KayaColors {
@@ -10,7 +10,7 @@ abstract final class KayaColors {
   static const charcoal = Color(0xFF131318);
   static const slate = Color(0xFF1C1C24);
   static const hairline = Color(0xFF26262F);
-  static const lane = Color(0xFF00E56A); // the fast-lane green
+  static const lane = Color(0xFF00E56A); // default fast-lane accent
   static const laneSoft = Color(0xFF7DFFB2);
   static const laneDeep = Color(0xFF00B354);
   static const ink = Color(0xFFF4F6F4);
@@ -28,13 +28,14 @@ abstract final class KayaRadius {
 }
 
 class KayaTheme {
-  static ThemeData dark() {
+  /// Builds the dark theme around a swappable accent color.
+  static ThemeData dark({Color accent = KayaColors.lane}) {
     final base = ThemeData.dark(useMaterial3: true);
     return base.copyWith(
       scaffoldBackgroundColor: KayaColors.obsidian,
       colorScheme: base.colorScheme.copyWith(
-        primary: KayaColors.lane,
-        secondary: KayaColors.laneSoft,
+        primary: accent,
+        secondary: accent.withValues(alpha: 0.7),
         surface: KayaColors.charcoal,
         onSurface: KayaColors.ink,
         error: KayaColors.hot,
@@ -53,18 +54,18 @@ class KayaTheme {
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: KayaColors.charcoal,
-        indicatorColor: KayaColors.lane.withValues(alpha: 0.16),
+        indicatorColor: accent.withValues(alpha: 0.16),
         height: 64,
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         iconTheme: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
-            return const IconThemeData(color: KayaColors.lane);
+            return IconThemeData(color: accent);
           }
           return const IconThemeData(color: KayaColors.inkFaint);
         }),
         labelTextStyle: WidgetStateProperty.resolveWith((states) {
           final color =
-              states.contains(WidgetState.selected) ? KayaColors.lane : KayaColors.inkFaint;
+              states.contains(WidgetState.selected) ? accent : KayaColors.inkFaint;
           return TextStyle(
             fontSize: 11.5,
             fontWeight: FontWeight.w600,
@@ -82,9 +83,9 @@ class KayaTheme {
         ),
       ),
       dividerTheme: const DividerThemeData(color: KayaColors.hairline, thickness: 1),
-      sliderTheme: const SliderThemeData(
-        activeTrackColor: KayaColors.lane,
-        thumbColor: KayaColors.laneSoft,
+      sliderTheme: SliderThemeData(
+        activeTrackColor: accent,
+        thumbColor: accent.withValues(alpha: 0.8),
         inactiveTrackColor: KayaColors.slate,
       ),
       switchTheme: SwitchThemeData(
@@ -92,7 +93,7 @@ class KayaTheme {
           (s) => s.contains(WidgetState.selected) ? KayaColors.obsidian : KayaColors.inkDim,
         ),
         trackColor: WidgetStateProperty.resolveWith(
-          (s) => s.contains(WidgetState.selected) ? KayaColors.lane : KayaColors.slate,
+          (s) => s.contains(WidgetState.selected) ? accent : KayaColors.slate,
         ),
       ),
       snackBarTheme: SnackBarThemeData(

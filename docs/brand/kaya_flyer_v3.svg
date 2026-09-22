@@ -1,0 +1,318 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1500" font-family="'Segoe UI', Inter, system-ui, sans-serif">
+  <!-- ============================================================
+       KAYA flyer v3 — studio product shot.
+       One phone, real app UI, restrained type. Designed, not decorated.
+       ============================================================ -->
+  <defs>
+    <!-- backdrop -->
+    <radialGradient id="bgGlow" cx="62%" cy="34%" r="75%">
+      <stop offset="0%" stop-color="#10141C"/>
+      <stop offset="55%" stop-color="#0A0C11"/>
+      <stop offset="100%" stop-color="#050608"/>
+    </radialGradient>
+    <linearGradient id="beam" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#00E56A" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#00E56A" stop-opacity="0"/>
+    </linearGradient>
+
+    <!-- titanium frame -->
+    <linearGradient id="titan" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"  stop-color="#8E959E"/>
+      <stop offset="18%" stop-color="#5E646C"/>
+      <stop offset="42%" stop-color="#3C4046"/>
+      <stop offset="60%" stop-color="#6B7178"/>
+      <stop offset="82%" stop-color="#2F3237"/>
+      <stop offset="100%" stop-color="#575D64"/>
+    </linearGradient>
+    <linearGradient id="screenSheen" x1="0" y1="0" x2="0.8" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.055"/>
+      <stop offset="38%" stop-color="#FFFFFF" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.018"/>
+    </linearGradient>
+
+    <!-- boost ring -->
+    <linearGradient id="ring" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0%" stop-color="#00B354"/>
+      <stop offset="55%" stop-color="#00E56A"/>
+      <stop offset="100%" stop-color="#7DFFB2"/>
+    </linearGradient>
+    <radialGradient id="ringGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="55%" stop-color="#00E56A" stop-opacity="0"/>
+      <stop offset="78%" stop-color="#00E56A" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#00E56A" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- panels -->
+    <linearGradient id="card" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#151A23"/>
+      <stop offset="100%" stop-color="#10141B"/>
+    </linearGradient>
+
+    <filter id="softShadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="26" stdDeviation="34" flood-color="#000000" flood-opacity="0.55"/>
+    </filter>
+    <filter id="neonBlur" x="-80%" y="-80%" width="260%" height="260%">
+      <feGaussianBlur stdDeviation="7"/>
+    </filter>
+    <filter id="tinyShadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="3" stdDeviation="6" flood-color="#000" flood-opacity="0.4"/>
+    </filter>
+
+    <clipPath id="screenClip">
+      <rect x="0" y="0" width="366" height="764" rx="58"/>
+    </clipPath>
+  </defs>
+
+  <!-- ============ backdrop ============ -->
+  <rect width="1200" height="1500" fill="url(#bgGlow)"/>
+  <g fill="#8A93A6" opacity="0.10">
+    <!-- dot grid, sparse & calm -->
+    <circle cx="60" cy="90" r="1.3"/><circle cx="140" cy="90" r="1.3"/><circle cx="220" cy="90" r="1.3"/>
+    <circle cx="60" cy="170" r="1.3"/><circle cx="140" cy="170" r="1.3"/><circle cx="220" cy="170" r="1.3"/>
+    <circle cx="980" cy="1400" r="1.3"/><circle cx="1060" cy="1400" r="1.3"/><circle cx="1140" cy="1400" r="1.3"/>
+    <circle cx="980" cy="1480" r="1.3"/><circle cx="1060" cy="1480" r="1.3"/><circle cx="1140" cy="1480" r="1.3"/>
+  </g>
+  <rect x="440" y="0" width="560" height="1500" fill="url(#beam)"/>
+
+  <!-- ============ header lockup ============ -->
+  <g transform="translate(84,92)">
+    <!-- shield mark -->
+    <g transform="scale(1.15)">
+      <path d="M28 4 L52 13 V33 C52 47 41 56 28 60 C15 56 4 47 4 33 V13 Z"
+            fill="none" stroke="#00E56A" stroke-width="3.2" stroke-linejoin="round"/>
+      <path d="M20 18 L28 44 L36 18" fill="none" stroke="#E8ECF1" stroke-width="4.6"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <text x="76" y="34" fill="#E8ECF1" font-size="30" font-weight="800" letter-spacing="10">KAYA</text>
+    <text x="77" y="56" fill="#8A93A6" font-size="12.5" letter-spacing="4.2">FAST LANE FOR MOBILE FPS</text>
+  </g>
+
+  <!-- ============ left copy column ============ -->
+  <g>
+    <text x="84" y="330" fill="#E8ECF1" font-size="66" font-weight="800" letter-spacing="-1.5">Drop the lag.</text>
+    <text x="84" y="404" fill="#00E56A" font-size="66" font-weight="800" letter-spacing="-1.5">Keep the streak.</text>
+
+    <text x="84" y="462" fill="#8A93A6" font-size="19" letter-spacing="0.2">On-device Smart DNS steering, radio locks and a</text>
+    <text x="84" y="489" fill="#8A93A6" font-size="19" letter-spacing="0.2">controller bridge. No VPN middlemen. No servers.</text>
+
+    <!-- feature rows -->
+    <g transform="translate(84,548)" font-size="16.5">
+      <g>
+        <path d="M0 8 l5 5 l11 -13" stroke="#00E56A" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+        <text x="30" y="12" fill="#C7CEDA">Smart Anycast DNS — races resolvers from your phone</text>
+      </g>
+      <g transform="translate(0,44)">
+        <path d="M0 8 l5 5 l11 -13" stroke="#00E56A" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+        <text x="30" y="12" fill="#C7CEDA">Wi-Fi low-latency lock keeps the radio awake</text>
+      </g>
+      <g transform="translate(0,88)">
+        <path d="M0 8 l5 5 l11 -13" stroke="#00E56A" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+        <text x="30" y="12" fill="#C7CEDA">PS4 / Xbox / V8 pads mapped to touch</text>
+      </g>
+      <g transform="translate(0,132)">
+        <path d="M0 8 l5 5 l11 -13" stroke="#00E56A" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+        <text x="30" y="12" fill="#C7CEDA">Measured ping, jitter &amp; route — no fake numbers</text>
+      </g>
+    </g>
+
+    <!-- stat strip -->
+    <g transform="translate(84,770)">
+      <line x1="0" y1="0" x2="380" y2="0" stroke="rgba(255,255,255,0.10)" stroke-width="1"/>
+      <g transform="translate(0,34)">
+        <text x="0"  y="0" fill="#E8ECF1" font-size="30" font-weight="800">18 MB</text>
+        <text x="0"  y="24" fill="#69707E" font-size="12" letter-spacing="2">ARM64 BUILD</text>
+        <text x="150" y="0" fill="#E8ECF1" font-size="30" font-weight="800">0</text>
+        <text x="150" y="24" fill="#69707E" font-size="12" letter-spacing="2">SERVERS</text>
+        <text x="248" y="0" fill="#E8ECF1" font-size="30" font-weight="800">FREE</text>
+        <text x="248" y="24" fill="#69707E" font-size="12" letter-spacing="2">FOREVER</text>
+      </g>
+      <line x1="0" y1="86" x2="380" y2="86" stroke="rgba(255,255,255,0.10)" stroke-width="1"/>
+    </g>
+
+    <!-- region chips -->
+    <g transform="translate(84,930)" font-size="13.5" letter-spacing="1.5">
+      <rect x="0" y="0" width="86" height="34" rx="17" fill="none" stroke="#2A313D"/>
+      <text x="43" y="22" text-anchor="middle" fill="#9AA3B2">ZA · JHB</text>
+      <rect x="98" y="0" width="86" height="34" rx="17" fill="none" stroke="#2A313D"/>
+      <text x="141" y="22" text-anchor="middle" fill="#9AA3B2">KE · NBO</text>
+      <rect x="196" y="0" width="86" height="34" rx="17" fill="none" stroke="#2A313D"/>
+      <text x="239" y="22" text-anchor="middle" fill="#9AA3B2">NG · LOS</text>
+      <rect x="308" y="0" width="60" height="34" rx="17" fill="none" stroke="#00E56A" stroke-opacity="0.55"/>
+      <circle cx="328" cy="17" r="3.5" fill="#00E56A"/>
+      <text x="346" y="22" text-anchor="middle" fill="#00E56A">LIVE</text>
+    </g>
+  </g>
+
+  <!-- ============ phone mockup (iPhone-class) ============ -->
+  <g transform="translate(672,208) rotate(-3 183 382)">
+    <!-- outer frame -->
+    <rect x="0" y="0" width="366" height="764" rx="58" fill="url(#titan)" filter="url(#softShadow)"/>
+    <!-- frame inner bevel -->
+    <rect x="3" y="3" width="360" height="758" rx="55" fill="#0B0D10"/>
+    <!-- screen -->
+    <g clip-path="url(#screenClip)">
+      <rect x="0" y="0" width="366" height="764" fill="#07090D"/>
+
+      <!-- app wallpaper: faint diagonal light -->
+      <rect x="0" y="0" width="366" height="764" fill="url(#screenSheen)"/>
+      <ellipse cx="300" cy="120" rx="240" ry="200" fill="#00E56A" opacity="0.05"/>
+
+      <!-- status bar -->
+      <text x="34" y="52" fill="#E8ECF1" font-size="17" font-weight="700">9:41</text>
+      <g fill="#E8ECF1" transform="translate(268,36)">
+        <rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="6" width="3" height="6" rx="1"/>
+        <rect x="10" y="4" width="3" height="8" rx="1"/><rect x="15" y="2" width="3" height="10" rx="1"/>
+        <path d="M28 12 a10 10 0 0 1 14 0" stroke="#E8ECF1" stroke-width="2" fill="none"/>
+        <path d="M31 15 a6 6 0 0 1 8 0" stroke="#E8ECF1" stroke-width="2" fill="none"/>
+        <circle cx="35" cy="18" r="1.6"/>
+        <rect x="50" y="4" width="22" height="12" rx="3.5" fill="none" stroke="#E8ECF1" stroke-opacity="0.5"/>
+        <rect x="52" y="6" width="14" height="8" rx="2" fill="#E8ECF1"/>
+        <rect x="73" y="8" width="2.5" height="4.5" rx="1" fill="#E8ECF1" fill-opacity="0.5"/>
+      </g>
+
+      <!-- app header -->
+      <g transform="translate(22,86)">
+        <circle cx="10" cy="10" r="10" fill="#00E56A" opacity="0.16"/>
+        <path d="M6 3 L14 6 V11 C14 15 10.5 17.5 6 19 C1.5 17.5 -2 15 -2 11 V6 Z"
+              transform="translate(4,1)" fill="none" stroke="#00E56A" stroke-width="1.6"/>
+        <text x="30" y="15" fill="#E8ECF1" font-size="15" font-weight="800" letter-spacing="4">KAYA</text>
+        <g transform="translate(300,-2)" stroke="#69707E" stroke-width="2" fill="none">
+          <circle cx="8" cy="8" r="5.5"/>
+          <path d="M12.5 12.5 L18 18" stroke-linecap="round"/>
+        </g>
+      </g>
+
+      <!-- FAST LANE label -->
+      <text x="22" y="150" fill="#69707E" font-size="11.5" letter-spacing="3.5">FAST LANE</text>
+
+      <!-- boost ring -->
+      <g transform="translate(183,262)">
+        <circle r="118" fill="url(#ringGlow)"/>
+        <circle r="96" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="10"/>
+        <circle r="96" fill="none" stroke="url(#ring)" stroke-width="10" stroke-linecap="round"
+                stroke-dasharray="452 603" transform="rotate(-90)"/>
+        <circle r="96" fill="none" stroke="#00E56A" stroke-width="10" stroke-linecap="round"
+                opacity="0.35" filter="url(#neonBlur)" stroke-dasharray="452 603" transform="rotate(-90)"/>
+        <circle r="78" fill="#0C1016" stroke="rgba(0,229,106,0.35)"/>
+        <text y="-4" text-anchor="middle" fill="#E8ECF1" font-size="27" font-weight="900" letter-spacing="3">BOOST</text>
+        <text y="20" text-anchor="middle" fill="#00E56A" font-size="11.5" letter-spacing="2.5">ENGINES ARMED</text>
+      </g>
+
+      <!-- ping card -->
+      <g transform="translate(22,414)" width="322">
+        <rect x="0" y="0" width="322" height="118" rx="18" fill="url(#card)" stroke="rgba(0,229,106,0.22)"/>
+        <text x="18" y="30" fill="#69707E" font-size="10.5" letter-spacing="2.5">MATCHMAKER PING</text>
+        <text x="18" y="66" fill="#E8ECF1" font-size="34" font-weight="800">18<tspan font-size="16" fill="#69707E"> ms</tspan></text>
+        <g font-size="11" fill="#8A93A6">
+          <text x="128" y="66">jitter <tspan fill="#00E56A" font-weight="700">3</tspan></text>
+          <text x="196" y="66">route <tspan fill="#00E56A" font-weight="700">SA</tspan></text>
+        </g>
+        <!-- sparkline -->
+        <g transform="translate(18,80)">
+          <path d="M0 22 L20 18 L40 24 L60 12 L80 16 L100 8 L120 14 L140 6 L160 12 L180 4 L200 10 L220 6 L240 12 L260 8 L284 10"
+                fill="none" stroke="#00E56A" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+          <circle cx="284" cy="10" r="3.4" fill="#7DFFB2"/>
+        </g>
+      </g>
+
+      <!-- game rows -->
+      <g transform="translate(22,552)">
+        <g>
+          <rect width="322" height="64" rx="16" fill="url(#card)"/>
+          <rect x="10" y="10" width="44" height="44" rx="12" fill="#1A2230"/>
+          <text x="32" y="40" text-anchor="middle" fill="#E8ECF1" font-size="15" font-weight="800">C</text>
+          <text x="70" y="27" fill="#E8ECF1" font-size="14" font-weight="700">Call of Duty: Mobile</text>
+          <text x="70" y="46" fill="#69707E" font-size="11">boosted · SA edge</text>
+          <rect x="252" y="20" width="58" height="24" rx="12" fill="rgba(0,229,106,0.14)" stroke="rgba(0,229,106,0.4)"/>
+          <text x="281" y="36" text-anchor="middle" fill="#00E56A" font-size="11" font-weight="700">RUN</text>
+        </g>
+        <g transform="translate(0,76)">
+          <rect width="322" height="64" rx="16" fill="url(#card)"/>
+          <rect x="10" y="10" width="44" height="44" rx="12" fill="#241A16"/>
+          <text x="32" y="40" text-anchor="middle" fill="#FFB020" font-size="15" font-weight="800">P</text>
+          <text x="70" y="27" fill="#E8ECF1" font-size="14" font-weight="700">PUBG Mobile</text>
+          <text x="70" y="46" fill="#69707E" font-size="11">ready</text>
+          <rect x="252" y="20" width="58" height="24" rx="12" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.12)"/>
+          <text x="281" y="36" text-anchor="middle" fill="#8A93A6" font-size="11" font-weight="700">BOOST</text>
+        </g>
+      </g>
+
+      <!-- bottom nav -->
+      <g transform="translate(0,714)">
+        <rect x="0" y="0" width="366" height="50" fill="#0A0D12"/>
+        <line x1="0" y1="0" x2="366" y2="0" stroke="rgba(255,255,255,0.06)"/>
+        <g fill="#69707E" font-size="9.5" text-anchor="middle" letter-spacing="1">
+          <g transform="translate(52,0)"><circle cy="16" r="4" fill="#00E56A"/><text y="36" fill="#00E56A">BOOST</text></g>
+          <g transform="translate(140,0)"><rect x="-5" y="12" width="10" height="8" rx="2" fill="none" stroke="#69707E" stroke-width="1.6"/><text y="36">GAMES</text></g>
+          <g transform="translate(228,0)"><path d="M-5 20 a5 5 0 0 1 10 0 M-8 20 a8 8 0 0 1 16 0" stroke="#69707E" fill="none" stroke-width="1.6"/><text y="36">NET</text></g>
+          <g transform="translate(314,0)"><circle cy="16" r="4.5" fill="none" stroke="#69707E" stroke-width="1.6"/><text y="36">TUNE</text></g>
+        </g>
+      </g>
+
+      <!-- dynamic island -->
+      <rect x="118" y="18" width="130" height="34" rx="17" fill="#000000"/>
+      <circle cx="218" cy="35" r="6.5" fill="#101318" stroke="#1E232B" stroke-width="1"/>
+    </g>
+
+    <!-- side buttons -->
+    <rect x="-2.5" y="180" width="4" height="34" rx="2" fill="#7A8087"/>
+    <rect x="-2.5" y="238" width="4" height="58" rx="2" fill="#6B7178"/>
+    <rect x="-2.5" y="312" width="4" height="58" rx="2" fill="#6B7178"/>
+    <rect x="364.5" y="250" width="4" height="92" rx="2" fill="#6B7178"/>
+
+    <!-- glass edge highlight -->
+    <rect x="1.5" y="1.5" width="363" height="761" rx="56.5" fill="none" stroke="#FFFFFF" stroke-opacity="0.16" stroke-width="1.5"/>
+  </g>
+
+  <!-- floating spec tag next to phone -->
+  <g transform="translate(1032,318) rotate(3)" filter="url(#tinyShadow)">
+    <rect width="118" height="64" rx="12" fill="#10141B" stroke="rgba(0,229,106,0.35)"/>
+    <text x="14" y="26" fill="#00E56A" font-size="13" font-weight="800" font-family="Consolas, monospace">18 ms</text>
+    <text x="14" y="46" fill="#69707E" font-size="10.5" letter-spacing="1.5">MEASURED · SA</text>
+  </g>
+  <g transform="translate(618,1046) rotate(-2)" filter="url(#tinyShadow)">
+    <rect width="128" height="64" rx="12" fill="#10141B" stroke="rgba(255,255,255,0.12)"/>
+    <text x="14" y="26" fill="#E8ECF1" font-size="13" font-weight="800" font-family="Consolas, monospace">DNS race</text>
+    <text x="14" y="46" fill="#69707E" font-size="10.5" letter-spacing="1.5">CF vs GOOGLE vs Q9</text>
+  </g>
+
+  <!-- ============ footer download strip ============ -->
+  <g transform="translate(0,1258)">
+    <rect x="0" y="0" width="1200" height="242" fill="#050608"/>
+    <line x1="0" y1="0" x2="1200" y2="0" stroke="rgba(0,229,106,0.25)"/>
+
+    <!-- big CTA -->
+    <g transform="translate(84,74)">
+      <rect width="330" height="74" rx="37" fill="#00E56A"/>
+      <text x="165" y="33" text-anchor="middle" fill="#04160B" font-size="19" font-weight="900" letter-spacing="0.5">⬇ DOWNLOAD APK</text>
+      <text x="165" y="56" text-anchor="middle" fill="#04160B" font-size="12.5" font-weight="700" opacity="0.75">github.com/kayefande-droid/kaya</text>
+    </g>
+    <text x="84" y="190" fill="#69707E" font-size="13.5" letter-spacing="0.4">Android 8.0+ · no account · no ads · open source (MIT) · SHA-256 checksums on every release</text>
+    <text x="84" y="214" fill="#454B56" font-size="12" letter-spacing="0.4">Direct: github.com/kayefande-droid/kaya/releases/latest/download/Kaya-arm64.apk</text>
+
+    <!-- maker credit -->
+    <g transform="translate(84,28)">
+      <circle r="9" fill="#00E56A" opacity="0.15"/>
+      <path d="M-4.5 -4.5 L-4.5 4.5 M-4.5 -4.5 L4 4.5 M0.5 -1 L4.5 -4.5"
+            stroke="#00E56A" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <text x="17" y="4" fill="#8A93A6" font-size="13" letter-spacing="1">CREATED BY <tspan fill="#00E56A" font-weight="800">KAYEFANDE</tspan></text>
+    </g>
+
+    <!-- right side mini QR-style block (decorative pattern, not a real QR) -->
+    <g transform="translate(1000,66)" fill="#1C222C">
+      <rect width="110" height="110" rx="14" fill="#0A0D12" stroke="rgba(255,255,255,0.08)"/>
+      <g fill="#8A93A6" opacity="0.85">
+        <rect x="14" y="14" width="18" height="18" rx="3"/><rect x="78" y="14" width="18" height="18" rx="3"/>
+        <rect x="14" y="78" width="18" height="18" rx="3"/>
+        <rect x="40" y="18" width="8" height="8"/><rect x="52" y="30" width="8" height="8"/>
+        <rect x="40" y="42" width="8" height="8"/><rect x="64" y="46" width="8" height="8"/>
+        <rect x="76" y="58" width="8" height="8"/><rect x="88" y="46" width="8" height="8"/>
+        <rect x="18" y="44" width="8" height="8"/><rect x="30" y="56" width="8" height="8"/>
+        <rect x="42" y="68" width="8" height="8"/><rect x="54" y="80" width="8" height="8"/>
+        <rect x="66" y="72" width="8" height="8"/><rect x="78" y="86" width="8" height="8"/>
+        <rect x="90" y="74" width="8" height="8"/><rect x="52" y="56" width="8" height="8"/>
+      </g>
+      <text x="55" y="140" text-anchor="middle" fill="#454B56" font-size="10" letter-spacing="2">SCAN OR TAP</text>
+    </g>
+  </g>
+</svg>

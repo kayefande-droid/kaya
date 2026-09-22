@@ -33,7 +33,7 @@ class KayaMediaButtonService : Service() {
                 val notif: Notification = Notification.Builder(this, MainApplication.CHANNEL_BOOST)
                     .setContentTitle("Kaya Controller Bridge")
                     .setContentText("Controller mapping is active. Tap to stop.")
-                    .setSmallIcon(R.drawable.ic_kaya_tile)
+                    .setSmallIcon(R.drawable.ic_notif_kaya)
                     .setOngoing(true)
                     .setContentIntent(open)
                     .addAction(Notification.Action.Builder(null, "Stop", stop).build())

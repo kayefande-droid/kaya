@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- KAYA logo v3 — engineered precision mark. Geometric shield, K monogram,
+       deliberate negative space. Reads at 24px and at poster size. -->
+  <defs>
+    <linearGradient id="shieldFace" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#12161E"/>
+      <stop offset="100%" stop-color="#0A0D12"/>
+    </linearGradient>
+    <linearGradient id="kStroke" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#7DFFB2"/>
+      <stop offset="100%" stop-color="#00C55A"/>
+    </linearGradient>
+    <filter id="logoGlow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="10"/>
+    </filter>
+  </defs>
+
+  <!-- plate -->
+  <rect width="512" height="512" rx="116" fill="#0A0D12"/>
+  <rect x="1.5" y="1.5" width="509" height="509" rx="114.5" fill="none"
+        stroke="#FFFFFF" stroke-opacity="0.07" stroke-width="3"/>
+
+  <!-- shield -->
+  <path d="M256 56 L412 116 V268 C412 350 344 406 256 440 C168 406 100 350 100 268 V116 Z"
+        fill="url(#shieldFace)" stroke="#00E56A" stroke-width="7" stroke-linejoin="round"/>
+  <!-- shield inner bevel -->
+  <path d="M256 74 L396 128 V266 C396 340 336 391 256 422 C176 391 116 340 116 266 V128 Z"
+        fill="none" stroke="#FFFFFF" stroke-opacity="0.06" stroke-width="2"/>
+
+  <!-- glow under K -->
+  <g filter="url(#logoGlow)" opacity="0.55">
+    <path d="M196 156 L196 356 M196 156 L316 356 M282 240 L336 156"
+          stroke="#00E56A" stroke-width="18" stroke-linecap="round" fill="none"/>
+  </g>
+  <!-- K monogram -->
+  <path d="M196 156 L196 356 M196 156 L316 356 M282 240 L336 156"
+        stroke="url(#kStroke)" stroke-width="22" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+  <!-- circuit nodes: two, balanced -->
+  <circle cx="150" cy="120" r="10" fill="#00E56A"/>
+  <circle cx="368" cy="120" r="10" fill="#00E56A" opacity="0.7"/>
+  <path d="M150 120 L256 84 M368 120 L256 84" stroke="#00E56A" stroke-width="3" opacity="0.35" fill="none"/>
+
+  <!-- wordmark -->
+  <text x="256" y="486" text-anchor="middle" fill="#E8ECF1"
+        font-family="'Segoe UI', Inter, sans-serif" font-size="44" font-weight="800"
+        letter-spacing="14">KAYA</text>
+</svg>
