@@ -7,6 +7,13 @@ import android.os.Build
 import android.os.PowerManager
 import java.util.concurrent.atomic.AtomicBoolean
 
+/** Simple library entry surfaced in the Tuning screen. */
+data class PackageEntry(
+    val packageName: String,
+    val label: String,
+    val isGame: Boolean,
+)
+
 /**
  * Best-effort, root-free background mitigation while a game session is live:
  *  - requests a temporary "burst" of battery saver restraint (no throttling of

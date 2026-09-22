@@ -5,7 +5,6 @@ import android.app.AppOpsManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.net.VpnService
 import android.os.Build
@@ -221,25 +220,26 @@ class MainActivity : FlutterActivity() {
         runOnUiThread { result.success(value) }
     }
 
-    @Suppress("DEPRECATION")
     private fun listInstalledApps(): List<Map<String, Any?>> {
         val pm = packageManager
-        val intent = Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_LAUNCHER)
-        val launchables = pm.queryIntentActivities(intent, 0)
-        return launchables.mapNotNull { ri ->
-            val ai = ri.applicationInfo ?: return@mapNotNull null
-            val pkg = ai.packageName
-            if (pkg == packageName) return@mapNotNull null
-            val isGame = (ai.flags and ApplicationInfo.FLAG_IS_GAME) != 0 ||
-                ai.category == ApplicationInfo.CATEGORY_GAME
+        val out = mutableListOf<Map<String, Any?>>()
+        for (appInfo in pm.getInstalledApplications(0)) {
+            val pkg = appInfo.packageName
+            if (pkg == null || pkg == packageName) continue
+            if (pm.getLaunchIntentForPackage(pkg) == null) continue
+            val isGame = (appInfo.flags and android.content.pm.ApplicationInfo.FLAG_IS_GAME) != 0 ||
+                appInfo.category == android.content.pm.ApplicationInfo.CATEGORY_GAME
             val version = runCatching { pm.getPackageInfo(pkg, 0).versionName }.getOrNull()
-            mapOf(
-                "packageName" to pkg,
-                "label" to (ri.loadLabel(pm)?.toString() ?: pkg),
-                "isGame" to isGame,
-                "version" to (version ?: ""),
-            )
-        }.sortedBy { (it["label"] as String).lowercase() }
+            val label = runCatching { pm.getApplicationLabel(appInfo).toString() }.getOrDefault(pkg)
+            val entry = HashMap<String, Any?>(4)
+            entry["packageName"] = pkg
+            entry["label"] = label
+            entry["isGame"] = isGame
+            entry["version"] = version ?: ""
+            out.add(entry)
+        }
+        out.sortBy { (it["label"] as String).lowercase() }
+        return out
     }
 
     @Suppress("DEPRECATION")

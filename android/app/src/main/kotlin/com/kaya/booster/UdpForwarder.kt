@@ -124,8 +124,8 @@ object UdpForwarder {
     }
 
     private fun keyFor(src: ByteArray, srcPort: Int, dst: ByteArray, dstPort: Int): Long {
-        var k = 0xcbf29ce484222325L
-        for (b in src + dst) k = (k xor (b.toInt() and 0xFF)) * 0x100000001b3L
+        var k = -3750763034362895579L // FNV-1a 64-bit offset basis (written to avoid literal overflow)
+        for (b in src + dst) k = (k xor (b.toInt() and 0xFF).toLong()) * 0x100000001b3L
         return k xor (srcPort.toLong() shl 20) xor dstPort.toLong()
     }
 

@@ -23,6 +23,7 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0.0"
+        ndkVersion = "28.2.13676358"
     }
 
     buildTypes {

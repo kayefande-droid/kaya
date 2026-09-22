@@ -27,6 +27,7 @@ class KayaBoostService : Service() {
     private lateinit var mitigator: BackgroundMitigator
     private val handler = Handler(Looper.getMainLooper())
     private val running = AtomicBoolean(false)
+    private val thermalExecutor = java.util.concurrent.Executors.newSingleThreadExecutor()
     private var thermalListener: OnThermalStatusChangedListener? = null
 
     override fun onCreate() {
@@ -80,7 +81,7 @@ class KayaBoostService : Service() {
             thermalListener = OnThermalStatusChangedListener { status ->
                 KayaEventHub.emit("thermal", mapOf("status" to status))
             }
-            runCatching { pm.addThermalStatusListener(handler, thermalListener!!) }
+            runCatching { pm.addThermalStatusListener(thermalExecutor, thermalListener!!) }
         }
     }
 

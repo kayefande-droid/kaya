@@ -56,7 +56,7 @@ object KayaInputBridge {
             val isGamepad = (source.sources and InputDevice.SOURCE_GAMEPAD) != 0 ||
                 (source.sources and InputDevice.SOURCE_JOYSTICK) != 0
             if (!isGamepad) return false
-            seenDevices.add(source.deviceId)
+            seenDevices.add(source.id)
         }
         val action = when (event.action) {
             KeyEvent.ACTION_DOWN -> "down"
@@ -75,18 +75,19 @@ object KayaInputBridge {
     }
 
     fun connectedGamepads(): List<Map<String, Any?>> {
-        val ids = InputDevice.getDeviceIds()
-        return ids.mapNotNull { id ->
-            val dev = InputDevice.getDevice(id) ?: return@mapNotNull null
+        val result = mutableListOf<Map<String, Any?>>()
+        for (id in InputDevice.getDeviceIds()) {
+            val dev = InputDevice.getDevice(id) ?: continue
             val isGamepad = (dev.sources and InputDevice.SOURCE_GAMEPAD) != 0 ||
                 (dev.sources and InputDevice.SOURCE_JOYSTICK) != 0
-            if (!isGamepad) null
-            else mapOf(
-                "id" to id,
-                "name" to dev.name,
-                "vendor" to dev.vendorId,
-                "product" to dev.productId,
-            )
+            if (!isGamepad) continue
+            val info = LinkedHashMap<String, Any?>()
+            info["id"] = dev.id
+            info["name"] = dev.name
+            info["vendor"] = dev.vendorId
+            info["product"] = dev.productId
+            result.add(info)
         }
+        return result
     }
 }

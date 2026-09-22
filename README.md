@@ -5,7 +5,7 @@
 </p>
 
 > ### 📲 Download & Install
-> **[⬇️ Download the latest Kaya APK](../../releases/latest/download/Kaya.apk)** — direct from GitHub Releases, no ads, no accounts, no tracking.
+> **[⬇️ Download the latest Kaya APK](https://github.com/kayefande-droid/kaya/releases/latest/download/Kaya.apk)** — direct from GitHub Releases, no ads, no accounts, no tracking.
 >
 > After installing: allow the **one-time VPN consent**, then set **Battery → Unrestricted** for Kaya (the Tuning screen walks you through it).
 

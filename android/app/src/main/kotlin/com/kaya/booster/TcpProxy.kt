@@ -246,5 +246,5 @@ object TcpProxy {
         pool.shutdownNow()
     }
 
-    val activeConnections: Int get() = connections.get()
+    val activeConnections: Int get() = connections.get().toInt()
 }
