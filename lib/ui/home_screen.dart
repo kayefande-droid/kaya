@@ -98,6 +98,8 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
           const SizedBox(height: 18),
+          AutoPilotCard(state: state, onOpenLibrary: widget.onOpenLibrary),
+          const SizedBox(height: 14),
           KayaCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -273,6 +275,159 @@ class _MiniStat extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Auto-arming indicator: shows the auto-pilot / floating-monitor state.
+///
+/// - A boosted game is live -> green: "auto-armed" with the game name,
+///   and the floating monitor pill is confirmed on-screen.
+/// - Waiting state -> dim: which watched signal is missing, with a direct
+///   jump to fix it (usage access / overlay permission / game library).
+class AutoPilotCard extends StatelessWidget {
+  const AutoPilotCard({super.key, required this.state, required this.onOpenLibrary});
+
+  final AppState state;
+  final VoidCallback onOpenLibrary;
+
+  @override
+  Widget build(BuildContext context) {
+    final armedGame = state.autoGame;
+    final waiting = state.autopilotOn && armedGame == null;
+
+    if (armedGame != null) {
+      return KayaCard(
+        accent: true,
+        child: Row(
+          children: [
+            const Icon(Icons.radar_rounded, color: KayaColors.lane),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'AUTO-ARMED · ${armedGame.toUpperCase()}',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: KayaColors.lane,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.8,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    state.overlayOk
+                        ? 'Live monitor on-screen · stands down when you leave'
+                        : 'Monitor needs "Display over apps" — grant it in Tuning',
+                    style: const TextStyle(
+                      color: KayaColors.inkDim,
+                      fontSize: 11.5,
+                      height: 1.35,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const _PulseDot(),
+          ],
+        ),
+      );
+    }
+
+    return KayaCard(
+      onTap: waiting ? null : onOpenLibrary,
+      child: Row(
+      children: [
+        Icon(
+          Icons.radar_rounded,
+          color: waiting ? KayaColors.inkFaint : KayaColors.lane,
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                waiting ? 'AUTO-ARM WAITING' : 'AUTO-ARM IS OFF',
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 0.8,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                waiting
+                    ? 'Watching for a boosted game to launch — monitor and fast lane arm themselves.'
+                    : 'Auto-pilot is off. Boosted games won\'t arm the fast lane automatically.',
+                style: const TextStyle(
+                  color: KayaColors.inkDim,
+                  fontSize: 11.5,
+                  height: 1.35,
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (!waiting)
+          TextButton(
+            onPressed: () => state.setAutopilot(true),
+            child: const Text('Turn on'),
+          )
+        else if (!state.usageStatsOk)
+          TextButton(
+            onPressed: () => state.bridge.grantUsageStats(),
+            child: const Text('Fix'),
+          )
+        else if (!state.overlayOk)
+          TextButton(
+            onPressed: () => state.bridge.requestOverlay(),
+            child: const Text('Fix'),
+          )
+      ],
+      ),
+    );
+  }
+}
+
+/// Small pulsing green dot for the armed state.
+class _PulseDot extends StatefulWidget {
+  const _PulseDot();
+
+  @override
+  State<_PulseDot> createState() => _PulseDotState();
+}
+
+class _PulseDotState extends State<_PulseDot> with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1400),
+  )..repeat(reverse: true);
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: Tween(begin: 0.35, end: 1.0).animate(
+        CurvedAnimation(parent: _c, curve: Curves.easeInOut),
+      ),
+      child: Container(
+        width: 9,
+        height: 9,
+        decoration: const BoxDecoration(
+          shape: BoxShape.circle,
+          color: KayaColors.lane,
+        ),
+      ),
     );
   }
 }
