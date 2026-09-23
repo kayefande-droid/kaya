@@ -897,3 +897,46 @@ img { max-width: 100%; }
   .marquee-track { animation: none; }
   .spot::before { transition: none; }
 }
+
+/* =====================================================================
+   MOBILE LEGIBILITY PASS — every text block must read clearly on phones.
+   Lifts the secondary gray, raises sizes and line-height on small screens;
+   desktop keeps its exact art direction (all of this is media-scoped).
+   ===================================================================== */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body { overflow-wrap: break-word; }
+
+@media (max-width: 640px) {
+  /* one variable lift brightens every --ink-dim text site-wide (~+40% luminance) */
+  :root { --ink-dim: #A9B4C6; }
+
+  /* hero + general copy */
+  .lede { font-size: 1.06rem; line-height: 1.65; }
+  .fineprint { font-size: .95rem; line-height: 1.6; }
+  .chip { font-size: .82rem; }
+  .marquee-group { font-size: .74rem; }
+  .hud-stats span { font-size: .82rem; letter-spacing: .08em; }
+  .hud-ping small { font-size: 1rem; }
+
+  /* feature cards, specs, FAQ, download cards, install steps, footer */
+  .fcard p, .timeline p, .faq p, .dl-sub, .spec span { font-size: 1rem; line-height: 1.65; }
+  .spec { font-size: .95rem; }
+  .steps { font-size: 1rem; line-height: 1.7; }
+  .footer { font-size: 1rem; line-height: 1.65; }
+
+  /* exploded-plate section: real content labels (mock-plate internals stay miniature by design) */
+  .xd-lede { font-size: 15.5px; color: #A9B4C6; line-height: 1.6; }
+  .xd-item h3 { font-size: 16.5px; color: #F5F5F7; }
+  .xd-item p { font-size: 14.5px; line-height: 1.6; color: #A9B4C6; }
+  .xd-item .xd-i { color: #A9B4C6; }
+
+  /* device session labels */
+  .dv-t { font-size: 18px; }
+  .dv-d { font-size: 14.5px; line-height: 1.65; }
+}
+
+@media (max-width: 400px) {
+  .lede { font-size: 1.02rem; }
+  .xd-item p { font-size: 14px; }
+  .steps { font-size: .97rem; }
+}
