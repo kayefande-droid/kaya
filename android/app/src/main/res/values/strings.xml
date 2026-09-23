@@ -9,4 +9,22 @@
     <string name="notif_boost_text">Holding Wi-Fi at full performance. Tap to stop.</string>
     <string name="notif_vpn_title">Kaya Fast Lane Active</string>
     <string name="notif_vpn_text">Smart DNS steering is on. Tap to stop.</string>
+
+    <!-- Home-screen widget -->
+    <string name="widget_desc">Kaya session state at a glance. Tap to arm or disarm.</string>
+    <string name="widget_title_standby">Kaya · Standby</string>
+    <string name="widget_title_boost">Kaya · Boost Only</string>
+    <string name="widget_title_armed">Kaya · Armed</string>
+    <string name="widget_sub_off">Fast lane off</string>
+    <string name="widget_sub_boost_only">Boost locks on, engine off</string>
+    <string name="widget_sub_engaged">Engine + boost locks engaged</string>
+    <string name="widget_chip_arm">ARM FAST LANE</string>
+    <string name="widget_chip_label">FAST LANE</string>
+    <string name="widget_ping_idle">— ms</string>
+    <string name="widget_ping_pending">… ms</string>
+    <string name="widget_ping_value">%1$d ms</string>
+    <string name="widget_toast_open_app">Allow the VPN consent in Kaya to finish arming.</string>
+
+    <!-- Updater -->
+    <string name="update_channel">Kaya Updates</string>
 </resources>

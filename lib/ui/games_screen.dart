@@ -141,17 +141,15 @@ class _GameCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: OutlinedButton.icon(
-                    onPressed: boosted
-                        ? null
-                        : () {
-                            HapticFeedback.selectionClick();
-                            state.toggleBoosted(app.packageName);
-                          },
+                    onPressed: () {
+                      HapticFeedback.selectionClick();
+                      state.toggleBoosted(app.packageName);
+                    },
                     icon: Icon(
-                      boosted ? Icons.check_rounded : Icons.bolt_rounded,
+                      boosted ? Icons.bolt_rounded : Icons.bolt_rounded,
                       size: 17,
                     ),
-                    label: Text(boosted ? 'Boosted' : 'Boost'),
+                    label: Text(boosted ? 'Auto-boost' : 'Boost'),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: boosted ? KayaColors.lane : KayaColors.ink,
                       side: BorderSide(
@@ -169,7 +167,7 @@ class _GameCard extends StatelessWidget {
                   ),
                   onPressed: () async {
                     HapticFeedback.heavyImpact();
-                    final ok = await state.bridge.launchApp(app.packageName);
+                    final ok = await state.launchGame(app);
                     if (!ok && context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Could not launch ${app.label}')),

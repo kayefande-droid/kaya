@@ -68,6 +68,7 @@ your device**.
 │     ├─ TcpProxy      → SYN-ACK terminator + upstream relay          │
 │     └─ ICMP echo     → answered on-device (in-game ping stays sane) │
 │   KayaBoostService ─ WifiLock(LL) + WakeLock + mitigator            │
+│   KayaAppWidgetProvider + KayaTileService ─ session control         │
 │   KayaAccessibilityService ─ controller→tap projection              │
 └─────────────────────────────────────────────────────────────────────┘
 ```
@@ -94,9 +95,38 @@ adb shell settings put global private_dns_specifier one.one.one.one
 
 - **VPN consent** — the DNS engine is a local VpnService. Nothing leaves the device except the game's own traffic.
 - **Battery exemption** — keeps the WifiLock/wake locks alive during a match.
-- **Usage access** — background traffic sampling for the Tuning screen.
+- **Usage access** — foreground-game detection for the auto-pilot + background traffic sampling for the Tuning screen.
 - **Accessibility** — only for the controller→touch bridge; window content is never read (`canRetrieveWindowContent=false`).
 - **Nearby devices / Bluetooth** — gamepad detection.
+- **Display over other apps** — the optional floating live-monitor bubble during a match.
+- **Do Not Disturb access** — Game Focus silences non-essential notifications during a match while calls and allowlisted apps (WhatsApp) still come through.
+- **Notification access** — the optional on-device notification center (read/unread). Notification content never leaves the phone.
+
+## Safety, Play Protect & checksums
+
+Kaya is built to pass Google Play Protect review:
+
+- **No risky permissions**: no SMS, contacts, location, storage, call log, or accessibility abuse — every permission maps 1:1 to a user-visible feature.
+- **No cross-app interference**: Kaya never kills, freezes, or injects into other apps. Background "mitigation" is advisory (OS schedulers), never process murder.
+- **No dynamic code loading, no obfuscated payloads** — the APK is plain, auditable Kotlin + Flutter.
+- **Signed releases with SHA-256 checksums** (`SHA256SUMS.txt` ships in every GitHub release). If Play Protect shows an "unknown developer" notice (expected for any sideloaded app), verify the checksum and tap *Install anyway*.
+- **The updater only ever opens GitHub release URLs** over HTTPS and hands the APK to the system installer — the user confirms every install.
+
+## Features
+
+| Feature | Where |
+|---|---|
+| Smart Anycast DNS engine + fast lane | Home / Network |
+| One-tap Boost with honest partial-failure messages | Home |
+| Engine auto-pilot (boosted games arm everything on launch) | Games + Tuning |
+| Game Focus (battery + DND allowlist: calls & WhatsApp) | Tuning |
+| Floating live monitor bubble (real ms, drag, tap to expand/close) | overlay during games |
+| Real game-connection benchmark (CODM / PUBG / Free Fire edges, median-of-3 TCP handshakes) | Network |
+| Parallel anycast resolver benchmark | Network |
+| On-device notification center (read / unread / dismiss) | Tuning |
+| In-app updates from GitHub Releases | Tuning |
+| Crash diagnostics ring-buffer (why something failed, not just *that* it failed) | Tuning |
+| Home-screen widget + QS tile (synced both ways) | launcher / shade |
 
 ## Deploying the website
 
@@ -115,7 +145,9 @@ The site is plain HTML/CSS (no build step) in `site/`, with a Render blueprint a
 
 - [ ] Per-game controller layout editor (drag pins over a screenshot)
 - [ ] Jitter-aware "engine auto-pilot" (arms boost when a game launches)
-- [ ] Home-screen widget + Quick-settings tile polish
+- [x] Home-screen widget + Quick-settings tile polish — one-tap session control from the launcher and the shade, state synced both ways
+- [x] Engine auto-pilot, Game Focus (battery + calls/WhatsApp allowlist), floating live monitor, notification center, GitHub in-app updates, real game-endpoint benchmark
+- [ ] iOS (IPA) version — needs a native Swift PacketExtension rewrite + macOS/Xcode signing; see the website's iOS note
 - [ ] DNS-over-TLS upstream option
 
 ## License

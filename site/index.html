@@ -38,7 +38,7 @@
     "operatingSystem": "Android 8.0+",
     "applicationCategory": "GameApplication",
     "description": "Open-source Android game booster: on-device Smart Anycast DNS steering, Wi-Fi low-latency locks, background mitigation and a controller-to-touch bridge. No servers, no accounts.",
-    "softwareVersion": "1.0.3",
+    "softwareVersion": "1.1.0",
     "fileSize": "18MB",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
     "author": { "@type": "Person", "name": "kayefande", "alternateName": "kayefande-droid", "url": "https://github.com/kayefande-droid" },
@@ -102,7 +102,7 @@
     <section class="hero">
       <div class="hero-copy">
         <p class="chip-row">
-          <span class="chip">v1.0.3</span>
+          <span class="chip">v1.1.0</span>
           <span class="chip chip-green">● engines hot</span>
           <span class="chip">open source</span>
         </p>
@@ -171,10 +171,32 @@
              starfield backdrop that speeds up while boosted.</p>
         </article>
         <article class="fcard tilt">
-          <div class="ficon">🔒</div>
-          <h3>Private by design</h3>
-          <p>No analytics, no accounts, no servers. Read every line of the source before
-             you install. The only traffic is your game's own.</p>
+          <div class="ficon">🤖</div>
+          <h3>Engine auto-pilot</h3>
+          <p>Mark a game as Auto-boost once. Every time you launch it, Kaya arms the
+             fast lane, holds the locks and floats the live monitor — then stands
+             down after you leave. Zero taps mid-session.</p>
+        </article>
+        <article class="fcard tilt">
+          <div class="ficon">🔕</div>
+          <h3>Game focus</h3>
+          <p>On game launch the phone quiets everything except calls and WhatsApp via
+             Do Not Disturb priority mode — OS-enforced, nothing blocked at the app
+             level, restored the moment you leave the match.</p>
+        </article>
+        <article class="fcard tilt">
+          <div class="ficon">🫧</div>
+          <h3>Floating live monitor</h3>
+          <p>A tiny draggable bubble docked to the left edge shows real measured ms
+             over your game. Tap to expand (ping, jitter, engine state), tap to
+             collapse, ✕ to close. No simulated numbers, ever.</p>
+        </article>
+        <article class="fcard tilt">
+          <div class="ficon">🔔</div>
+          <h3>Notification center + updates</h3>
+          <p>An on-device read/unread inbox for your notifications (nothing leaves the
+             phone), plus one-tap updates straight from GitHub Releases with the
+             system installer confirming every step.</p>
         </article>
       </div>
     </section>
@@ -247,12 +269,24 @@
           <span class="dl-title">Kaya.apk</span>
           <span class="dl-sub">~48 MB · older 32-bit devices</span>
         </a>
+        <a class="dl" href="https://github.com/kayefande-droid/kaya/releases">
+          <span class="dl-badge">all versions</span>
+          <span class="dl-title">Every release</span>
+          <span class="dl-sub">older APKs · SHA256SUMS.txt per release</span>
+        </a>
+        <div class="dl">
+          <span class="dl-badge">iphone / ipad</span>
+          <span class="dl-title">iOS — not yet</span>
+          <span class="dl-sub">Apple requires a native rewrite + Mac signing; no IPA exists. Anything claiming otherwise is fake.</span>
+        </div>
       </div>
       <ol class="steps">
         <li>Download in Chrome → allow "install unknown apps" when asked.</li>
-        <li>Play Protect note: tap <strong>More details → Install anyway</strong> (standard for any app outside the Play Store; Kaya is signed & checksummed).</li>
-        <li>Open Kaya → <strong>BOOST</strong> → accept the VPN prompt once.</li>
-        <li>Tuning → <strong>Battery: Unrestricted</strong>. Then play.</li>
+        <li>Play Protect note: tap <strong>More details → Install anyway</strong> (standard for any app outside the Play Store; Kaya is signed, checksummed, and requests no sensitive permissions).</li>
+        <li>Open Kaya → <strong>BOOST</strong> → accept the VPN prompt once (that's the on-device DNS engine).</li>
+        <li>Tuning → <strong>Battery: Unrestricted</strong> so the locks hold through a whole match.</li>
+        <li>Optional, one tap each in <strong>Tuning → Automation</strong>: allow "Display over other apps" (floating live monitor), allow "Do Not Disturb access" (Game Focus keeps calls &amp; WhatsApp, quiets the rest), allow "Notification access" (on-device inbox).</li>
+        <li>Games → mark your title <strong>Auto-boost</strong> — from then on, launching the game arms everything automatically and the live bubble rides along.</li>
       </ol>
       <p class="fineprint">Permalinks always serve the newest release · verify with
       <a href="https://github.com/kayefande-droid/kaya/releases" target="_blank" rel="noopener">SHA256SUMS.txt</a></p>
@@ -284,7 +318,22 @@
           <summary>How much ping will I actually save?</summary>
           <p>Depends on your ISP. Where the resolver chain detours through Europe, gains
           are real and noticeable. Where your network already routes cleanly, expect
-          little. The app shows measured numbers, not marketing ones.</p>
+          little. The app shows measured numbers, not marketing ones — and the Network
+          screen's game benchmark gives you before/after numbers on your own phone.</p>
+        </details>
+        <details>
+          <summary>Is there an iPhone (IPA) version?</summary>
+          <p>Not yet, honestly. iOS has no VpnService equivalent that a cross-platform
+          app can use — Kaya's engine needs a native Swift Packet Extension rewrite,
+          and Apple requires macOS + paid developer signing to build an installable
+          IPA. There is no IPA today; any site offering one is not Kaya.</p>
+        </details>
+        <details>
+          <summary>Will Game Focus block my messages?</summary>
+          <p>No. It uses Android's Do Not Disturb in priority mode: phone calls and
+          allowlisted apps (WhatsApp by default) still come through; everything else
+          is silenced for the match and automatically restored after. Kaya never
+          reads or stores message content.</p>
         </details>
       </div>
     </section>

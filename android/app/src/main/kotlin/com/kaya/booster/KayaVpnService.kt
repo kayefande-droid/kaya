@@ -47,18 +47,20 @@ class KayaVpnService : VpnService() {
 
     override fun onCreate() {
         super.onCreate()
+        KayaState.init(this)
         KayaVpnServiceHolder.vpn = this
         KayaEventHub.emit("vpn", mapOf("state" to "created"))
     }
 
     override fun onDestroy() {
-        running.set(false)
+        val wasRunning = running.getAndSet(false)
         runCatching { replySocket?.close() }
         runCatching { tunOut?.close() }
         runCatching { tun?.close() }
         UdpForwarder.stop()
         TcpProxy.shutdown()
         KayaVpnServiceHolder.vpn = null
+        if (wasRunning) KayaState.update(engine = false)
         KayaEventHub.emit("vpn", mapOf("state" to "stopped"))
         super.onDestroy()
     }
@@ -132,6 +134,7 @@ class KayaVpnService : VpnService() {
 
         startReplyLoop()
         startReadLoop(fd)
+        KayaState.update(engine = true)
         KayaEventHub.emit("vpn", mapOf("state" to "active"))
     }
 

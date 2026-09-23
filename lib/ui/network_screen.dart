@@ -17,9 +17,11 @@ class NetworkScreen extends StatefulWidget {
 
 class _NetworkScreenState extends State<NetworkScreen> {
   Map<String, int?> benchmarks = {};
+  Map<String, int?> gameBench = {};
   List<String> gameHosts = [];
   Map<String, String> winners = {};
   bool benching = false;
+  bool gameBenching = false;
 
   static const resolvers = [
     ('Cloudflare', '1.1.1.1'),
@@ -27,6 +29,12 @@ class _NetworkScreenState extends State<NetworkScreen> {
     ('Quad9', '9.9.9.9'),
     ('OpenDNS', '208.67.222.222'),
   ];
+
+  static const resolverNote =
+    'These are the resolvers Kaya races from your device. Lower DNS ms '
+    'means faster matchmaker lookups; the engine keeps the winner per domain.';
+  // Surfaced beneath the resolver card; kept here so the wording stays
+  // in one place with the benchmark code.
 
   @override
   void initState() {
@@ -47,14 +55,30 @@ class _NetworkScreenState extends State<NetworkScreen> {
 
   Future<void> _benchmark() async {
     setState(() => benching = true);
+    // Race every resolver in parallel (three rounds, median kept natively
+    // per probe call) so one slow resolver doesn't stretch the whole run.
+    final futures = <Future<void>>[
+      for (final (name, ip) in resolvers)
+        widget.state.bridge
+            .dnsProbe(ip, 'www.activision.com')
+            .then((ms) => benchmarks[name] = ms),
+    ];
+    await Future.wait(futures);
+    if (mounted) setState(() => benching = false);
+  }
+
+  Future<void> _gameBenchmark() async {
+    setState(() => gameBenching = true);
+    final rows = await widget.state.bridge.gameBenchmark(rounds: 3);
     final results = <String, int?>{};
-    for (final (name, ip) in resolvers) {
-      results[name] = await widget.state.bridge.dnsProbe(ip, 'www.activision.com');
+    for (final row in rows) {
+      final label = '${row['game']} · ${row['label']}';
+      results[label] = (row['ms'] as num?)?.toInt();
     }
     if (mounted) {
       setState(() {
-        benchmarks = results;
-        benching = false;
+        gameBench = results;
+        gameBenching = false;
       });
     }
   }
@@ -79,6 +103,13 @@ class _NetworkScreenState extends State<NetworkScreen> {
           KayaCard(
             child: Column(
               children: [
+                const Padding(
+                  padding: EdgeInsets.only(bottom: 6),
+                  child: Text(
+                    resolverNote,
+                    style: TextStyle(color: KayaColors.inkFaint, fontSize: 11.5, height: 1.4),
+                  ),
+                ),
                 for (final (name, ip) in resolvers)
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 7),
@@ -114,6 +145,62 @@ class _NetworkScreenState extends State<NetworkScreen> {
                           )
                         : const Icon(Icons.speed_rounded),
                     label: Text(benching ? 'Racing resolvers…' : 'Run benchmark'),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          const SectionHeader(title: 'Game connection benchmark'),
+          KayaCard(
+            child: Column(
+              children: [
+                const Text(
+                  'Real TCP handshakes from this device to each game\'s public '
+                  'edge, median of 3. Run before and after arming the Fast Lane '
+                  'to see the difference steering makes. In-game ping still '
+                  'depends on the matchmaker\'s datacenter pick.',
+                  style: TextStyle(color: KayaColors.inkDim, fontSize: 12.5, height: 1.45),
+                ),
+                const SizedBox(height: 10),
+                if (gameBench.isNotEmpty)
+                  for (final e in gameBench.entries)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 5),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              e.key,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(fontSize: 13),
+                            ),
+                          ),
+                          _BenchBadge(ms: e.value),
+                        ],
+                      ),
+                    ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  child: FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: KayaColors.cool,
+                      foregroundColor: KayaColors.obsidian,
+                    ),
+                    onPressed: gameBenching ? null : _gameBenchmark,
+                    icon: gameBenching
+                        ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: KayaColors.obsidian,
+                            ),
+                          )
+                        : const Icon(Icons.sports_esports_rounded),
+                    label: Text(gameBenching ? 'Probing game edges…' : 'Benchmark game connection'),
                   ),
                 ),
               ],

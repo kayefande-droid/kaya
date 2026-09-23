@@ -68,6 +68,71 @@ class KayaBridge {
   Future<bool> boostStart() async => await _invoke<bool>('boostStart') ?? false;
   Future<bool> boostStop() async => await _invoke<bool>('boostStop') ?? false;
 
+  // ---- diagnostics ---------------------------------------------------------
+  Future<List<String>> crashLogRead() async {
+    final raw = await _invoke<List<Object?>>('crashLogRead');
+    return raw?.map((e) => e.toString()).toList() ?? [];
+  }
+
+  Future<void> crashLogClear() => _invoke<void>('crashLogClear');
+
+  // ---- game endpoint benchmark ----------------------------------------------
+  Future<List<Map<String, Object?>>> gameBenchmark({int rounds = 3}) async {
+    final raw = await _invoke<List<Object?>>('gameBenchmark', {'rounds': rounds});
+    if (raw == null) return [];
+    return raw.map((e) => Map<String, Object?>.from(e as Map)).toList();
+  }
+
+  // ---- auto-pilot / game focus / live bubble --------------------------------
+  Future<Map<String, Object?>?> autopilotGet() async {
+    final raw = await _invoke<Map<Object?, Object?>>('autopilotGet');
+    return raw?.map((k, v) => MapEntry(k.toString(), v));
+  }
+
+  Future<void> autopilotSet(bool enabled) =>
+      _invoke<void>('autopilotSet', {'enabled': enabled});
+
+  Future<void> autopilotBoost(String packageName, bool boosted) =>
+      _invoke<void>('autopilotBoost', {'package': packageName, 'boosted': boosted});
+
+  Future<Map<String, Object?>?> gameFocusGet() async {
+    final raw = await _invoke<Map<Object?, Object?>>('gameFocusGet');
+    return raw?.map((k, v) => MapEntry(k.toString(), v));
+  }
+
+  Future<void> gameFocusSet(bool enabled) =>
+      _invoke<void>('gameFocusSet', {'enabled': enabled});
+
+  Future<void> gameFocusDnd() => _invoke<void>('gameFocusDnd');
+
+  Future<bool> overlayGranted() async => await _invoke<bool>('overlayGranted') ?? false;
+  Future<void> requestOverlay() => _invoke<void>('requestOverlay');
+  Future<bool> bubbleShow(String label) async =>
+      await _invoke<bool>('bubbleShow', {'label': label}) ?? false;
+  Future<void> bubbleHide() => _invoke<void>('bubbleHide');
+
+  // ---- notification center ---------------------------------------------------
+  Future<List<Map<String, Object?>>> notifList() async {
+    final raw = await _invoke<List<Object?>>('notifList');
+    if (raw == null) return [];
+    return raw.map((e) => Map<String, Object?>.from(e as Map)).toList();
+  }
+
+  Future<int> notifUnread() async => await _invoke<int>('notifUnread') ?? 0;
+  Future<void> notifMarkRead(String key) => _invoke<void>('notifMarkRead', {'key': key});
+  Future<void> notifMarkAll() => _invoke<void>('notifMarkAll');
+  Future<void> notifClear(String key) => _invoke<void>('notifClear', {'key': key});
+  Future<void> notifGrant() => _invoke<void>('notifGrant');
+
+  // ---- updates ----------------------------------------------------------------
+  Future<Map<String, Object?>?> updateCheck() async {
+    final raw = await _invoke<Map<Object?, Object?>>('updateCheck');
+    return raw?.map((k, v) => MapEntry(k.toString(), v));
+  }
+
+  Future<bool> updateInstall(String url) async =>
+      await _invoke<bool>('updateInstall', {'url': url}) ?? false;
+
   // ---- permissions -------------------------------------------------------
   Future<bool> isIgnoringBatteryOptimizations() async =>
       await _invoke<bool>('isIgnoringBatteryOptimizations') ?? true;
@@ -134,6 +199,14 @@ class KayaBridge {
 
   Future<void> clearDnsCache() => _invoke<void>('clearDnsCache');
   Future<int> thermalStatus() async => await _invoke<int>('thermalStatus') ?? 0;
+
+  /// Native session truth (engine/boost flags + last ping sample) as seen by
+  /// the tile, widget and services. Used to resync after a cold engine start.
+  Future<Map<String, Object?>?> widgetState() async {
+    final raw = await _invoke<Map<Object?, Object?>>('widgetState');
+    if (raw == null) return null;
+    return raw.map((k, v) => MapEntry(k.toString(), v));
+  }
 
   Future<void> toast(String message) => _invoke<void>('toast', {'message': message});
 }

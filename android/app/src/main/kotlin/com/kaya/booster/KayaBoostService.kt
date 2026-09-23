@@ -30,8 +30,17 @@ class KayaBoostService : Service() {
     private val thermalExecutor = java.util.concurrent.Executors.newSingleThreadExecutor()
     private var thermalListener: OnThermalStatusChangedListener? = null
 
+    // Auto-pilot: watches which boosted game is foreground while the session runs.
+    private val autopilotPoller = object : Runnable {
+        override fun run() {
+            KayaGuard.bg("autopilot-poll") { GameAutoPilot.poll(applicationContext) }
+            handler.postDelayed(this, 5_000)
+        }
+    }
+
     override fun onCreate() {
         super.onCreate()
+        KayaState.init(this)
         locks = BoostLocks(this)
         mitigator = BackgroundMitigator(this)
     }
@@ -49,7 +58,8 @@ class KayaBoostService : Service() {
 
     private fun startSession() {
         if (running.getAndSet(true)) return
-        KayaBoostServiceHolder.isRunning = true
+        KayaState.init(this)
+        KayaState.update(boost = true)
         startForeground(
             NOTIF_ID,
             buildNotification(getString(R.string.notif_boost_title), getString(R.string.notif_boost_text)),
@@ -57,13 +67,18 @@ class KayaBoostService : Service() {
         locks.acquire()
         mitigator.activate()
         observeThermal()
+        GameFocusManager.apply(this) // quiet non-allowlisted noise for the session
+        handler.removeCallbacks(autopilotPoller)
+        handler.postDelayed(autopilotPoller, 5_000)
     }
 
     override fun onDestroy() {
         running.set(false)
-        KayaBoostServiceHolder.isRunning = false
+        KayaState.update(boost = false)
+        handler.removeCallbacks(autopilotPoller)
         mitigator.deactivate()
         locks.release()
+        GameFocusManager.restore(this)
         thermalListener?.let { l ->
             runCatching {
                 (getSystemService(Context.POWER_SERVICE) as PowerManager)

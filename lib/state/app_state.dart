@@ -11,6 +11,8 @@ class AppState extends ChangeNotifier {
     _bridge.listen();
     _sub = _bridge.events.listen(_onEvent);
     unawaited(refreshPermissions());
+    unawaited(_resyncSession());
+    unawaited(loadFeatures());
   }
 
   final KayaBridge _bridge;
@@ -29,6 +31,13 @@ class AppState extends ChangeNotifier {
   bool usageStatsOk = false;
   bool accessibilityOk = false;
   Map<String, String> privateDns = {'mode': 'off', 'specifier': ''};
+
+  // ---- features (auto-pilot / focus / overlay) ----
+  bool autopilotOn = true;
+  bool gameFocusOn = true;
+  bool dndGranted = false;
+  bool overlayOk = false;
+  String? autoGame; // game auto-pilot is currently holding a session for
 
   // ---- live data ----
   final List<int> pingHistory = [];
@@ -64,7 +73,39 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Full startup sequence: consent -> engine -> boost locks.
+  Future<void> loadFeatures() async {
+    final ap = await _bridge.autopilotGet();
+    if (ap != null) {
+      autopilotOn = ap['enabled'] == true;
+      final boosted = ap['boosted'];
+      if (boosted is List) {
+        boostedPackages
+          ..clear()
+          ..addAll(boosted.map((e) => e.toString()));
+      }
+    }
+    final gf = await _bridge.gameFocusGet();
+    if (gf != null) {
+      gameFocusOn = gf['enabled'] == true;
+      dndGranted = gf['dndGranted'] == true;
+    }
+    overlayOk = await _bridge.overlayGranted();
+    notifyListeners();
+  }
+
+  Future<void> setAutopilot(bool value) async {
+    autopilotOn = value;
+    notifyListeners();
+    await _bridge.autopilotSet(value);
+  }
+
+  Future<void> setGameFocus(bool value) async {
+    gameFocusOn = value;
+    notifyListeners();
+    await _bridge.gameFocusSet(value);
+  }
+
+  /// Full startup sequence: consent -> engine -> boost locks + focus + HUD.
   Future<bool> armBoost() async {
     if (!engineOn) {
       final ok = await _bridge.vpnConsent();
@@ -74,15 +115,24 @@ class AppState extends ChangeNotifier {
       engineOn = true;
     }
     if (!boostOn) {
-      await _bridge.boostStart();
+      final started = await _bridge.boostStart();
+      if (!started) {
+        // Engine can stay on its own; never leave the UI claiming both.
+        notifyListeners();
+        return engineOn;
+      }
       boostOn = true;
     }
     await refreshPermissions();
+    if (overlayOk) {
+      await _bridge.bubbleShow('Kaya'); // live monitor over the session
+    }
     notifyListeners();
     return true;
   }
 
   Future<void> disarm() async {
+    await _bridge.bubbleHide();
     if (engineOn) {
       await _bridge.vpnStop();
       engineOn = false;
@@ -92,6 +142,16 @@ class AppState extends ChangeNotifier {
       boostOn = false;
     }
     notifyListeners();
+  }
+
+  /// Launch a game; if it's boosted, auto-pilot arms the full session.
+  Future<bool> launchGame(KayaApp app) async {
+    final ok = await _bridge.launchApp(app.packageName);
+    if (ok && boostedPackages.contains(app.packageName) && overlayOk) {
+      // Bubble is shown by the native auto-pilot when overlay is granted.
+      await _bridge.bubbleShow(app.label);
+    }
+    return ok;
   }
 
   void setBoostOn(bool value) {
@@ -105,9 +165,10 @@ class AppState extends ChangeNotifier {
   }
 
   void toggleBoosted(String packageName) {
-    if (!boostedPackages.remove(packageName)) {
-      boostedPackages.add(packageName);
-    }
+    final boosted = !boostedPackages.remove(packageName);
+    if (boosted) boostedPackages.add(packageName);
+    // Persist for the native auto-pilot (survives app restarts).
+    unawaited(_bridge.autopilotBoost(packageName, boosted));
     notifyListeners();
   }
 
@@ -116,9 +177,30 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Re-sync session flags with the native truth: the QS tile or the
+  /// home-screen widget may have armed/disarmed the session while this
+  /// Flutter engine was cold (or before the UI attached).
+  Future<void> _resyncSession() async {
+    final state = await _bridge.widgetState();
+    if (state == null) return;
+    engineOn = state['engine'] == true;
+    boostOn = state['boost'] == true;
+    final ping = (state['lastPing'] as num?)?.toInt();
+    if (ping != null && pingHistory.isEmpty) _addPing(ping);
+    notifyListeners();
+  }
+
   // ---- events ----
   void _onEvent(KayaEvent event) {
     switch (event.type) {
+      case 'session':
+        // Tile/widget/service-driven flag changes. Ping values are ignored
+        // here on purpose: probe callers already record their own samples,
+        // and duplicates would skew the jitter math.
+        final engine = event.data['engine'] as bool?;
+        final boost = event.data['boost'] as bool?;
+        if (engine != null) engineOn = engine;
+        if (boost != null) boostOn = boost;
       case 'vpn':
         final state = event.data['state']?.toString();
         if (state == 'active') engineOn = true;
@@ -141,6 +223,15 @@ class AppState extends ChangeNotifier {
         packetsRelayed++;
       case 'controller':
         // surfaced by the controller screen through its own listener
+        break;
+      case 'autopilot':
+        final game = event.data['game']?.toString();
+        autoGame = event.data['armed'] == true ? game : null;
+      case 'focus':
+      case 'notif':
+      case 'mitigator':
+      case 'update':
+        // consumed by their feature screens through bridge.events
         break;
     }
     notifyListeners();

@@ -48,10 +48,17 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     final ok = await state.armBoost();
     if (!mounted) return;
-    if (ok) {
+    if (ok && state.boostOn) {
       HapticFeedback.heavyImpact();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Fast lane live: DNS steered, locks held.')),
+      );
+    } else if (ok) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Engine armed, but the boost locks were refused — '
+              'check Battery → Unrestricted, then retry.'),
+        ),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

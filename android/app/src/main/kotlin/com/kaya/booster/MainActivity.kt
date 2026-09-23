@@ -5,6 +5,7 @@ import android.app.AppOpsManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.net.VpnService
 import android.os.Build
@@ -30,6 +31,9 @@ class MainActivity : FlutterActivity() {
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        KayaGuard.install(this) // crash forensics: log to file, then pass through
+        KayaGuard.attach(this)
+        KayaState.init(this) // sync tile + widget with any stored session
         channel = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL)
         channel?.setMethodCallHandler { call, result ->
             when (call.method) {
@@ -40,6 +44,11 @@ class MainActivity : FlutterActivity() {
                     if (intent != null) {
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         startActivity(intent)
+                        // Auto-pilot: launching a boosted game arms everything
+                        // (engine if consented, locks, focus, live bubble).
+                        if (pkg in GameAutoPilot.boostedPackages(this)) {
+                            GameAutoPilot.arm(this, pkg)
+                        }
                         finishOnMain(result) { true }
                     } else {
                         finishOnMain(result) { false }
@@ -56,27 +65,48 @@ class MainActivity : FlutterActivity() {
                 }
                 "vpnStart" -> {
                     if (VpnService.prepare(this) == null) {
-                        KayaVpnService.start(this)
-                        finishOnMain(result) { true }
+                        // Consent is granted: start the FGS defensively. If the
+                        // OEM refuses the foreground promotion we surface WHY
+                        // instead of crashing the process.
+                        val ok = try {
+                            KayaVpnService.start(this)
+                            true
+                        } catch (t: Throwable) {
+                            KayaGuard.append(this, "vpnStart", t.message ?: t.javaClass.simpleName)
+                            false
+                        }
+                        finishOnMain(result) { ok }
                     } else {
                         finishOnMain(result) { false }
                     }
                 }
                 "vpnStop" -> {
-                    KayaVpnService.stop(this)
+                    runCatching { KayaVpnService.stop(this) }
                     finishOnMain(result) { true }
                 }
                 "boostStart" -> {
-                    KayaBoostService.start(this)
-                    finishOnMain(result) { true }
+                    val ok = try {
+                        KayaBoostService.start(this)
+                        true
+                    } catch (t: Throwable) {
+                        KayaGuard.append(this, "boostStart", t.message ?: t.javaClass.simpleName)
+                        false
+                    }
+                    finishOnMain(result) { ok }
                 }
                 "boostStop" -> {
-                    KayaBoostService.stop(this)
+                    runCatching { KayaBoostService.stop(this) }
                     finishOnMain(result) { true }
                 }
                 "controllerBridgeStart" -> {
-                    KayaMediaButtonService.start(this)
-                    finishOnMain(result) { true }
+                    val ok = try {
+                        KayaMediaButtonService.start(this)
+                        true
+                    } catch (t: Throwable) {
+                        KayaGuard.append(this, "bridgeStart", t.message ?: t.javaClass.simpleName)
+                        false
+                    }
+                    finishOnMain(result) { ok }
                 }
                 "controllerBridgeStop" -> {
                     KayaMediaButtonService.stop(this)
@@ -136,7 +166,9 @@ class MainActivity : FlutterActivity() {
                         KayaInputBridge.Mapping(keyCode, x, y, hold)
                     }
                     KayaInputBridge.arm(mappings)
-                    if (mappings.isNotEmpty()) KayaMediaButtonService.start(this)
+                    if (mappings.isNotEmpty()) {
+                        runCatching { KayaMediaButtonService.start(this) }
+                    }
                     finishOnMain(result) { true }
                 }
                 "clearControllerMapping" -> {
@@ -166,7 +198,8 @@ class MainActivity : FlutterActivity() {
                     val host = call.argument<String>("host") ?: return@setMethodCallHandler
                     val port = call.argument<Int>("port") ?: 80
                     bg.execute {
-                        val ms = TcpPinger.ping(host, port)
+                        val ms = KayaGuard.guard("pingProbe") { TcpPinger.ping(host, port) }
+                        if (ms != null) KayaState.update(ping = ms) // widget's honest ping line
                         runOnUiThread { result.success(ms) }
                     }
                 }
@@ -174,7 +207,7 @@ class MainActivity : FlutterActivity() {
                     val server = call.argument<String>("server") ?: return@setMethodCallHandler
                     val domain = call.argument<String>("domain") ?: "www.activision.com"
                     bg.execute {
-                        val ms = probeResolver(server, domain)
+                        val ms = KayaGuard.guard("dnsProbe") { probeResolver(server, domain) }
                         runOnUiThread { result.success(ms) }
                     }
                 }
@@ -192,10 +225,122 @@ class MainActivity : FlutterActivity() {
                     val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
                     pm.currentThermalStatus
                 }
+                "widgetState" -> finishOnMain(result) {
+                    mapOf(
+                        "engine" to KayaState.engineOn,
+                        "boost" to KayaState.boostOn,
+                        "lastPing" to KayaState.lastPing,
+                    )
+                }
                 "toast" -> {
                     val msg = call.argument<String>("message") ?: ""
                     runOnUiThread { Toast.makeText(this, msg, Toast.LENGTH_SHORT).show() }
                     result.success(true)
+                }
+                "crashLogRead" -> bg.execute {
+                    val lines = KayaGuard.tail(this)
+                    runOnUiThread { result.success(lines) }
+                }
+                "crashLogClear" -> {
+                    KayaGuard.clear(this)
+                    finishOnMain(result) { true }
+                }
+                "gameBenchmark" -> bg.execute {
+                    val rounds = call.argument<Int>("rounds") ?: 3
+                    val rows: List<Map<String, Any?>>? = KayaGuard.guard("gameBenchmark") {
+                        GameEndpoints.benchmarkAll(rounds.coerceIn(1, 5))
+                    }
+                    val safeRows: List<Map<String, Any?>> = rows ?: emptyList()
+                    runOnUiThread { result.success(safeRows) }
+                }
+                "overlayGranted" -> finishOnMain(result) { KayaLiveBubble.canDraw(this) }
+                "requestOverlay" -> {
+                    runCatching {
+                        startActivity(
+                            Intent(
+                                Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
+                                Uri.parse("package:$packageName"),
+                            ),
+                        )
+                    }
+                    finishOnMain(result) { true }
+                }
+                "bubbleShow" -> {
+                    val ok = runCatching {
+                        KayaLiveBubble.show(this, call.argument<String>("label"))
+                        KayaLiveBubble.isShowing()
+                    }.getOrDefault(false)
+                    finishOnMain(result) { ok }
+                }
+                "bubbleHide" -> {
+                    KayaLiveBubble.hide(this)
+                    finishOnMain(result) { true }
+                }
+                "autopilotGet" -> finishOnMain(result) {
+                    mapOf(
+                        "enabled" to GameAutoPilot.isEnabled(this),
+                        "boosted" to GameAutoPilot.boostedPackages(this).toList(),
+                    )
+                }
+                "autopilotSet" -> {
+                    GameAutoPilot.setEnabled(this, call.argument<Boolean>("enabled") ?: true)
+                    finishOnMain(result) { true }
+                }
+                "autopilotBoost" -> {
+                    val pkg = call.argument<String>("package") ?: ""
+                    val boosted = call.argument<Boolean>("boosted") ?: true
+                    GameAutoPilot.setBoosted(this, pkg, boosted)
+                    finishOnMain(result) { true }
+                }
+                "gameFocusGet" -> finishOnMain(result) {
+                    mapOf(
+                        "enabled" to GameFocusManager.isEnabled(this),
+                        "dndGranted" to GameFocusManager.isDndGranted(this),
+                    )
+                }
+                "gameFocusSet" -> {
+                    GameFocusManager.setEnabled(this, call.argument<Boolean>("enabled") ?: true)
+                    finishOnMain(result) { true }
+                }
+                "gameFocusDnd" -> {
+                    GameFocusManager.requestDndAccess(this)
+                    finishOnMain(result) { true }
+                }
+                "notifList" -> finishOnMain(result) {
+                    KayaNotificationCenter.list()
+                }
+                "notifUnread" -> finishOnMain(result) { KayaNotificationCenter.unreadCount() }
+                "notifMarkRead" -> {
+                    val key = call.argument<String>("key") ?: ""
+                    KayaNotificationCenter.markRead(key)
+                    finishOnMain(result) { true }
+                }
+                "notifMarkAll" -> {
+                    KayaNotificationCenter.markAllRead()
+                    finishOnMain(result) { true }
+                }
+                "notifClear" -> {
+                    KayaNotificationCenter.clear(this, call.argument<String>("key") ?: "")
+                    finishOnMain(result) { true }
+                }
+                "notifGrant" -> {
+                    runCatching {
+                        startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS))
+                    }
+                    finishOnMain(result) { true }
+                }
+                "updateCheck" -> bg.execute {
+                    val c = KayaUpdater.check(this)
+                    runOnUiThread { result.success(c?.toMap()) }
+                }
+                "updateInstall" -> {
+                    val url = call.argument<String>("url") ?: ""
+                    if (url.startsWith("https://github.com/")) {
+                        runCatching { KayaUpdater.install(this, url) }
+                        finishOnMain(result) { true }
+                    } else {
+                        finishOnMain(result) { false }
+                    }
                 }
                 else -> result.notImplemented()
             }

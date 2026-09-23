@@ -4,6 +4,15 @@ plugins {
     id "dev.flutter.flutter-gradle-plugin"
 }
 
+// Versioning follows pubspec.yaml via the flutter tool's local.properties
+// (flutter.versionCode / flutter.versionName), so the in-app updater's
+// current-vs-latest comparison is always accurate.
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localPropertiesFile.withReader("UTF-8") { localProperties.load(it) }
+}
+
 // Release signing: reads key.properties (gitignored). When absent (e.g. a
 // fork's CI without secrets), falls back to debug signing so builds never break.
 def keystoreProperties = new Properties()
@@ -29,8 +38,8 @@ android {
         applicationId = "com.kaya.booster"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = localProperties.getProperty("flutter.versionCode")?.toInteger() ?: 1
+        versionName = localProperties.getProperty("flutter.versionName") ?: "1.0.0"
         ndkVersion = "28.2.13676358"
     }
 
@@ -60,4 +69,8 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    implementation "androidx.core:core-ktx:1.13.1"
 }
