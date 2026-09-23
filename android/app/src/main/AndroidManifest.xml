@@ -65,6 +65,19 @@
             <property
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
                 android:value="dns_optimization" />
+            <!-- Opt in to Always-on VPN: Settings → Network → VPN → Kaya →
+                 Always-on (+ optional "Block connections without VPN").
+                 The system then starts/revives the engine itself (null intent
+                 → START_STICKY → startSafely) at boot and after crashes. -->
+            <meta-data
+                android:name="android.net.VpnService.SUPPORTS_ALWAYS_ON"
+                android:value="true" />
+            <!-- Required for the system to RESOLVE this service when starting
+                 Always-on VPN (at boot / after crash) — without this action
+                 filter the system cannot find the service and silently skips. -->
+            <intent-filter>
+                <action android:name="android.net.VpnService" />
+            </intent-filter>
         </service>
         <service
             android:name="com.kaya.booster.KayaBoostService"
