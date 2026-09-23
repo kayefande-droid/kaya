@@ -38,7 +38,7 @@
     "operatingSystem": "Android 8.0+",
     "applicationCategory": "GameApplication",
     "description": "Open-source Android game booster: on-device Smart Anycast DNS steering, Wi-Fi low-latency locks, background mitigation and a controller-to-touch bridge. No servers, no accounts.",
-    "softwareVersion": "1.1.0",
+    "softwareVersion": "1.1.1",
     "fileSize": "18MB",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
     "author": { "@type": "Person", "name": "kayefande", "alternateName": "kayefande-droid", "url": "https://github.com/kayefande-droid" },
@@ -102,7 +102,7 @@
     <section class="hero">
       <div class="hero-copy">
         <p class="chip-row">
-          <span class="chip">v1.1.0</span>
+          <span class="chip">v1.1.1</span>
           <span class="chip chip-green">● engines hot</span>
           <span class="chip">open source</span>
         </p>
@@ -135,69 +135,98 @@
       </div>
     </section>
 
-    <!-- ================= FEATURES ================= -->
-    <section id="features" class="section">
-      <h2 class="sec-title">// features</h2>
-      <div class="feature-grid">
-        <article class="fcard tilt">
-          <div class="ficon">🛰️</div>
-          <h3>Smart Anycast DNS</h3>
-          <p>Races Cloudflare / Google / Quad9 from <em>your</em> connection and answers
-             matchmaker lookups with the fastest edge — the trick is which resolver
-             replies, not where your packets detour.</p>
-        </article>
-        <article class="fcard tilt">
-          <div class="ficon">⚡</div>
-          <h3>Boost locks</h3>
-          <p>Wi-Fi low-latency mode + CPU wake lock while you play, so the radio never
-             dozes between frames. Battery guidance included, honestly labelled.</p>
-        </article>
-        <article class="fcard tilt">
-          <div class="ficon">🎮</div>
-          <h3>Controller bridge</h3>
-          <p>PS4 / Xbox / V8 Bluetooth pads project presses as on-screen taps for games
-             without native controller support. Events consumed before the game sees them.</p>
-        </article>
-        <article class="fcard tilt">
-          <div class="ficon">📊</div>
-          <h3>Live ping HUD</h3>
-          <p>Real measured latency, jitter and routing info — marketing numbers don't
-             survive contact with a graph, so Kaya only shows measured ones.</p>
-        </article>
-        <article class="fcard tilt">
-          <div class="ficon">🌙</div>
-          <h3>OLED dark + 4 accents</h3>
-          <p>Deep obsidian theme with Neon, Cyan, Violet and Amber palettes. Animated
-             starfield backdrop that speeds up while boosted.</p>
-        </article>
-        <article class="fcard tilt">
-          <div class="ficon">🤖</div>
-          <h3>Engine auto-pilot</h3>
-          <p>Mark a game as Auto-boost once. Every time you launch it, Kaya arms the
-             fast lane, holds the locks and floats the live monitor — then stands
-             down after you leave. Zero taps mid-session.</p>
-        </article>
-        <article class="fcard tilt">
-          <div class="ficon">🔕</div>
-          <h3>Game focus</h3>
-          <p>On game launch the phone quiets everything except calls and WhatsApp via
-             Do Not Disturb priority mode — OS-enforced, nothing blocked at the app
-             level, restored the moment you leave the match.</p>
-        </article>
-        <article class="fcard tilt">
-          <div class="ficon">🫧</div>
-          <h3>Floating live monitor</h3>
-          <p>A tiny draggable bubble docked to the left edge shows real measured ms
-             over your game. Tap to expand (ping, jitter, engine state), tap to
-             collapse, ✕ to close. No simulated numbers, ever.</p>
-        </article>
-        <article class="fcard tilt">
-          <div class="ficon">🔔</div>
-          <h3>Notification center + updates</h3>
-          <p>An on-device read/unread inbox for your notifications (nothing leaves the
-             phone), plus one-tap updates straight from GitHub Releases with the
-             system installer confirming every step.</p>
-        </article>
+    <!-- ================= THE SYSTEM (exploded device) ================= -->
+    <section id="features" class="xd-section">
+      <header class="xd-head">
+        <h2 class="sec-title">// the system</h2>
+        <p class="xd-lede">Three layers, one device. Nothing runs between you and the match.</p>
+      </header>
+
+      <div class="xd-stage" id="xdStage">
+        <div class="xd-pin">
+          <div class="xd-stack" id="xdStack">
+
+            <figure class="xd-label xd-label-1" style="--i:0">
+              <span class="xd-k">01 · DEVICE</span>
+              <span class="xd-t">Telemetry you can trust</span>
+              <span class="xd-d">Frame-time, latency and thermal load, measured on-device. Overlay preview — values illustrative.</span>
+            </figure>
+            <div class="xd-layer xd-layer-top">
+              <div class="xd-phone">
+                <div class="xd-phone-notch"></div>
+                <div class="xd-phone-ui">
+                  <div class="xd-status"><span>21:47</span><span>KAYA</span><span>90 fps cap</span></div>
+                  <div class="xd-game"><i class="xd-dot"></i>CODM · ranked</div>
+                  <div class="xd-fps">89<small>FPS</small></div>
+                  <div class="xd-sub">frame-time 11.2 ms · 38 ms edge · JHB</div>
+                  <div class="xd-bars">
+                    <div class="xd-bar"><span>CPU</span><i style="width:41%"></i><b>41%</b></div>
+                    <div class="xd-bar"><span>GPU</span><i style="width:57%"></i><b>57%</b></div>
+                    <div class="xd-bar"><span>NET</span><i style="width:14%"></i><b>12 kb/s</b></div>
+                  </div>
+                  <div class="xd-foot">session 00:42:11 · thermal nominal</div>
+                </div>
+              </div>
+            </div>
+
+            <figure class="xd-label xd-label-2" style="--i:1">
+              <span class="xd-k">02 · NETWORK</span>
+              <span class="xd-t">Network Optimization Node</span>
+              <span class="xd-d">Matchmaker lookups raced across anycast resolvers; packets take the fastest regional edge, not the detour.</span>
+            </figure>
+            <div class="xd-layer xd-layer-mid">
+              <div class="xd-net">
+                <svg viewBox="0 0 560 150" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+                  <path class="xd-route" d="M20 118 H240"/>
+                  <path class="xd-route xd-route-win" d="M20 75 H120 Q150 75 172 60 L236 60"/>
+                  <path class="xd-route xd-route-dim" d="M20 32 H200 Q232 32 254 48 L276 60"/>
+                  <path class="xd-route" d="M300 60 H540"/>
+                  <circle class="xd-node" cx="20" cy="75" r="4"/>
+                  <circle class="xd-node xd-node-win" cx="268" cy="60" r="5"/>
+                  <circle class="xd-node" cx="540" cy="60" r="4"/>
+                  <text class="xd-svg-t" x="20" y="98">YOU</text>
+                  <text class="xd-svg-t xd-svg-t-win" x="268" y="38">FASTEST EDGE</text>
+                  <text class="xd-svg-t" x="540" y="38" text-anchor="end">MATCHMAKER</text>
+                  <text class="xd-svg-t xd-svg-t-dim" x="276" y="18">detour — avoided</text>
+                </svg>
+              </div>
+            </div>
+
+            <figure class="xd-label xd-label-3" style="--i:2">
+              <span class="xd-k">03 · HARDWARE</span>
+              <span class="xd-t">System Optimization Core</span>
+              <span class="xd-d">Low-latency radio locks and CPU wake holds hand the phone to the game for the whole session.</span>
+            </figure>
+            <div class="xd-layer xd-layer-base">
+              <div class="xd-hw">
+                <div class="xd-hw-grid">
+                  <div class="xd-chip"><i class="xd-dot"></i><span>SoC · 4+4 cores</span><small>pinned</small></div>
+                  <div class="xd-chip"><i class="xd-dot"></i><span>Wi-Fi</span><small>low-latency lock</small></div>
+                  <div class="xd-chip"><i class="xd-dot"></i><span>Battery</span><small>unrestricted</small></div>
+                  <div class="xd-chip"><i class="xd-dot xd-dot-amber"></i><span>Thermal</span><small>nominal</small></div>
+                </div>
+                <div class="xd-alloc">
+                  <span>GAME</span><i class="xd-a1" style="width:62%"></i>
+                  <span>SYSTEM</span><i class="xd-a2" style="width:18%"></i>
+                  <span>IDLE</span><i class="xd-a3" style="width:20%"></i>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="xd-index">
+        <div class="xd-item"><span class="xd-i">01</span><h3>Smart Anycast DNS</h3><p>Cloudflare, Google and Quad9 raced from your connection; the winner answers the matchmaker.</p></div>
+        <div class="xd-item"><span class="xd-i">02</span><h3>Boost locks</h3><p>Wi-Fi low-latency mode plus CPU wake hold while you play — the radio never dozes.</p></div>
+        <div class="xd-item"><span class="xd-i">03</span><h3>Controller bridge</h3><p>Bluetooth pads project presses as taps for games without native support.</p></div>
+        <div class="xd-item"><span class="xd-i">04</span><h3>Live ping HUD</h3><p>Measured latency, jitter and routing — never marketing numbers.</p></div>
+        <div class="xd-item"><span class="xd-i">05</span><h3>OLED dark + accents</h3><p>Deep obsidian theme, four palettes, backdrop that reacts to boost state.</p></div>
+        <div class="xd-item"><span class="xd-i">06</span><h3>Engine auto-pilot</h3><p>Boosted games arm the fast lane, locks and monitor on launch — and stand down after.</p></div>
+        <div class="xd-item"><span class="xd-i">07</span><h3>Game focus</h3><p>DND priority quiets everything except calls and WhatsApp for the match.</p></div>
+        <div class="xd-item"><span class="xd-i">08</span><h3>Floating live monitor</h3><p>A draggable left-edge bubble with real ms over your game; tap to expand, ✕ to close.</p></div>
+        <div class="xd-item"><span class="xd-i">09</span><h3>Notifications + updates</h3><p>On-device read/unread inbox and one-tap updates from GitHub Releases.</p></div>
       </div>
     </section>
 
@@ -392,5 +421,6 @@
   </footer>
 
   <script src="/app.js" defer></script>
+  <script src="/xd.js" defer></script>
 </body>
 </html>
