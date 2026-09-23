@@ -120,6 +120,8 @@ object GameAutoPilot {
                 KayaState.update(boost = true)
             }
             GameFocusManager.apply(context)
+            // Live monitor rides along even if the engine is not armed yet
+            // (no consent yet) — it is the one thing the player must see.
             KayaLiveBubble.show(context, pkg)
             KayaEventHub.emit("autopilot", mapOf("game" to pkg, "armed" to true))
         }

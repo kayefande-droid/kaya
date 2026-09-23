@@ -44,9 +44,31 @@ class KayaShell extends StatefulWidget {
   State<KayaShell> createState() => _KayaShellState();
 }
 
-class _KayaShellState extends State<KayaShell> {
+class _KayaShellState extends State<KayaShell> with WidgetsBindingObserver {
   late final AppState state = AppState(KayaBridge.shared)..loadLibrary();
   int _tab = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    state.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState s) {
+    // Returning from the overlay-permission screen: re-check and surface the
+    // live monitor immediately if the user granted it.
+    if (s == AppLifecycleState.resumed) {
+      state.onResumed();
+    }
+  }
 
   static const _destinations = [
     (Icons.bolt_rounded, 'Boost'),
@@ -54,12 +76,6 @@ class _KayaShellState extends State<KayaShell> {
     (Icons.lan_rounded, 'Network'),
     (Icons.tune_rounded, 'Tuning'),
   ];
-
-  @override
-  void dispose() {
-    state.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {

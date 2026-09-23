@@ -169,7 +169,12 @@ class KayaVpnService : VpnService() {
     private fun buildVpnInterface(): ParcelFileDescriptor? {
         val builder = Builder()
             .setSession("Kaya Fast Lane")
-            .setMtu(1500)
+            // 1280 (IPv6 minimum) instead of 1500: smaller packets fragment
+            // less on lossy/congested radio links, which trims serialization
+            // delay and jitter spikes — the visible effect is steadier game
+            // ms. The relay reassembles nothing; payloads just travel in
+            // right-sized frames.
+            .setMtu(1280)
             .addAddress(tunAddr, 32)
             .addRoute("0.0.0.0", 0)
             .addDnsServer(tunRouter)
@@ -213,6 +218,13 @@ class KayaVpnService : VpnService() {
         reply.soTimeout = 500
         replySocket = reply
         replyThread = Thread({
+            // Real-time priority: tunnel I/O must never wait behind UI threads
+            // or the game's ms climbs exactly when the phone gets busy.
+            runCatching {
+                android.os.Process.setThreadPriority(
+                    android.os.Process.THREAD_PRIORITY_URGENT_AUDIO,
+                )
+            }
             val buf = ByteArray(65535)
             val pkt = DatagramPacket(buf, buf.size)
             while (running.get()) {
@@ -232,6 +244,11 @@ class KayaVpnService : VpnService() {
 
     private fun startReadLoop(fd: ParcelFileDescriptor) {
         readThread = Thread({
+            runCatching {
+                android.os.Process.setThreadPriority(
+                    android.os.Process.THREAD_PRIORITY_URGENT_AUDIO,
+                )
+            }
             val input = FileInputStream(fd.fileDescriptor)
             val packet = ByteArray(32767)
             while (running.get()) {

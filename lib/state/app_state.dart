@@ -64,6 +64,17 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Called when the app returns to the foreground (e.g. from the overlay
+  /// permission screen). Re-checks permissions and surfaces the live monitor
+  /// if a boost session is active and the user just granted the overlay.
+  Future<void> onResumed() async {
+    final hadOverlay = overlayOk;
+    await refreshPermissions();
+    if (!hadOverlay && overlayOk && (engineOn || boostOn)) {
+      await _bridge.bubbleShow('Kaya');
+    }
+  }
+
   Future<void> refreshPermissions() async {
     batteryExempt = await _bridge.isIgnoringBatteryOptimizations();
     usageStatsOk = await _bridge.hasUsageStats();
@@ -126,6 +137,12 @@ class AppState extends ChangeNotifier {
     await refreshPermissions();
     if (overlayOk) {
       await _bridge.bubbleShow('Kaya'); // live monitor over the session
+    } else {
+      // Never silently skip the live monitor: send the user to the one-tap
+      // overlay screen. On return, refresh + show immediately.
+      await _bridge.requestOverlay();
+      await refreshPermissions();
+      if (overlayOk) await _bridge.bubbleShow('Kaya');
     }
     notifyListeners();
     return true;
@@ -147,10 +164,15 @@ class AppState extends ChangeNotifier {
   /// Launch a game; if it's boosted, auto-pilot arms the full session.
   Future<bool> launchGame(KayaApp app) async {
     final ok = await _bridge.launchApp(app.packageName);
-    if (ok && boostedPackages.contains(app.packageName) && overlayOk) {
-      // Bubble is shown by the native auto-pilot when overlay is granted.
-      await _bridge.bubbleShow(app.label);
+    if (!ok) return false;
+    if (!boostedPackages.contains(app.packageName)) return ok;
+    // Live monitor must ride along. If the overlay permission is missing,
+    // route through it once — the next launch shows the bubble instantly.
+    if (!overlayOk) {
+      await _bridge.requestOverlay();
+      await refreshPermissions();
     }
+    if (overlayOk) await _bridge.bubbleShow(app.label);
     return ok;
   }
 
