@@ -1,7 +1,7 @@
 // KAYA — "The System" exploded-device scroll driver.
-// Self-contained: only touches #xdStage / #xdStack and the xd- plates.
-// Desktop: sticky stage, plates Z-split apart as you scroll, labels fade in
-// sequentially. Mobile / reduced-motion: static timeline (CSS handles it).
+// Desktop: sticky stage; scroll maps to the stack pulling apart quietly
+// along Z, labels fade in sequentially. Mobile / reduced-motion: the CSS
+// static timeline takes over (this script gets out of the way).
 
 (function () {
   "use strict";
@@ -39,19 +39,20 @@
     var p = Math.min(1, Math.max(0, -rect.top / total));
     var e = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2; // easeInOutQuad
 
-    // Explode: top plate lifts back/up, base drops forward, mid holds the line.
-    var spread = 116 * e;
+    // Quiet, deliberate separation: the screen pushes forward out of the
+    // chassis, the base plate recedes — small Y travel, gentle Z travel.
+    var z = 90 * e;
     top.style.transform =
-      "translate3d(0," + (-spread).toFixed(1) + "px," + (74 * e).toFixed(1) + "px)";
+      "translate3d(0," + (-46 * e).toFixed(1) + "px," + z.toFixed(1) + "px)";
     mid.style.transform =
-      "translate3d(0," + (spread * 0.08).toFixed(1) + "px," + (12 * e).toFixed(1) + "px)";
+      "translate3d(0," + (6 * e).toFixed(1) + "px," + (14 * e).toFixed(1) + "px)";
     base.style.transform =
-      "translate3d(0," + (spread * 0.64).toFixed(1) + "px," + (-62 * e).toFixed(1) + "px)";
+      "translate3d(0," + (40 * e).toFixed(1) + "px," + (-56 * e).toFixed(1) + "px)";
 
     // Labels appear one by one as their plate separates.
-    if (labels[0]) labels[0].classList.toggle("on", e > 0.05);
-    if (labels[1]) labels[1].classList.toggle("on", e > 0.42);
-    if (labels[2]) labels[2].classList.toggle("on", e > 0.72);
+    if (labels[0]) labels[0].classList.toggle("on", e > 0.06);
+    if (labels[1]) labels[1].classList.toggle("on", e > 0.4);
+    if (labels[2]) labels[2].classList.toggle("on", e > 0.7);
   }
 
   function onScroll() {
