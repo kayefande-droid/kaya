@@ -15,10 +15,17 @@ object KayaEventHub {
 
     fun emit(type: String, payload: Map<String, Any?>) {
         val event = mapOf("type" to type, "data" to payload)
+        val deliver = { s: EventChannel.EventSink ->
+            // A dead Flutter engine (app swiped away) throws here; swallow it —
+            // emitting an event must never be able to kill a service thread.
+            runCatching { s.success(event) }
+        }
         if (Looper.myLooper() == Looper.getMainLooper()) {
-            sink?.success(event)
+            sink?.let(deliver)
         } else {
-            mainHandler.post { sink?.success(event) }
+            mainHandler.post {
+                sink?.let(deliver)
+            }
         }
     }
 }

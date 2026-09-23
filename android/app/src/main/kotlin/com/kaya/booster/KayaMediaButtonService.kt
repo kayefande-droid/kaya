@@ -4,6 +4,7 @@ import android.app.Notification
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
+import android.os.Build
 import android.os.IBinder
 
 /**
@@ -38,7 +39,17 @@ class KayaMediaButtonService : Service() {
                     .setContentIntent(open)
                     .addAction(Notification.Action.Builder(null, "Stop", stop).build())
                     .build()
-                startForeground(NOTIF_ID, notif)
+                try {
+                    if (Build.VERSION.SDK_INT >= 29) {
+                        startForeground(NOTIF_ID, notif, android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
+                    } else {
+                        startForeground(NOTIF_ID, notif)
+                    }
+                } catch (t: Throwable) {
+                    KayaGuard.append(this, "bridge-fg", t.message ?: "?")
+                    runCatching { startForeground(NOTIF_ID, notif) }
+                        .onFailure { stopSelf() }
+                }
             }
         }
         return START_STICKY
@@ -50,14 +61,21 @@ class KayaMediaButtonService : Service() {
         const val ACTION_STOP = "com.kaya.booster.STOP_CONTROLLER"
         private const val NOTIF_ID = 43
 
-        fun start(context: android.content.Context) {
-            context.startForegroundService(Intent(context, KayaMediaButtonService::class.java))
-        }
+        fun start(context: android.content.Context): Boolean = runCatching {
+            if (Build.VERSION.SDK_INT >= 26) {
+                context.startForegroundService(Intent(context, KayaMediaButtonService::class.java))
+            } else {
+                context.startService(Intent(context, KayaMediaButtonService::class.java))
+            }
+            true
+        }.getOrDefault(false)
 
         fun stop(context: android.content.Context) {
-            context.startService(
-                Intent(context, KayaMediaButtonService::class.java).setAction(ACTION_STOP),
-            )
+            runCatching {
+                context.startService(
+                    Intent(context, KayaMediaButtonService::class.java).setAction(ACTION_STOP),
+                )
+            }
         }
     }
 }

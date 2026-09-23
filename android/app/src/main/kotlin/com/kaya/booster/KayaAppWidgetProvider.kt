@@ -41,9 +41,12 @@ class KayaAppWidgetProvider : AppWidgetProvider() {
                 android.net.VpnService.prepare(context) == null
             }.getOrDefault(false)
             if (wantOn) {
-                if (vpnPrepared) KayaVpnService.start(context)
-                KayaBoostService.start(context)
-                KayaState.update(boost = true)
+                if (vpnPrepared && !KayaState.storedEngineOn(context)) {
+                    if (KayaVpnService.start(context)) KayaState.update(engine = true)
+                }
+                if (!KayaState.storedBoostOn(context) && KayaBoostService.start(context)) {
+                    KayaState.update(boost = true)
+                }
                 if (!vpnPrepared) {
                     android.widget.Toast.makeText(
                         context,

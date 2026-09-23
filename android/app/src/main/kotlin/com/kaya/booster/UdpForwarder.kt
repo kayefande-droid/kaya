@@ -18,19 +18,25 @@ object UdpForwarder {
     private const val HEADER_SIZE = 13
     private val sockets = ConcurrentHashMap<Long, DatagramSocket>()
     @Volatile private var running = false
+    @Volatile private var boundPortNo = -1
     private var serverSocket: DatagramSocket? = null
     private var thread: Thread? = null
     private var protectFn: ((DatagramSocket) -> Boolean)? = null
     private var replyPort = 51976
 
+    /** Actual local relay port after a successful [start] (fallbacks included). */
+    fun boundPort(): Int = boundPortNo
+
     @Synchronized
-    fun start(listenPort: Int, protect: (DatagramSocket) -> Boolean) {
+    fun start(listenPort: Int, replyToPort: Int, protect: (DatagramSocket) -> Boolean) {
         if (running) return
         protectFn = protect
+        replyPort = replyToPort
         val srv = DatagramSocket(null)
         srv.reuseAddress = true
         srv.bind(InetSocketAddress("127.0.0.1", listenPort))
         serverSocket = srv
+        boundPortNo = srv.localPort
         running = true
         thread = Thread({
             val buf = ByteArray(65535)
@@ -132,6 +138,7 @@ object UdpForwarder {
     @Synchronized
     fun stop() {
         running = false
+        boundPortNo = -1
         runCatching { serverSocket?.close() }
         sockets.values.forEach { runCatching { it.close() } }
         sockets.clear()

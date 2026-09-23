@@ -113,12 +113,10 @@ object GameAutoPilot {
             } catch (_: Throwable) {
                 false
             }
-            if (prepared && !KayaState.engineOn) {
-                KayaVpnService.start(context)
+            if (prepared && !KayaState.engineOn && KayaVpnService.start(context)) {
                 KayaState.update(engine = true)
             }
-            if (!KayaState.boostOn) {
-                KayaBoostService.start(context)
+            if (!KayaState.boostOn && KayaBoostService.start(context)) {
                 KayaState.update(boost = true)
             }
             GameFocusManager.apply(context)

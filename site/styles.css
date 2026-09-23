@@ -229,6 +229,12 @@ h1 {
 .game-tile span { font-weight: 900; font-size: 1.25rem; letter-spacing: .04em; }
 .game-tile small { color: var(--ink-dim); }
 .game-tile.alt { border-style: dashed; color: var(--ink-dim); justify-content: center; text-align: center; }
+.game-ico {
+  width: 34px; height: 34px; margin-bottom: 8px;
+  fill: none; stroke: currentColor; stroke-width: 2.4;
+  stroke-linecap: round; stroke-linejoin: round; color: var(--lane);
+}
+.game-tile:hover .game-ico { filter: drop-shadow(0 0 7px currentColor); }
 
 /* tech specs */
 .spec-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; }

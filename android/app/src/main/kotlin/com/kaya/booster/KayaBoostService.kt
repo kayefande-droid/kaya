@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
@@ -60,14 +61,31 @@ class KayaBoostService : Service() {
         if (running.getAndSet(true)) return
         KayaState.init(this)
         KayaState.update(boost = true)
-        startForeground(
-            NOTIF_ID,
-            buildNotification(getString(R.string.notif_boost_title), getString(R.string.notif_boost_text)),
+        // Foreground promotion first, OEM-crash-proof: some launchers throw
+        // here even with the permission granted; a plain retry covers most.
+        val notif = buildNotification(
+            getString(R.string.notif_boost_title),
+            getString(R.string.notif_boost_text),
         )
-        locks.acquire()
-        mitigator.activate()
-        observeThermal()
-        GameFocusManager.apply(this) // quiet non-allowlisted noise for the session
+        try {
+            if (Build.VERSION.SDK_INT >= 29) {
+                startForeground(NOTIF_ID, notif, android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
+            } else {
+                startForeground(NOTIF_ID, notif)
+            }
+        } catch (t: Throwable) {
+            KayaGuard.append(this, "boost-fg", t.message ?: t.javaClass.simpleName)
+            runCatching { startForeground(NOTIF_ID, notif) }
+                .onFailure {
+                    KayaGuard.append(this, "boost-fg-retry", it.message ?: "?")
+                    stopSelf()
+                    return
+                }
+        }
+        runCatching { locks.acquire() }
+        runCatching { mitigator.activate() }
+        runCatching { observeThermal() }
+        runCatching { GameFocusManager.apply(this) } // quiet non-allowlisted noise for the session
         handler.removeCallbacks(autopilotPoller)
         handler.postDelayed(autopilotPoller, 5_000)
     }
@@ -126,12 +144,20 @@ class KayaBoostService : Service() {
         const val ACTION_STOP = "com.kaya.booster.STOP_BOOST"
         private const val NOTIF_ID = 41
 
-        fun start(context: Context) {
-            context.startForegroundService(Intent(context, KayaBoostService::class.java))
-        }
+        /** Background-safe: falls back and never throws when the OS refuses. */
+        fun start(context: Context): Boolean = runCatching {
+            if (Build.VERSION.SDK_INT >= 26) {
+                context.startForegroundService(Intent(context, KayaBoostService::class.java))
+            } else {
+                context.startService(Intent(context, KayaBoostService::class.java))
+            }
+            true
+        }.getOrDefault(false)
 
         fun stop(context: Context) {
-            context.startService(Intent(context, KayaBoostService::class.java).setAction(ACTION_STOP))
+            runCatching {
+                context.startService(Intent(context, KayaBoostService::class.java).setAction(ACTION_STOP))
+            }
         }
     }
 }

@@ -70,7 +70,6 @@ class MainActivity : FlutterActivity() {
                         // instead of crashing the process.
                         val ok = try {
                             KayaVpnService.start(this)
-                            true
                         } catch (t: Throwable) {
                             KayaGuard.append(this, "vpnStart", t.message ?: t.javaClass.simpleName)
                             false
@@ -87,7 +86,6 @@ class MainActivity : FlutterActivity() {
                 "boostStart" -> {
                     val ok = try {
                         KayaBoostService.start(this)
-                        true
                     } catch (t: Throwable) {
                         KayaGuard.append(this, "boostStart", t.message ?: t.javaClass.simpleName)
                         false
@@ -101,7 +99,6 @@ class MainActivity : FlutterActivity() {
                 "controllerBridgeStart" -> {
                     val ok = try {
                         KayaMediaButtonService.start(this)
-                        true
                     } catch (t: Throwable) {
                         KayaGuard.append(this, "bridgeStart", t.message ?: t.javaClass.simpleName)
                         false

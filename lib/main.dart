@@ -163,7 +163,7 @@ class _KayaShellState extends State<KayaShell> {
                   const AboutListTile(
                     icon: Icon(Icons.info_outline_rounded),
                     applicationName: 'Kaya',
-                    applicationVersion: '1.0.4',
+                    applicationVersion: '1.1.1',
                     aboutBoxChildren: [
                       Text('Zero servers. Zero accounts. Hand-built.'),
                     ],

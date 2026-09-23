@@ -10,7 +10,9 @@ import java.io.ByteArrayOutputStream
 object DnsResponder {
 
     private data class Entry(val at: Long, val ips: List<String>, val resolver: String)
-    private val cache = HashMap<String, Entry>()
+
+    // Tun-read thread + racer threads share this: must be concurrent.
+    private val cache = java.util.concurrent.ConcurrentHashMap<String, Entry>()
     private const val TTL_MS = 60_000L
 
     fun answer(srcIp: ByteArray, srcPort: Int, query: ByteArray, writer: (ByteArray) -> Unit) {

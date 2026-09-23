@@ -43,6 +43,7 @@ class KayaVpnService : VpnService() {
     private val tunAddr = "198.18.0.2"
     private val tunRouter = "198.18.0.1"
     private var fwdUdpPort = 51975
+    private var fwdRelayPort = 51975
     private var replyUdpPort = 51976
 
     override fun onCreate() {
@@ -59,6 +60,7 @@ class KayaVpnService : VpnService() {
         runCatching { tun?.close() }
         UdpForwarder.stop()
         TcpProxy.shutdown()
+        fwdRelayPort = fwdUdpPort
         KayaVpnServiceHolder.vpn = null
         if (wasRunning) KayaState.update(engine = false)
         KayaEventHub.emit("vpn", mapOf("state" to "stopped"))
@@ -66,6 +68,9 @@ class KayaVpnService : VpnService() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        // Always satisfy the startForegroundService obligation FIRST — stopping
+        // without promoting crashes the process on Android 12+.
+        promoteToForeground()
         when (intent?.action) {
             ACTION_STOP -> {
                 stopSelf()
@@ -133,6 +138,21 @@ class KayaVpnService : VpnService() {
         running.set(true)
 
         startReplyLoop()
+        // Bring the UDP relay up (guarded: a busy port must never take the
+        // engine down — packets simply pass through untouched instead).
+        var relayPort = fwdUdpPort
+        for (candidate in intArrayOf(fwdUdpPort, fwdUdpPort + 1, fwdUdpPort + 7, 0)) {
+            val started = runCatching {
+                UdpForwarder.start(candidate, replyUdpPort) { sock -> protectDatagram(sock) }
+                true
+            }.getOrDefault(false)
+            if (started) {
+                relayPort = UdpForwarder.boundPort().takeIf { it > 0 } ?: candidate
+                break
+            }
+        }
+        fwdRelayPort = relayPort
+
         startReadLoop(fd)
         KayaState.update(engine = true)
         KayaEventHub.emit("vpn", mapOf("state" to "active"))
@@ -235,6 +255,7 @@ class KayaVpnService : VpnService() {
     // ------------------------------------------------------------- UDP / DNS
 
     private fun processUdp(packet: ByteArray, len: Int, ipHeaderLen: Int, srcIp: ByteArray, dstIp: ByteArray) {
+        if (len < ipHeaderLen + 8) return // truncated UDP header
         val udpLen = PacketEngine.udpLength(packet, ipHeaderLen)
         if (udpLen < 8 || ipHeaderLen + udpLen > len) return
         val srcPort = PacketEngine.udpSourcePort(packet, ipHeaderLen)
@@ -261,7 +282,7 @@ class KayaVpnService : VpnService() {
         runCatching {
             val sock = DatagramSocket(null)
             sock.bind(InetSocketAddress(0))
-            sock.send(DatagramPacket(out, out.size, InetAddress.getByName("127.0.0.1"), fwdUdpPort))
+            sock.send(DatagramPacket(out, out.size, InetAddress.getByName("127.0.0.1"), fwdRelayPort))
             sock.close()
         }
     }
@@ -295,6 +316,7 @@ class KayaVpnService : VpnService() {
     // ------------------------------------------------------------- TCP
 
     private fun processTcp(packet: ByteArray, len: Int, ipHeaderLen: Int, srcIp: ByteArray, dstIp: ByteArray) {
+        if (len < ipHeaderLen + 20) return // truncated header; drop instead of throwing
         val srcPort = PacketEngine.tcpSourcePort(packet, ipHeaderLen)
         val dstPort = PacketEngine.tcpDestPort(packet, ipHeaderLen)
         val flags = PacketEngine.tcpFlags(packet, ipHeaderLen)
@@ -371,12 +393,20 @@ class KayaVpnService : VpnService() {
         const val ACTION_STOP = "com.kaya.booster.STOP_VPN"
         private const val NOTIF_ID = 40
 
-        fun start(context: android.content.Context) {
-            context.startService(Intent(context, KayaVpnService::class.java))
-        }
+        /** Background-safe: returns false instead of throwing when the OS refuses. */
+        fun start(context: android.content.Context): Boolean = runCatching {
+            if (Build.VERSION.SDK_INT >= 26) {
+                context.startForegroundService(Intent(context, KayaVpnService::class.java))
+            } else {
+                context.startService(Intent(context, KayaVpnService::class.java))
+            }
+            true
+        }.getOrDefault(false)
 
         fun stop(context: android.content.Context) {
-            context.startService(Intent(context, KayaVpnService::class.java).setAction(ACTION_STOP))
+            runCatching {
+                context.startService(Intent(context, KayaVpnService::class.java).setAction(ACTION_STOP))
+            }
         }
     }
 }

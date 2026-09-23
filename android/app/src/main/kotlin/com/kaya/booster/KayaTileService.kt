@@ -29,9 +29,12 @@ class KayaTileService : TileService() {
             val vpnPrepared = runCatching {
                 android.net.VpnService.prepare(applicationContext) == null
             }.getOrDefault(false)
-            if (vpnPrepared) KayaVpnService.start(applicationContext)
-            KayaBoostService.start(applicationContext)
-            KayaState.update(boost = true)
+            if (vpnPrepared && !KayaState.engineOn) {
+                if (KayaVpnService.start(applicationContext)) KayaState.update(engine = true)
+            }
+            if (!KayaState.boostOn && KayaBoostService.start(applicationContext)) {
+                KayaState.update(boost = true)
+            }
         } else {
             KayaVpnService.stop(applicationContext)
             KayaBoostService.stop(applicationContext)
