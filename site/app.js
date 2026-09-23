@@ -173,6 +173,15 @@
     links.querySelectorAll("a").forEach(function (a) {
       a.addEventListener("click", function () { links.classList.remove("open"); });
     });
+    // Any scroll while the menu is open closes it — avoids the panel
+    // lingering over the content after jumping to a section.
+    window.addEventListener(
+      "scroll",
+      function () {
+        if (links.classList.contains("open")) links.classList.remove("open");
+      },
+      { passive: true },
+    );
   }
 
   /* ---------- scroll reveal ---------- */

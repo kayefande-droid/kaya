@@ -98,13 +98,15 @@ main, .nav, .footer { position: relative; z-index: 2; }
 .burger { display: none; background: none; border: 1px solid var(--line); border-radius: 8px; padding: 9px; cursor: pointer; }
 .burger span { display: block; width: 20px; height: 2px; background: var(--ink); margin: 4px 0; border-radius: 2px; }
 
-@media (max-width: 900px) {
+/* nav: switch to burger earlier so laptop widths never crowd */
+@media (max-width: 1020px) {
   .burger { display: block; margin-left: auto; }
   .nav-cta { display: none; }
   .nav-links {
     display: none; position: absolute; top: 100%; left: 0; right: 0;
     flex-direction: column; align-items: stretch;
     background: rgba(7,7,10,.97); border-bottom: 1px solid var(--line); padding: 14px;
+    max-height: calc(100vh - 64px); overflow-y: auto;
   }
   .nav-links.open { display: flex; }
   .dropdown-menu { position: static; display: none; box-shadow: none; border: 0; }
@@ -208,7 +210,7 @@ h1 {
 }
 
 /* feature cards */
-.feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 18px; }
+.feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(290px, 100%), 1fr)); gap: 18px; }
 .fcard {
   background: var(--panel); border: 1px solid var(--line); border-radius: 16px;
   padding: 26px; transition: transform .2s, border-color .2s, box-shadow .2s;
@@ -453,7 +455,7 @@ h1 {
 }
 
 /* tech specs */
-.spec-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px; }
+.spec-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: 14px; }
 .spec {
   border: 1px solid var(--line); border-radius: 12px; padding: 18px;
   background: rgba(255,255,255,.02); font-family: var(--mono); font-size: .88rem;
@@ -463,9 +465,9 @@ h1 {
 
 /* download */
 .dl-section { text-align: center; }
-.dl-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 18px; max-width: 760px; margin: 0 auto 30px; }
+.dl-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 18px; max-width: 760px; margin: 0 auto 30px; }
 .dl {
-  position: relative; display: flex; flex-direction: column; gap: 6px; padding: 30px 24px;
+  position: relative; display: flex; flex-direction: column; gap: 6px; padding: 40px 24px 24px;
   border-radius: 16px; text-decoration: none; color: var(--ink);
   background: var(--panel); border: 1px solid var(--line);
   transition: transform .18s, border-color .18s, box-shadow .18s;
@@ -473,7 +475,7 @@ h1 {
 .dl:hover { transform: translateY(-4px); border-color: rgba(0,229,106,.55); box-shadow: 0 20px 60px rgba(0,0,0,.5); }
 .dl-hot { border-color: rgba(0,229,106,.5); }
 .dl-badge {
-  position: absolute; top: -12px; left: 20px; font-family: var(--mono); font-size: .7rem;
+  position: absolute; top: 12px; left: 20px; font-family: var(--mono); font-size: .7rem;
   letter-spacing: .12em; text-transform: uppercase; padding: 3px 10px; border-radius: 999px;
   background: var(--neon); color: #04160B; font-weight: 800;
 }
