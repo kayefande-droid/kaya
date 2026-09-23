@@ -83,6 +83,7 @@ a { color: inherit; }
   font-weight: 700; font-size: 14px; letter-spacing: -0.03em;
 }
 .brand-name { font-weight: 600; font-size: 15px; letter-spacing: -0.01em; }
+.brand-logo, .footer-logo { border-radius: 6px; display: block; }
 
 .nav-links { display: flex; align-items: center; gap: 2px; margin-left: auto; }
 .nav-links a {
@@ -611,7 +612,8 @@ h1 {
 /* on-screen Kaya UI */
 .dv-app { flex: 1; padding: 20px 18px 14px; display: grid; gap: 14px; align-content: start; }
 .dv-row { display: flex; align-items: center; justify-content: space-between; }
-.dv-row strong { font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
+.dv-appid { display: inline-flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
+.dv-applogo { border-radius: 5px; display: block; }
 .dv-chip {
   font-family: var(--mono); font-size: 9.5px; color: var(--ink-4);
   border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px;
