@@ -3,20 +3,18 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="color-scheme" content="dark"/>
 
   <title>Kaya — Game Booster & Fast Lane for Mobile FPS</title>
   <meta name="description" content="Kaya is a free, open-source Android game booster for CODM, PUBG Mobile and Free Fire. Smart DNS steering, boost locks, controller bridge, live ping HUD. Zero servers, zero ads, zero accounts."/>
-  <meta name="theme-color" content="#0B0B0C"/>
+  <meta name="theme-color" content="#07070A"/>
   <meta name="author" content="kayefande"/>
   <link rel="canonical" href="https://kaya-booster.onrender.com/"/>
   <link rel="icon" type="image/png" href="/assets/kaya-icon.png"/>
-  <meta name="google-site-verification" content="REPLACE_WITH_YOUR_GSC_TOKEN"/>
 
-  <!-- Inter — primary typeface -->
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"/>
+  <!-- ============ Google Search Console verification ============
+       Replace the content below with YOUR token from
+       https://search.google.com/search-console → add property → HTML tag -->
+  <meta name="google-site-verification" content="REPLACE_WITH_YOUR_GSC_TOKEN"/>
 
   <!-- Open Graph / Twitter -->
   <meta property="og:type" content="website"/>
@@ -31,7 +29,7 @@
   <meta name="twitter:description" content="Free, open-source, zero servers. Built for CODM, PUBG Mobile & Free Fire."/>
   <meta name="twitter:image" content="/assets/kaya-flyer.png"/>
 
-  <!-- Structured data -->
+  <!-- Structured data for app rich results in web search -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -55,63 +53,78 @@
 </head>
 <body>
 
-  <a class="skip" href="#main">Skip to content</a>
+  <!-- animated backdrop layers -->
+  <canvas id="starfield" aria-hidden="true"></canvas>
+  <div class="grid-floor" aria-hidden="true"></div>
+  <div class="aurora" aria-hidden="true"></div>
 
   <!-- ================= NAV ================= -->
   <header class="nav" id="nav">
     <a class="brand" href="/">
-      <img src="/assets/kaya-logo.png" alt="Kaya logo" width="26" height="26" class="brand-logo"/>
-      <span class="brand-name">Kaya</span>
+      <img src="/assets/kaya-logo.png" alt="Kaya logo" width="40" height="40"/>
+      <span>KAYA</span>
     </a>
 
-    <nav class="nav-links" id="navLinks" aria-label="Primary">
+    <nav class="nav-links" id="navLinks">
       <a href="#features">Features</a>
       <a href="#app">The app</a>
-      <a href="#how">How it works</a>
-      <a href="#games">Games</a>
-      <a href="#tech">Under the hood</a>
-      <a href="#faq">FAQ</a>
-      <a href="https://github.com/kayefande-droid/kaya" target="_blank" rel="noopener">Source&nbsp;<span aria-hidden="true">&#8599;</span></a>
+      <div class="dropdown">
+        <button class="dropbtn" type="button">Games ▾</button>
+        <div class="dropdown-menu">
+          <a href="#games">Supported titles</a>
+          <a href="#games">COD Mobile</a>
+          <a href="#games">PUBG Mobile</a>
+          <a href="#games">Free Fire</a>
+          <a href="#games">Apex / other FPS</a>
+        </div>
+      </div>
+      <div class="dropdown">
+        <button class="dropbtn" type="button">Tech ▾</button>
+        <div class="dropdown-menu">
+          <a href="#how">How it works</a>
+          <a href="#hud">Live HUD</a>
+          <a href="#tech">Under the hood</a>
+          <a href="#faq">Honest FAQ</a>
+        </div>
+      </div>
+      <a href="#download">Download</a>
+      <a href="https://github.com/kayefande-droid/kaya" target="_blank" rel="noopener">Source ↗</a>
     </nav>
 
-    <a class="nav-cta" href="https://github.com/kayefande-droid/kaya/releases/latest/download/Kaya-arm64.apk">Download</a>
+    <a class="nav-cta" href="https://github.com/kayefande-droid/kaya/releases/latest/download/Kaya-arm64.apk">⬇ Get APK</a>
 
     <button class="burger" id="burger" aria-label="Menu" type="button">
-      <span></span><span></span>
+      <span></span><span></span><span></span>
     </button>
   </header>
 
-  <main id="main">
-
+  <main>
     <!-- ================= HERO ================= -->
     <section class="hero">
       <div class="hero-copy">
-        <p class="hero-meta">
-          <span>v1.1.1</span>
-          <span aria-hidden="true">·</span>
-          <span>Open source</span>
-          <span aria-hidden="true">·</span>
-          <span>Android 8.0+</span>
+        <p class="chip-row">
+          <span class="chip">v1.1.1</span>
+          <span class="chip chip-green">● engines hot</span>
+          <span class="chip">open source</span>
         </p>
-        <h1>Lower ping.<br/>Stable frames.<br/>Direct routes.</h1>
+        <h1>Drop the lag.<br/><span class="glow">Keep the killstreak.</span></h1>
         <p class="lede">
-          Kaya races public DNS resolvers from your phone, pins the radio at full
-          performance and steers you onto the fastest regional edge —
-          <strong>no VPN detours, no middlemen, no subscriptions.</strong>
+          Kaya races public DNS resolvers straight from your phone, pins the radio
+          at full performance and launches you into <strong>SA servers</strong> —
+          no VPN detours, no middlemen, no subscriptions. Just your fastest route.
         </p>
         <div class="cta-row">
-          <a class="btn btn-primary" href="https://github.com/kayefande-droid/kaya/releases/latest/download/Kaya-arm64.apk">Download APK</a>
+          <a class="btn btn-primary" href="https://github.com/kayefande-droid/kaya/releases/latest/download/Kaya-arm64.apk">⬇ Download — 18 MB</a>
           <a class="btn" href="#how">See how it works</a>
         </div>
-        <p class="fineprint">~18&nbsp;MB · no account · no ads · checksums published per release</p>
+        <p class="fineprint">Android 8.0+ · no account · no ads · checksums published</p>
       </div>
 
-      <!-- live ping demo — flat panel, measured-style presentation -->
-      <div class="hero-hud" id="hud" aria-label="Live ping demonstration">
+      <!-- live ping demo card -->
+      <div class="hero-hud" id="hud">
         <div class="hud-head">
-          <span class="hud-dot" aria-hidden="true"></span>
-          <span>LIVE DEMO</span>
-          <span class="hud-region">ZA&nbsp;·&nbsp;JHB</span>
+          <span class="hud-dot"></span> KAYA · LIVE
+          <span class="hud-region">ZA · JHB</span>
         </div>
         <div class="hud-ping"><span id="pingNum">18</span><small>ms</small></div>
         <canvas id="sparkline" width="420" height="120" aria-label="ping graph"></canvas>
@@ -120,16 +133,14 @@
           <div><b id="lossNum">0%</b><span>loss</span></div>
           <div><b id="routeNum">SA</b><span>route</span></div>
         </div>
-        <p class="hud-note">Illustrative sample — the app shows measured values only.</p>
       </div>
     </section>
 
     <!-- ================= THE SYSTEM (exploded device) ================= -->
     <section id="features" class="xd-section">
       <header class="xd-head">
-        <p class="xd-kicker">The system</p>
-        <h2>Three layers, one device.</h2>
-        <p class="xd-lede">Nothing runs between you and the match. Scroll to pull the stack apart.</p>
+        <h2 class="sec-title">// the system</h2>
+        <p class="xd-lede">Three layers, one device. Nothing runs between you and the match.</p>
       </header>
 
       <div class="xd-stage" id="xdStage">
@@ -137,7 +148,7 @@
           <div class="xd-stack" id="xdStack">
 
             <figure class="xd-label xd-label-1" style="--i:0">
-              <span class="xd-k">01 · Device</span>
+              <span class="xd-k">01 · DEVICE</span>
               <span class="xd-t">Telemetry you can trust</span>
               <span class="xd-d">Frame-time, latency and thermal load, measured on-device. Overlay preview — values illustrative.</span>
             </figure>
@@ -160,7 +171,7 @@
             </div>
 
             <figure class="xd-label xd-label-2" style="--i:1">
-              <span class="xd-k">02 · Network</span>
+              <span class="xd-k">02 · NETWORK</span>
               <span class="xd-t">Network Optimization Node</span>
               <span class="xd-d">Matchmaker lookups raced across anycast resolvers; packets take the fastest regional edge, not the detour.</span>
             </figure>
@@ -183,7 +194,7 @@
             </div>
 
             <figure class="xd-label xd-label-3" style="--i:2">
-              <span class="xd-k">03 · Hardware</span>
+              <span class="xd-k">03 · HARDWARE</span>
               <span class="xd-t">System Optimization Core</span>
               <span class="xd-d">Low-latency radio locks and CPU wake holds hand the phone to the game for the whole session.</span>
             </figure>
@@ -215,7 +226,7 @@
         <div class="xd-item"><span class="xd-i">05</span><h3>OLED dark + accents</h3><p>Deep obsidian theme, four palettes, backdrop that reacts to boost state.</p></div>
         <div class="xd-item"><span class="xd-i">06</span><h3>Engine auto-pilot</h3><p>Boosted games arm the fast lane, locks and monitor on launch — and stand down after.</p></div>
         <div class="xd-item"><span class="xd-i">07</span><h3>Game focus</h3><p>DND priority quiets everything except calls and WhatsApp for the match.</p></div>
-        <div class="xd-item"><span class="xd-i">08</span><h3>Floating live monitor</h3><p>A draggable left-edge bubble with real ms over your game; tap to expand, close to dismiss.</p></div>
+        <div class="xd-item"><span class="xd-i">08</span><h3>Floating live monitor</h3><p>A draggable left-edge bubble with real ms over your game; tap to expand, ✕ to close.</p></div>
         <div class="xd-item"><span class="xd-i">09</span><h3>Notifications + updates</h3><p>On-device read/unread inbox and one-tap updates from GitHub Releases.</p></div>
       </div>
     </section>
@@ -223,8 +234,7 @@
     <!-- ================= THE APP (scroll-synced device) ================= -->
     <section id="app" class="dv-section">
       <header class="dv-head">
-        <p class="kicker">The app</p>
-        <h2 class="sec-title">One session, end to end.</h2>
+        <h2 class="sec-title">// the app</h2>
         <p class="dv-lede">Scroll — the device walks through a real Kaya session: idle, armed, focused, live.</p>
       </header>
 
@@ -234,12 +244,12 @@
 
             <div class="dv-col">
               <figure class="dv-label" id="dvL1">
-                <span class="dv-k">01 · Monitor</span>
+                <span class="dv-k">01 · MONITOR</span>
                 <span class="dv-t">Everything on one screen</span>
                 <span class="dv-d">Ping, loss and load at a glance — measured on-device, never estimated.</span>
               </figure>
               <figure class="dv-label" id="dvL2">
-                <span class="dv-k">02 · Fast lane</span>
+                <span class="dv-k">02 · FAST LANE</span>
                 <span class="dv-t">One tap arms the engine</span>
                 <span class="dv-d">Resolvers race, locks engage, the route pins to the fastest regional edge.</span>
               </figure>
@@ -274,12 +284,12 @@
 
             <div class="dv-col">
               <figure class="dv-label" id="dvL3">
-                <span class="dv-k">03 · Game Focus</span>
+                <span class="dv-k">03 · GAME FOCUS</span>
                 <span class="dv-t">Quiet, not cut off</span>
                 <span class="dv-d">DND priority quiets the noise — calls and WhatsApp still come through.</span>
               </figure>
               <figure class="dv-label" id="dvL4">
-                <span class="dv-k">04 · Live route</span>
+                <span class="dv-k">04 · LIVE ROUTE</span>
                 <span class="dv-t">Pinned to the fastest edge</span>
                 <span class="dv-d">The session rides the winning route; the HUD shows the real number.</span>
               </figure>
@@ -291,9 +301,8 @@
     </section>
 
     <!-- ================= HOW IT WORKS ================= -->
-    <section id="how" class="section">
-      <p class="kicker">How it works</p>
-      <h2 class="sec-title">Three steps, no tunnels.</h2>
+    <section id="how" class="section alt">
+      <h2 class="sec-title">// how it works</h2>
       <ol class="timeline">
         <li>
           <span class="t-num">01</span>
@@ -317,9 +326,8 @@
     </section>
 
     <!-- ================= GAMES ================= -->
-    <section id="games" class="section section-bordered">
-      <p class="kicker">Built for</p>
-      <h2 class="sec-title">Your library, boosted.</h2>
+    <section id="games" class="section">
+      <h2 class="sec-title">// built for</h2>
       <div class="game-row">
         <div class="game-tile">
           <svg class="game-ico" viewBox="0 0 48 48" aria-hidden="true">
@@ -330,7 +338,7 @@
           <span>CODM</span><small>Call of Duty: Mobile</small>
         </div>
         <div class="game-tile">
-          <svg class="game-ico" viewBox="0 0 48 48" aria-hidden="true">
+          <svg class="game-ico" viewBox="0 0 48 48" style="color:#FFC24B" aria-hidden="true">
             <circle cx="21" cy="27" r="11"/>
             <circle cx="21" cy="27" r="5"/>
             <path d="M29 19l11-11"/>
@@ -338,19 +346,19 @@
           <span>PUBGM</span><small>PUBG Mobile</small>
         </div>
         <div class="game-tile">
-          <svg class="game-ico" viewBox="0 0 48 48" aria-hidden="true">
+          <svg class="game-ico" viewBox="0 0 48 48" style="color:#FF7A3D" aria-hidden="true">
             <path d="M24 5c5 8 12 12 12 21a12 12 0 0 1-24 0c0-6 3-9 6-13 1 4 2 6 6 9 1-7-2-12 0-17z"/>
           </svg>
           <span>FF</span><small>Free Fire</small>
         </div>
         <div class="game-tile">
-          <svg class="game-ico" viewBox="0 0 48 48" aria-hidden="true">
+          <svg class="game-ico" viewBox="0 0 48 48" style="color:#FF5A5A" aria-hidden="true">
             <path d="M7 35L24 9l17 26h-9L24 22l-8 13z"/>
           </svg>
           <span>APEX</span><small>Apex Legends Mobile</small>
         </div>
         <div class="game-tile">
-          <svg class="game-ico" viewBox="0 0 48 48" aria-hidden="true">
+          <svg class="game-ico" viewBox="0 0 48 48" style="color:#5AC8FF" aria-hidden="true">
             <circle cx="24" cy="24" r="13"/>
             <path d="M24 5v8M24 35v8M5 24h8M35 24h8"/>
             <circle cx="24" cy="24" r="2.4"/>
@@ -364,16 +372,15 @@
             <rect x="8" y="27" width="13" height="13" rx="3"/>
             <rect x="27" y="27" width="13" height="13" rx="3"/>
           </svg>
-          <span>+ more</span><small>your whole library is boostable</small>
+          + your whole library
         </div>
       </div>
       <p class="fineprint">Every installed app is boostable — games just float to the top of the list.</p>
     </section>
 
     <!-- ================= TECH SPECS ================= -->
-    <section id="tech" class="section">
-      <p class="kicker">Under the hood</p>
-      <h2 class="sec-title">Hand-written Kotlin, zero dependencies.</h2>
+    <section id="tech" class="section alt">
+      <h2 class="sec-title">// under the hood</h2>
       <div class="spec-grid">
         <div class="spec"><b>DNS engine</b><span>VpnService TUN · RFC 1035 wire format · parallel resolver racing · 60s cache</span></div>
         <div class="spec"><b>UDP fast path</b><span>per-flow sockets, protected from the tunnel · zero-copy packet build</span></div>
@@ -382,32 +389,31 @@
         <div class="spec"><b>Boost service</b><span>WIFI_MODE_FULL_LOW_LATENCY · partial wake lock · thermal status feed</span></div>
         <div class="spec"><b>Controller bridge</b><span>AccessibilityService key interception · GestureDescription taps</span></div>
       </div>
-      <p class="fineprint">The full source is
-      <a href="https://github.com/kayefande-droid/kaya" target="_blank" rel="noopener">on GitHub</a> — read every line before you install it.</p>
+      <p class="fineprint">Hand-written Kotlin core, zero third-party dependencies. The full source is
+      <a href="https://github.com/kayefande-droid/kaya" target="_blank" rel="noopener">on GitHub</a>.</p>
     </section>
 
     <!-- ================= DOWNLOAD ================= -->
-    <section id="download" class="section section-bordered">
-      <p class="kicker">Download</p>
-      <h2 class="sec-title">Free, forever. Verify before you trust.</h2>
+    <section id="download" class="section dl-section">
+      <h2 class="sec-title">// download</h2>
       <div class="dl-grid">
         <a class="dl dl-hot" href="https://github.com/kayefande-droid/kaya/releases/latest/download/Kaya-arm64.apk">
-          <span class="dl-badge">Recommended</span>
+          <span class="dl-badge">recommended</span>
           <span class="dl-title">Kaya-arm64.apk</span>
           <span class="dl-sub">~18 MB · every phone since 2016</span>
         </a>
         <a class="dl" href="https://github.com/kayefande-droid/kaya/releases/latest/download/Kaya.apk">
-          <span class="dl-badge">Universal</span>
+          <span class="dl-badge">universal</span>
           <span class="dl-title">Kaya.apk</span>
           <span class="dl-sub">~48 MB · older 32-bit devices</span>
         </a>
         <a class="dl" href="https://github.com/kayefande-droid/kaya/releases">
-          <span class="dl-badge">All versions</span>
+          <span class="dl-badge">all versions</span>
           <span class="dl-title">Every release</span>
           <span class="dl-sub">older APKs · SHA256SUMS.txt per release</span>
         </a>
         <div class="dl">
-          <span class="dl-badge">iPhone / iPad</span>
+          <span class="dl-badge">iphone / ipad</span>
           <span class="dl-title">iOS — not yet</span>
           <span class="dl-sub">Apple requires a native rewrite + Mac signing; no IPA exists. Anything claiming otherwise is fake.</span>
         </div>
@@ -426,8 +432,7 @@
 
     <!-- ================= FAQ ================= -->
     <section id="faq" class="section">
-      <p class="kicker">Honest FAQ</p>
-      <h2 class="sec-title">Straight answers.</h2>
+      <h2 class="sec-title">// honest faq</h2>
       <div class="faq">
         <details open>
           <summary>Is it really free? What's the catch?</summary>
@@ -473,18 +478,16 @@
   </main>
 
   <footer class="footer">
-    <div class="footer-inner">
-      <p class="credit">
-        <img src="/assets/kaya-logo.png" alt="" width="22" height="22" class="footer-logo"/>
-        <span>Created by <a href="https://github.com/kayefande-droid" target="_blank" rel="noopener">kayefande</a></span>
-      </p>
-      <p class="footer-meta">
-        Kaya — hand-built for players who measure.
-        <a href="https://github.com/kayefande-droid/kaya" target="_blank" rel="noopener">GitHub</a>
-        <a href="https://github.com/kayefande-droid/kaya/releases" target="_blank" rel="noopener">Releases</a>
-        <span>MIT licensed</span>
-      </p>
-    </div>
+    <p class="credit">
+      <img src="/assets/kaya-logo.png" alt="" width="22" height="22"/>
+      Created by <a href="https://github.com/kayefande-droid" target="_blank" rel="noopener">kayefande</a>
+    </p>
+    <p>
+      Kaya — hand-built for players who measure. ·
+      <a href="https://github.com/kayefande-droid/kaya" target="_blank" rel="noopener">GitHub</a> ·
+      <a href="https://github.com/kayefande-droid/kaya/releases" target="_blank" rel="noopener">Releases</a> ·
+      MIT licensed
+    </p>
   </footer>
 
   <script src="/app.js" defer></script>
