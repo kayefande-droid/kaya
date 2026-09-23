@@ -339,7 +339,8 @@ class AutoPilotCard extends StatelessWidget {
     }
 
     return KayaCard(
-      onTap: waiting ? null : onOpenLibrary,
+      // Waiting state taps through to the library: mark games to watch.
+      onTap: onOpenLibrary,
       child: Row(
       children: [
         Icon(
@@ -362,7 +363,7 @@ class AutoPilotCard extends StatelessWidget {
               const SizedBox(height: 2),
               Text(
                 waiting
-                    ? 'Watching for a boosted game to launch — monitor and fast lane arm themselves.'
+                    ? 'Watching for boosted games — tap to pick some in the library.'
                     : 'Auto-pilot is off. Boosted games won\'t arm the fast lane automatically.',
                 style: const TextStyle(
                   color: KayaColors.inkDim,
@@ -388,6 +389,8 @@ class AutoPilotCard extends StatelessWidget {
             onPressed: () => state.bridge.requestOverlay(),
             child: const Text('Fix'),
           )
+        else
+          const Icon(Icons.chevron_right_rounded, color: KayaColors.inkFaint)
       ],
       ),
     );

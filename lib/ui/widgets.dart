@@ -132,6 +132,9 @@ class _BoostButtonState extends State<BoostButton>
   @override
   Widget build(BuildContext context) {
     final active = widget.active;
+    // Scale to the viewport: tiny screens get a smaller ring, tablets don't
+    // grow absurdly. 170–196 px keeps the composition on every phone.
+    final side = (MediaQuery.sizeOf(context).width * 0.46).clamp(158.0, 196.0);
     return GestureDetector(
       onTap: widget.onPressed,
       child: AnimatedBuilder(
@@ -140,8 +143,8 @@ class _BoostButtonState extends State<BoostButton>
           final t = _c.value;
           final breath = active ? (0.5 + 0.5 * math.sin(t * 2 * math.pi)) : 0.0;
           return Container(
-            width: 190,
-            height: 190,
+            width: side,
+            height: side,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: active ? KayaColors.lane.withValues(alpha: 0.12) : KayaColors.slate,
@@ -179,7 +182,7 @@ class _BoostButtonState extends State<BoostButton>
                 Icon(
                   active ? Icons.flash_on_rounded : Icons.bolt_rounded,
                   color: active ? KayaColors.lane : KayaColors.inkDim,
-                  size: 44,
+                  size: side * 0.24,
                 ),
                 const SizedBox(height: 6),
                 Text(
@@ -187,7 +190,7 @@ class _BoostButtonState extends State<BoostButton>
                   style: TextStyle(
                     color: active ? KayaColors.laneSoft : KayaColors.inkDim,
                     fontWeight: FontWeight.w800,
-                    fontSize: 15,
+                    fontSize: side * 0.082,
                     letterSpacing: 1.2,
                   ),
                 ),
