@@ -119,6 +119,27 @@ main, .nav, .footer { position: relative; z-index: 2; }
 }
 @media (max-width: 900px) { .hero { grid-template-columns: 1fr; } }
 
+.hero-visual { position: relative; display: grid; justify-items: center; }
+.hero-phone {
+  width: min(100%, 540px); height: auto; display: block;
+  filter: drop-shadow(0 32px 60px rgba(0, 0, 0, 0.55));
+  animation: phoneFloat 7s ease-in-out infinite;
+}
+@keyframes phoneFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+.hero-hud {
+  position: absolute; left: -34px; bottom: 34px; width: min(300px, 78%);
+  z-index: 2;
+}
+@media (max-width: 900px) {
+  .hero-hud { position: static; width: min(360px, 100%); margin: 18px auto 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-phone { animation: none; }
+}
+
 .chip-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
 .chip {
   font-family: var(--mono); font-size: .74rem; letter-spacing: .08em;
