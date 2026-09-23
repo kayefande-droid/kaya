@@ -634,3 +634,125 @@ h1 {
   .dv-device { transform: none !important; }
   .dv-label { opacity: 1; transform: none; transition: none; }
 }
+
+/* =====================================================================
+   MOTION & FX LAYER — 21st.dev-style, dependency-free
+   ===================================================================== */
+
+/* ---------- entrance: staggered rise ---------- */
+.load {
+  opacity: 0;
+  transform: translateY(18px);
+  animation: loadRise .7s cubic-bezier(.22,1,.36,1) forwards;
+  animation-delay: var(--d, 0s);
+}
+@keyframes loadRise {
+  to { opacity: 1; transform: translateY(0); }
+}
+.hl { display: inline-block; }
+
+/* ---------- cursor spotlight (hero HUD) ---------- */
+.spot { position: relative; overflow: hidden; }
+.spot::before {
+  content: "";
+  position: absolute; inset: 0;
+  background: radial-gradient(340px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(0, 229, 106, 0.10), transparent 65%);
+  opacity: 0;
+  transition: opacity .35s ease;
+  pointer-events: none;
+  z-index: 0;
+}
+.spot:hover::before { opacity: 1; }
+.spot > * { position: relative; z-index: 1; }
+
+/* ---------- border beam (cards) ---------- */
+.beam { position: relative; overflow: hidden; }
+.beam::after {
+  content: "";
+  position: absolute; top: 0; left: 0;
+  width: 46px; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--neon), transparent);
+  box-shadow: 0 0 12px rgba(0, 229, 106, 0.55);
+  animation: beamRun 4.2s linear infinite;
+  animation-delay: var(--bd, 0s);
+  pointer-events: none;
+}
+@keyframes beamRun {
+  0%   { transform: translateX(-60px); opacity: 0; }
+  8%   { opacity: 1; }
+  92%  { opacity: 1; }
+  100% { transform: translateX(calc(100cqw + 60px)); opacity: 0; }
+}
+.beam { container-type: size; }
+
+/* ---------- capability marquee ---------- */
+.marquee {
+  position: relative; z-index: 2;
+  overflow: hidden;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: rgba(7, 10, 8, 0.6);
+  padding: 13px 0;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+.marquee-track {
+  display: flex; width: max-content;
+  animation: marquee 30s linear infinite;
+}
+.marquee:hover .marquee-track { animation-play-state: paused; }
+.marquee-group {
+  display: flex; align-items: center; gap: 26px;
+  padding-right: 26px;
+  font-family: var(--mono); font-size: .78rem; font-weight: 700;
+  letter-spacing: .16em; color: var(--ink-dim);
+  white-space: nowrap;
+}
+.marquee-group span:hover { color: var(--neon); }
+.marquee-group i { color: var(--neon); font-style: normal; text-shadow: 0 0 10px rgba(0,229,106,.7); }
+@keyframes marquee { to { transform: translateX(-50%); } }
+
+/* ---------- responsive fit: all screens ---------- */
+img { max-width: 100%; }
+.xd-pin, .dv-pin { height: 100vh; height: 100svh; }
+
+@media (max-width: 640px) {
+  .hero { padding-top: 48px; gap: 40px; }
+  .hero-hud { padding: 18px 16px; }
+  .hud-ping { font-size: 2.7rem; }
+  .marquee { padding: 10px 0; }
+  .marquee-group { font-size: .68rem; gap: 18px; padding-right: 18px; }
+  .section { padding: 56px 16px; }
+  .xd-section { padding: 64px 16px 56px; }
+  .dv-section { padding: 64px 16px 0; }
+  .game-tile { min-height: 104px; padding: 14px; }
+  .dl-grid { grid-template-columns: 1fr; }
+  .steps { padding-left: 20px; }
+  .footer { padding: 24px 16px; }
+}
+
+/* short laptop screens: scale the pinned stages down */
+@media (min-width: 1180px) and (max-height: 800px) {
+  .xd-stack { transform: rotateX(var(--tilt, 6deg)) scale(0.84); }
+  .dv-device-wrap { transform: scale(0.84); }
+}
+@media (min-width: 1180px) and (max-height: 660px) {
+  .xd-stack { transform: rotateX(var(--tilt, 6deg)) scale(0.72); }
+  .dv-device-wrap { transform: scale(0.72); }
+}
+
+/* landscape phones: tighten the hero, calm the backdrop */
+@media (max-width: 940px) and (orientation: landscape) {
+  .hero { padding: 40px 6vw 48px; gap: 32px; }
+  .grid-floor { height: 30vh; opacity: .14; }
+  .aurora { width: 640px; height: 420px; }
+}
+
+/* ---------- reduced motion: static, accessible ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .load, .hl { opacity: 1; transform: none; animation: none; }
+  .beam::after { animation: none; opacity: 0; }
+  .marquee-track { animation: none; }
+  .spot::before { transition: none; }
+}

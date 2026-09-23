@@ -198,4 +198,36 @@
     });
     card.addEventListener("pointerleave", function () { card.style.transform = ""; });
   });
+
+  /* ---------- 21st.dev-style cursor spotlight (fine pointers only) ---------- */
+  var finePointer = window.matchMedia("(pointer: fine)").matches;
+  if (finePointer) {
+    document.querySelectorAll(".spot").forEach(function (card) {
+      card.addEventListener("pointermove", function (e) {
+        var r = card.getBoundingClientRect();
+        card.style.setProperty("--mx", ((e.clientX - r.left) / r.width * 100).toFixed(1) + "%");
+        card.style.setProperty("--my", ((e.clientY - r.top) / r.height * 100).toFixed(1) + "%");
+      });
+    });
+  }
+
+  /* ---------- border-beam stagger so cards don't pulse in unison ---------- */
+  document.querySelectorAll(".beam").forEach(function (el, i) {
+    el.style.setProperty("--bd", ((i % 6) * 0.7).toFixed(1) + "s");
+  });
+
+  /* ---------- magnetic primary CTA (desktop, motion allowed) ---------- */
+  var reduceMotion2 = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (finePointer && !reduceMotion2) {
+    var magnet = document.querySelector(".btn-primary");
+    if (magnet) {
+      magnet.addEventListener("pointermove", function (e) {
+        var r = magnet.getBoundingClientRect();
+        var dx = (e.clientX - (r.left + r.width / 2)) / r.width;
+        var dy = (e.clientY - (r.top + r.height / 2)) / r.height;
+        magnet.style.transform = "translate(" + (dx * 7).toFixed(1) + "px," + (dy * 5 - 2).toFixed(1) + "px)";
+      });
+      magnet.addEventListener("pointerleave", function () { magnet.style.transform = ""; });
+    }
+  }
 })();

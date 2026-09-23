@@ -102,26 +102,26 @@
     <!-- ================= HERO ================= -->
     <section class="hero">
       <div class="hero-copy">
-        <p class="chip-row">
+        <p class="chip-row load">
           <span class="chip">v1.1.1</span>
           <span class="chip chip-green">● engines hot</span>
           <span class="chip">open source</span>
         </p>
-        <h1>Drop the lag.<br/><span class="glow">Keep the killstreak.</span></h1>
-        <p class="lede">
+        <h1><span class="hl load">Drop the lag.</span><br/><span class="glow hl load" style="--d:.08s">Keep the killstreak.</span></h1>
+        <p class="lede load" style="--d:.16s">
           Kaya races public DNS resolvers straight from your phone, pins the radio
           at full performance and launches you into <strong>SA servers</strong> —
           no VPN detours, no middlemen, no subscriptions. Just your fastest route.
         </p>
-        <div class="cta-row">
+        <div class="cta-row load" style="--d:.24s">
           <a class="btn btn-primary" href="https://github.com/kayefande-droid/kaya/releases/latest/download/Kaya-arm64.apk">⬇ Download — 18 MB</a>
           <a class="btn" href="#how">See how it works</a>
         </div>
-        <p class="fineprint">Android 8.0+ · no account · no ads · checksums published</p>
+        <p class="fineprint load" style="--d:.32s">Android 8.0+ · no account · no ads · checksums published</p>
       </div>
 
       <!-- live ping demo card -->
-      <div class="hero-hud" id="hud">
+      <div class="hero-hud spot load" id="hud" style="--d:.2s">
         <div class="hud-head">
           <span class="hud-dot"></span> KAYA · LIVE
           <span class="hud-region">ZA · JHB</span>
@@ -135,6 +135,32 @@
         </div>
       </div>
     </section>
+
+    <!-- ================= CAPABILITY TICKER ================= -->
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee-track">
+        <div class="marquee-group">
+          <span>SMART ANYCAST DNS</span><i>✦</i>
+          <span>UDP FAST PATH</span><i>✦</i>
+          <span>WIFI LOW-LATENCY LOCK</span><i>✦</i>
+          <span>ENGINE AUTO-PILOT</span><i>✦</i>
+          <span>GAME FOCUS</span><i>✦</i>
+          <span>LIVE PING HUD</span><i>✦</i>
+          <span>CONTROLLER BRIDGE</span><i>✦</i>
+          <span>NO VPN · NO ADS · OPEN SOURCE</span><i>✦</i>
+        </div>
+        <div class="marquee-group">
+          <span>SMART ANYCAST DNS</span><i>✦</i>
+          <span>UDP FAST PATH</span><i>✦</i>
+          <span>WIFI LOW-LATENCY LOCK</span><i>✦</i>
+          <span>ENGINE AUTO-PILOT</span><i>✦</i>
+          <span>GAME FOCUS</span><i>✦</i>
+          <span>LIVE PING HUD</span><i>✦</i>
+          <span>CONTROLLER BRIDGE</span><i>✦</i>
+          <span>NO VPN · NO ADS · OPEN SOURCE</span><i>✦</i>
+        </div>
+      </div>
+    </div>
 
     <!-- ================= THE SYSTEM (exploded device) ================= -->
     <section id="features" class="xd-section">
@@ -256,7 +282,7 @@
             </div>
 
             <div class="dv-device-wrap">
-              <div class="dv-device" id="dvDevice">
+              <div class="dv-device beam" id="dvDevice">
                 <div class="dv-screen">
                   <span class="dv-cam" aria-hidden="true"></span>
                   <div class="dv-statusbar">
@@ -329,7 +355,7 @@
     <section id="games" class="section">
       <h2 class="sec-title">// built for</h2>
       <div class="game-row">
-        <div class="game-tile">
+        <div class="game-tile beam">
           <svg class="game-ico" viewBox="0 0 48 48" aria-hidden="true">
             <path d="M9 27a15 15 0 0 1 30 0v7H9z"/>
             <path d="M14 26h20"/>
@@ -337,7 +363,7 @@
           </svg>
           <span>CODM</span><small>Call of Duty: Mobile</small>
         </div>
-        <div class="game-tile">
+        <div class="game-tile beam">
           <svg class="game-ico" viewBox="0 0 48 48" style="color:#FFC24B" aria-hidden="true">
             <circle cx="21" cy="27" r="11"/>
             <circle cx="21" cy="27" r="5"/>
@@ -345,19 +371,19 @@
           </svg>
           <span>PUBGM</span><small>PUBG Mobile</small>
         </div>
-        <div class="game-tile">
+        <div class="game-tile beam">
           <svg class="game-ico" viewBox="0 0 48 48" style="color:#FF7A3D" aria-hidden="true">
             <path d="M24 5c5 8 12 12 12 21a12 12 0 0 1-24 0c0-6 3-9 6-13 1 4 2 6 6 9 1-7-2-12 0-17z"/>
           </svg>
           <span>FF</span><small>Free Fire</small>
         </div>
-        <div class="game-tile">
+        <div class="game-tile beam">
           <svg class="game-ico" viewBox="0 0 48 48" style="color:#FF5A5A" aria-hidden="true">
             <path d="M7 35L24 9l17 26h-9L24 22l-8 13z"/>
           </svg>
           <span>APEX</span><small>Apex Legends Mobile</small>
         </div>
-        <div class="game-tile">
+        <div class="game-tile beam">
           <svg class="game-ico" viewBox="0 0 48 48" style="color:#5AC8FF" aria-hidden="true">
             <circle cx="24" cy="24" r="13"/>
             <path d="M24 5v8M24 35v8M5 24h8M35 24h8"/>
@@ -365,7 +391,7 @@
           </svg>
           <span>SG</span><small>Shadowgun Legends</small>
         </div>
-        <div class="game-tile alt">
+        <div class="game-tile alt beam">
           <svg class="game-ico" viewBox="0 0 48 48" aria-hidden="true">
             <rect x="8" y="8" width="13" height="13" rx="3"/>
             <rect x="27" y="8" width="13" height="13" rx="3"/>
@@ -397,22 +423,22 @@
     <section id="download" class="section dl-section">
       <h2 class="sec-title">// download</h2>
       <div class="dl-grid">
-        <a class="dl dl-hot" href="https://github.com/kayefande-droid/kaya/releases/latest/download/Kaya-arm64.apk">
+        <a class="dl dl-hot beam" href="https://github.com/kayefande-droid/kaya/releases/latest/download/Kaya-arm64.apk">
           <span class="dl-badge">recommended</span>
           <span class="dl-title">Kaya-arm64.apk</span>
           <span class="dl-sub">~18 MB · every phone since 2016</span>
         </a>
-        <a class="dl" href="https://github.com/kayefande-droid/kaya/releases/latest/download/Kaya.apk">
+        <a class="dl beam" href="https://github.com/kayefande-droid/kaya/releases/latest/download/Kaya.apk">
           <span class="dl-badge">universal</span>
           <span class="dl-title">Kaya.apk</span>
           <span class="dl-sub">~48 MB · older 32-bit devices</span>
         </a>
-        <a class="dl" href="https://github.com/kayefande-droid/kaya/releases">
+        <a class="dl beam" href="https://github.com/kayefande-droid/kaya/releases">
           <span class="dl-badge">all versions</span>
           <span class="dl-title">Every release</span>
           <span class="dl-sub">older APKs · SHA256SUMS.txt per release</span>
         </a>
-        <div class="dl">
+        <div class="dl beam">
           <span class="dl-badge">iphone / ipad</span>
           <span class="dl-title">iOS — not yet</span>
           <span class="dl-sub">Apple requires a native rewrite + Mac signing; no IPA exists. Anything claiming otherwise is fake.</span>
