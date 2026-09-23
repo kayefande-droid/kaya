@@ -68,11 +68,13 @@
     var total = Math.max(1, rect.height - window.innerHeight);
     var p = Math.min(1, Math.max(0, -rect.top / total));
 
-    // Device settles toward the viewer as the session comes alive.
-    var lift = (14 * p).toFixed(1);
-    var tilt = ((1 - p) * 2.2).toFixed(2);
+    // The device turns from the studio angle (like the reference photo)
+    // to face you as the session arms — real 3D rotation on scroll.
+    var e2 = 1 - Math.pow(1 - p, 3); // easeOutCubic
+    var rx = 10 - 10 * e2;
+    var ry = -26 + 19 * e2;
     device.style.transform =
-      "translate3d(0," + "-" + lift + "px,0) rotateX(" + tilt + "deg)";
+      "translate3d(0," + (-16 * e2).toFixed(1) + "px,0) rotateX(" + rx.toFixed(2) + "deg) rotateY(" + ry.toFixed(2) + "deg)";
 
     // Phases
     if (p < 0.12) setPhase("idle");

@@ -520,20 +520,107 @@ h1 {
 .dv-t { font-size: 17px; font-weight: 800; letter-spacing: -.01em; color: var(--ink); }
 .dv-d { font-size: 13.5px; line-height: 1.6; color: var(--ink-dim); }
 
-/* device chassis — obsidian slab, neon edge on live */
+/* device — true 3D solid: titanium frame, glass front/back, buttons.
+   Starts at the studio angle (like the reference photo), straightens
+   to face you as the session arms. */
 .dv-device-wrap { position: relative; }
-.dv-device {
-  position: relative; width: 292px; height: 596px;
-  background: linear-gradient(180deg, #14181F, #0C0E13 60%);
-  border: 1px solid rgba(0, 229, 106, 0.28);
-  border-radius: 46px;
-  padding: 14px;
-  box-shadow:
-    0 0 0 1px rgba(0, 229, 106, 0.08),
-    0 0 42px rgba(0, 229, 106, 0.12),
-    0 30px 70px rgba(0, 0, 0, 0.55);
+.dv-device3d {
+  position: relative;
+  width: 292px; height: 596px;
   transform-style: preserve-3d;
+  transform: rotateX(var(--rx, 10deg)) rotateY(var(--ry, -26deg));
   will-change: transform;
+}
+.dv-face { position: absolute; inset: 0; border-radius: 46px; backface-visibility: hidden; }
+
+/* front glass + screen */
+.dv-front {
+  transform: translateZ(9px);
+  background: #050507;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow:
+    inset 0 0 0 3px #0B0B0D,
+    inset 0 0 0 4px rgba(255, 255, 255, 0.06),
+    0 0 42px rgba(0, 229, 106, 0.10);
+  padding: 12px;
+}
+.dv-screen {
+  height: 100%;
+  background: rgba(7, 7, 10, 0.98);
+  border: 1px solid rgba(0, 229, 106, 0.16);
+  border-radius: 34px; overflow: hidden;
+  display: flex; flex-direction: column;
+}
+/* glass sheen — moves subtly with the rotation */
+.dv-glass {
+  position: absolute; inset: -2px;
+  border-radius: 48px;
+  transform: translateZ(10px);
+  background: linear-gradient(115deg,
+    rgba(255, 255, 255, 0.13) 0%,
+    rgba(255, 255, 255, 0.035) 24%,
+    transparent 42%,
+    transparent 72%,
+    rgba(255, 255, 255, 0.05) 100%);
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+/* back panel + camera island */
+.dv-back {
+  transform: rotateY(180deg) translateZ(9px);
+  background: linear-gradient(148deg, #3A3D42, #17181C 55%, #24262B);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  overflow: hidden;
+}
+.dv-back::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(115deg, rgba(255,255,255,.08), transparent 45%);
+}
+.dv-cam-island {
+  position: absolute; top: 22px; left: 22px;
+  width: 116px; height: 116px; border-radius: 30px;
+  background: rgba(12, 13, 16, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 14px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45);
+}
+.dv-cam-island i {
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 32%, #3E4750, #0A0C0F 62%);
+  border: 2px solid #23262B;
+  box-shadow: inset 0 0 6px rgba(0,0,0,.9);
+}
+.dv-cam-island span {
+  grid-column: 2; align-self: end; justify-self: center;
+  width: 13px; height: 13px; border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #4A5560, #101317 65%);
+}
+.dv-etch {
+  position: absolute; bottom: 26px; left: 0; right: 0;
+  text-align: center;
+  font-family: var(--mono); font-size: 11px; font-weight: 700;
+  letter-spacing: .5em; color: rgba(255, 255, 255, 0.14);
+}
+
+/* titanium edges (the frame thickness) + physical buttons */
+.dv-edge { position: absolute; background: linear-gradient(90deg, #5A5E64, #26282C 55%, #43464C); }
+.dv-edge-l { left: -9px;  top: 12px; bottom: 12px; width: 9px;  border-radius: 6px 0 0 6px; transform: rotateY(-90deg) translateZ(9px); transform-origin: left center; }
+.dv-edge-r { right: -9px; top: 12px; bottom: 12px; width: 9px;  border-radius: 0 6px 6px 0; transform: rotateY(90deg) translateZ(9px); transform-origin: right center; }
+.dv-edge-t { top: -9px; left: 12px; right: 12px; height: 9px; border-radius: 6px 6px 0 0; background: linear-gradient(180deg, #5A5E64, #26282C); transform: rotateX(90deg) translateZ(9px); transform-origin: center top; }
+.dv-edge-b { bottom: -9px; left: 12px; right: 12px; height: 9px; border-radius: 0 0 6px 6px; background: linear-gradient(0deg, #5A5E64, #26282C); transform: rotateX(-90deg) translateZ(9px); transform-origin: center bottom; }
+.dv-btn {
+  position: absolute; left: -2px; right: auto; width: 4px;
+  background: linear-gradient(90deg, #6A6E74, #3A3D42);
+  border-radius: 3px; box-shadow: 0 1px 3px rgba(0,0,0,.5);
+}
+.dv-volu { top: 130px; height: 44px; }
+.dv-vold { top: 186px; height: 44px; }
+.dv-edge-r .dv-pwr { left: auto; right: -2px; top: 160px; height: 68px; }
+.dv-port {
+  position: absolute; bottom: -1px; left: 50%; transform: translateX(-50%);
+  width: 56px; height: 5px; border-radius: 0 0 5px 5px;
+  background: #0A0B0D; border: 1px solid #33363B;
 }
 .dv-shadow {
   position: absolute; left: 8%; right: 8%; bottom: -34px; height: 44px;
@@ -626,12 +713,18 @@ h1 {
   .dv-device-wrap { order: -1; }
   .dv-label { opacity: 1; transform: none; }
   .dv-device { margin: 0 auto; transform: none !important; }
+  .dv-device3d { margin: 0 auto; --ry: -14deg; --rx: 8deg; }
+  .dv-front, .dv-back { transform: none; backface-visibility: visible; }
+  .dv-back, .dv-edge, .dv-glass { display: none; }
+  .dv-front { position: relative; inset: auto; }
 }
 @media (max-width: 400px) {
+  .dv-device3d { width: 262px; height: 536px; }
   .dv-device { width: 262px; height: 536px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .dv-device { transform: none !important; }
+  .dv-device3d { transform: rotateX(8deg) rotateY(-14deg); }
   .dv-label { opacity: 1; transform: none; transition: none; }
 }
 
