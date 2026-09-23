@@ -536,6 +536,141 @@ h1 {
   .hud-dot, .hudPulse { animation: none; }
 }
 
+/* =======================================================================
+   THE APP — scroll-synced device (dv-*)
+   Matte 2026-style Android chassis with the Kaya UI on screen.
+   Desktop: pinned, scroll walks a real session; mobile: static armed state.
+   ======================================================================= */
+.dv-section { border-top: 1px solid var(--line); padding: clamp(72px, 10vh, 112px) 24px 0; }
+.dv-head { max-width: 720px; margin: 0 auto 24px; }
+.dv-lede { color: var(--ink-2); font-size: 15.5px; line-height: 1.6; }
+
+.dv-stage { position: relative; height: 300vh; }
+.dv-pin {
+  position: sticky; top: 0; height: 100vh;
+  display: grid; place-items: center; overflow: hidden;
+  perspective: 1200px;
+}
+.dv-wrap {
+  display: grid;
+  grid-template-columns: minmax(220px, 300px) auto minmax(220px, 300px);
+  gap: clamp(32px, 5vw, 72px); align-items: center;
+}
+.dv-col { display: grid; gap: 56px; }
+
+.dv-label {
+  display: grid; gap: 7px; align-content: start; margin: 0;
+  opacity: 0; transform: translateY(14px);
+  transition: opacity .6s ease, transform .6s ease;
+}
+.dv-label.on { opacity: 1; transform: none; }
+.dv-k { font-size: 11px; font-weight: 600; letter-spacing: .14em; color: var(--ink-4); }
+.dv-t { font-size: 17px; font-weight: 600; letter-spacing: -.015em; color: var(--ink); }
+.dv-d { font-size: 13.5px; line-height: 1.6; color: var(--ink-3); }
+
+/* device chassis */
+.dv-device-wrap { position: relative; }
+.dv-device {
+  position: relative; width: 292px; height: 596px;
+  background: linear-gradient(180deg, #1C1C1F, #121214 60%);
+  border: 1px solid var(--line-strong);
+  border-radius: 46px;
+  padding: 14px;
+  box-shadow: var(--shadow-2), inset 0 0 0 1px rgba(255,255,255,.04);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.dv-shadow {
+  position: absolute; left: 8%; right: 8%; bottom: -34px; height: 44px;
+  background: radial-gradient(closest-side, rgba(0,0,0,.5), transparent 72%);
+  z-index: -1;
+}
+
+/* screen */
+.dv-screen {
+  position: relative; height: 100%;
+  background: #0B0B0C;
+  border: 1px solid var(--line);
+  border-radius: 34px; overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.dv-cam {
+  position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+  width: 68px; height: 18px; border-radius: 9px;
+  background: #050506; border: 1px solid rgba(255,255,255,.06);
+  z-index: 3;
+}
+.dv-statusbar {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 16px 0;
+  font-family: var(--mono); font-size: 9.5px; color: var(--ink-4); letter-spacing: .04em;
+}
+.dv-sb-mid { display: inline-flex; align-items: center; gap: 5px; letter-spacing: .12em; }
+.dv-dot { width: 5px; height: 5px; border-radius: 50%; background: #30D158; display: inline-block; flex: none; }
+
+/* on-screen Kaya UI */
+.dv-app { flex: 1; padding: 20px 18px 14px; display: grid; gap: 14px; align-content: start; }
+.dv-row { display: flex; align-items: center; justify-content: space-between; }
+.dv-row strong { font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
+.dv-chip {
+  font-family: var(--mono); font-size: 9.5px; color: var(--ink-4);
+  border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px;
+}
+.dv-ping { display: flex; align-items: baseline; gap: 8px; }
+.dv-ping b {
+  font-size: 46px; font-weight: 700; letter-spacing: -.04em; line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.dv-ping b.dim { color: var(--ink-4); }
+.dv-ping small { font-size: 10.5px; color: var(--ink-3); letter-spacing: .06em; }
+.dv-bars { display: grid; gap: 8px; border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+.dv-bar { display: grid; grid-template-columns: 28px 1fr; align-items: center; gap: 8px; }
+.dv-bar span { font-family: var(--mono); font-size: 9px; color: var(--ink-4); letter-spacing: .1em; }
+.dv-bar i { display: block; height: 2px; border-radius: 1px; background: #E5E5EA; transition: width .5s ease; }
+.dv-bar-net i { width: 8%; background: #30D158; }
+.dv-session {
+  display: grid; gap: 2px;
+  border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px;
+  font-size: 11px; color: var(--ink-2);
+}
+.dv-session i { display: inline-flex; align-items: center; }
+.dv-session > i { margin-right: 6px; }
+.dv-session div { font-size: 9.5px; color: var(--ink-4); }
+.dv-boost {
+  margin-top: 8px;
+  border: 1px solid var(--line-strong); border-radius: 12px;
+  padding: 13px 0; text-align: center;
+  font-size: 13px; font-weight: 700; letter-spacing: .18em;
+  color: var(--ink-3); background: var(--bg-raised);
+  transition: color .3s ease, border-color .3s ease, background .3s ease;
+}
+.dv-boost.active { color: #0B0B0C; background: #F5F5F7; border-color: #F5F5F7; }
+.dv-boost-sub { text-align: center; font-family: var(--mono); font-size: 9.5px; color: var(--ink-4); letter-spacing: .04em; }
+.dv-gnav {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px;
+  border-top: 1px solid var(--line); padding: 10px 8px 12px;
+}
+.dv-gnav span { text-align: center; font-size: 9.5px; color: var(--ink-4); letter-spacing: .04em; }
+.dv-gnav span.on { color: var(--ink); }
+
+/* mobile / reduced motion — static armed state */
+@media (max-width: 1179px) {
+  .dv-stage { height: auto; }
+  .dv-pin { position: static; height: auto; overflow: visible; display: block; }
+  .dv-wrap { grid-template-columns: 1fr; gap: 40px; max-width: 480px; margin: 0 auto; }
+  .dv-col { display: contents; }
+  .dv-device-wrap { order: -1; }
+  .dv-label { opacity: 1; transform: none; }
+  .dv-device { margin: 0 auto; transform: none !important; }
+}
+@media (max-width: 400px) {
+  .dv-device { width: 262px; height: 536px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dv-device { transform: none !important; }
+  .dv-label { opacity: 1; transform: none; transition: none; }
+}
+
 /* Reveal on scroll (subtle, no bounce) */
 .reveal { opacity: 0; transform: translateY(14px); transition: opacity .5s ease, transform .5s ease; }
 .reveal.in { opacity: 1; transform: none; }

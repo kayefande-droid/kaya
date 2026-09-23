@@ -60,12 +60,13 @@
   <!-- ================= NAV ================= -->
   <header class="nav" id="nav">
     <a class="brand" href="/">
-      <span class="brand-mark" aria-hidden="true">K</span>
+      <img src="/assets/kaya-icon.png" alt="Kaya logo" width="26" height="26" class="brand-logo"/>
       <span class="brand-name">Kaya</span>
     </a>
 
     <nav class="nav-links" id="navLinks" aria-label="Primary">
       <a href="#features">Features</a>
+      <a href="#app">The app</a>
       <a href="#how">How it works</a>
       <a href="#games">Games</a>
       <a href="#tech">Under the hood</a>
@@ -216,6 +217,76 @@
         <div class="xd-item"><span class="xd-i">07</span><h3>Game focus</h3><p>DND priority quiets everything except calls and WhatsApp for the match.</p></div>
         <div class="xd-item"><span class="xd-i">08</span><h3>Floating live monitor</h3><p>A draggable left-edge bubble with real ms over your game; tap to expand, close to dismiss.</p></div>
         <div class="xd-item"><span class="xd-i">09</span><h3>Notifications + updates</h3><p>On-device read/unread inbox and one-tap updates from GitHub Releases.</p></div>
+      </div>
+    </section>
+
+    <!-- ================= THE APP (scroll-synced device) ================= -->
+    <section id="app" class="dv-section">
+      <header class="dv-head">
+        <p class="kicker">The app</p>
+        <h2 class="sec-title">One session, end to end.</h2>
+        <p class="dv-lede">Scroll — the device walks through a real Kaya session: idle, armed, focused, live.</p>
+      </header>
+
+      <div class="dv-stage" id="dvStage">
+        <div class="dv-pin">
+          <div class="dv-wrap">
+
+            <div class="dv-col">
+              <figure class="dv-label" id="dvL1">
+                <span class="dv-k">01 · Monitor</span>
+                <span class="dv-t">Everything on one screen</span>
+                <span class="dv-d">Ping, loss and load at a glance — measured on-device, never estimated.</span>
+              </figure>
+              <figure class="dv-label" id="dvL2">
+                <span class="dv-k">02 · Fast lane</span>
+                <span class="dv-t">One tap arms the engine</span>
+                <span class="dv-d">Resolvers race, locks engage, the route pins to the fastest regional edge.</span>
+              </figure>
+            </div>
+
+            <div class="dv-device-wrap">
+              <div class="dv-device" id="dvDevice">
+                <div class="dv-screen">
+                  <span class="dv-cam" aria-hidden="true"></span>
+                  <div class="dv-statusbar">
+                    <span>21:47</span>
+                    <span class="dv-sb-mid"><i class="dv-dot"></i>KAYA</span>
+                    <span>5G · 100%</span>
+                  </div>
+                  <div class="dv-app">
+                    <div class="dv-row"><strong>Kaya</strong><span class="dv-chip">v1.1.1</span></div>
+                    <div class="dv-ping"><b id="dvMs">—</b><small>ms to edge</small></div>
+                    <div class="dv-bars">
+                      <div class="dv-bar"><span>CPU</span><i style="width:41%"></i></div>
+                      <div class="dv-bar"><span>GPU</span><i style="width:57%"></i></div>
+                      <div class="dv-bar dv-bar-net"><span>NET</span><i></i></div>
+                    </div>
+                    <div class="dv-session"><i class="dv-dot"></i>CODM · ranked<div>Auto-boost armed</div></div>
+                    <div class="dv-boost">BOOST</div>
+                    <p class="dv-boost-sub" id="dvBoostSub">Engine idle</p>
+                  </div>
+                  <div class="dv-gnav"><span class="on">Home</span><span>Games</span><span>Network</span><span>Tuning</span></div>
+                </div>
+              </div>
+              <div class="dv-shadow" aria-hidden="true"></div>
+            </div>
+
+            <div class="dv-col">
+              <figure class="dv-label" id="dvL3">
+                <span class="dv-k">03 · Game Focus</span>
+                <span class="dv-t">Quiet, not cut off</span>
+                <span class="dv-d">DND priority quiets the noise — calls and WhatsApp still come through.</span>
+              </figure>
+              <figure class="dv-label" id="dvL4">
+                <span class="dv-k">04 · Live route</span>
+                <span class="dv-t">Pinned to the fastest edge</span>
+                <span class="dv-d">The session rides the winning route; the HUD shows the real number.</span>
+              </figure>
+            </div>
+
+          </div>
+        </div>
       </div>
     </section>
 
@@ -404,7 +475,7 @@
   <footer class="footer">
     <div class="footer-inner">
       <p class="credit">
-        <span class="brand-mark" aria-hidden="true">K</span>
+        <img src="/assets/kaya-icon.png" alt="" width="22" height="22" class="footer-logo"/>
         <span>Created by <a href="https://github.com/kayefande-droid" target="_blank" rel="noopener">kayefande</a></span>
       </p>
       <p class="footer-meta">
@@ -418,5 +489,6 @@
 
   <script src="/app.js" defer></script>
   <script src="/xd.js" defer></script>
+  <script src="/device.js" defer></script>
 </body>
 </html>
