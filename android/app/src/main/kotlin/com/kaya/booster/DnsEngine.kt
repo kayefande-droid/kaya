@@ -237,8 +237,17 @@ fun probeResolver(server: String, domain: String = "www.activision.com", timeout
 
 object TcpPinger {
     fun ping(host: String, port: Int, timeoutMs: Int = 1500): Int? {
-        val addr = InetAddress.getByName(host)
+        val addr = try {
+            InetAddress.getByName(host)
+        } catch (_: Throwable) {
+            return null
+        }
         val socket = Socket()
+        // When the fast lane is live, Kaya's own probes must NOT be routed
+        // into the tunnel — otherwise the UI benchmark would measure the
+        // loopback and (on some OEM stacks) dead-lock and return nothing,
+        // leaving the LIVE LATENCY panel empty exactly while the lane runs.
+        KayaVpnServiceHolder.vpn?.protectStream(socket)
         return try {
             val started = System.nanoTime()
             socket.connect(InetSocketAddress(addr, port), timeoutMs)

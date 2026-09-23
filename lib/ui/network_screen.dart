@@ -306,14 +306,11 @@ class _NetworkScreenState extends State<NetworkScreen> {
                             final ok = await widget.state.bridge.setPrivateDns(host);
                             await widget.state.refreshPermissions();
                             if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    ok
-                                        ? 'Private DNS pinned to $label.'
-                                        : 'Denied — grant WRITE_SECURE_SETTINGS via adb (see README).',
-                                  ),
-                                ),
+                              showKayaSnack(
+                                context,
+                                ok
+                                    ? 'Private DNS pinned to $label.'
+                                    : 'Denied — grant WRITE_SECURE_SETTINGS via adb (see README).',
                               );
                             }
                           },

@@ -73,6 +73,14 @@ class KayaVpnService : VpnService() {
         promoteToForeground()
         when (intent?.action) {
             ACTION_STOP -> {
+                // Tearing down the engine must also release the boost
+                // session — otherwise a stopped engine leaves locks, the
+                // mitigator and the auto-pilot poller running against a
+                // dead tunnel (the on/off-loop bug).
+                try {
+                    startService(Intent(this, KayaBoostService::class.java).setAction(ACTION_STOP))
+                } catch (_: Throwable) {
+                }
                 stopSelf()
                 return START_NOT_STICKY
             }

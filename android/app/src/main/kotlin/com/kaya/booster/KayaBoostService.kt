@@ -35,7 +35,9 @@ class KayaBoostService : Service() {
     private val autopilotPoller = object : Runnable {
         override fun run() {
             KayaGuard.bg("autopilot-poll") { GameAutoPilot.poll(applicationContext) }
-            handler.postDelayed(this, 5_000)
+            // 2s: a boosted game must trigger the fast lane almost instantly,
+            // not up to five seconds into a match.
+            handler.postDelayed(this, 2_000)
         }
     }
 

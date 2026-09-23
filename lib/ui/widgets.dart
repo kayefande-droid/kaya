@@ -7,6 +7,21 @@ import 'theme.dart';
 /// Shared hand-drawn-style widgets: cards, chips, the pulse Boost button and
 /// a live sparkline for ping history.
 
+/// Floating snack anchored clear of the bottom navigation bar — the default
+/// placement slid under content (extendBody) and clipped text on Home.
+void showKayaSnack(BuildContext context, String message) {
+  ScaffoldMessenger.of(context)
+    ..removeCurrentSnackBar()
+    ..showSnackBar(
+      SnackBar(
+        content: Text(message),
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.fromLTRB(16, 0, 16, 92),
+        duration: const Duration(seconds: 3),
+      ),
+    );
+}
+
 class KayaCard extends StatelessWidget {
   const KayaCard({
     super.key,

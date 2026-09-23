@@ -169,9 +169,7 @@ class _GameCard extends StatelessWidget {
                     HapticFeedback.heavyImpact();
                     final ok = await state.launchGame(app);
                     if (!ok && context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Could not launch ${app.label}')),
-                      );
+                      showKayaSnack(context, 'Could not launch ${app.label}');
                     }
                   },
                   icon: const Icon(Icons.play_arrow_rounded),

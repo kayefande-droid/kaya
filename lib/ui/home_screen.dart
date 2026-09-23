@@ -39,31 +39,18 @@ class _HomeScreenState extends State<HomeScreen> {
     final state = widget.state;
     if (state.engineOn || state.boostOn) {
       await state.disarm();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Fast lane disengaged.')),
-        );
-      }
+      if (mounted) showKayaSnack(context, 'Fast lane disengaged.');
       return;
     }
     final ok = await state.armBoost();
     if (!mounted) return;
     if (ok && state.boostOn) {
       HapticFeedback.heavyImpact();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Fast lane live: DNS steered, locks held.')),
-      );
+      showKayaSnack(context, 'Fast lane live: DNS steered, locks held.');
     } else if (ok) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Engine armed, but the boost locks were refused — '
-              'check Battery → Unrestricted, then retry.'),
-        ),
-      );
+      showKayaSnack(context, 'Engine armed, but the boost locks were refused — check Battery → Unrestricted, then retry.');
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('VPN consent denied — the engine needs it once.')),
-      );
+      showKayaSnack(context, 'VPN consent denied — the engine needs it once.');
     }
   }
 
@@ -88,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               const Spacer(),
-              _StatusPill(active: active),
+              Flexible(child: _StatusPill(active: active)),
             ],
           ),
           const SizedBox(height: 28),
@@ -203,11 +190,15 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const SizedBox(height: 10),
-          Text(
-            state.batteryExempt
-                ? 'Battery: unrestricted — locks can hold at full performance.'
-                : 'Battery optimisation may throttle the boost. Allow "unrestricted" for Kaya.',
-            style: const TextStyle(color: KayaColors.inkFaint, fontSize: 12, height: 1.4),
+          // Bottom inset so the last line never hides under the nav bar.
+          Padding(
+            padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom + 72),
+            child: Text(
+              state.batteryExempt
+                  ? 'Battery: unrestricted — locks can hold at full performance.'
+                  : 'Battery optimisation may throttle the boost. Allow "unrestricted" for Kaya.',
+              style: const TextStyle(color: KayaColors.inkFaint, fontSize: 12, height: 1.4),
+            ),
           ),
         ],
       ),
@@ -232,6 +223,7 @@ class _StatusPill extends StatelessWidget {
         ),
       ),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
             width: 8,

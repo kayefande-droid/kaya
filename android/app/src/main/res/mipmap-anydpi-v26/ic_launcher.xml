@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Adaptive launcher icon (all devices: minSdk 26 = API 26+) -->
+<!-- Foreground/mono: the real Kaya shield artwork (PNG, 432px canvas,
+     art inside the 66dp safe zone). Background: Kaya obsidian. -->
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
     <background android:drawable="@color/ic_launcher_background" />
-    <foreground android:drawable="@drawable/ic_launcher_foreground" />
-    <monochrome android:drawable="@drawable/ic_launcher_foreground" />
+    <foreground android:drawable="@mipmap/ic_launcher_foreground" />
+    <monochrome android:drawable="@mipmap/ic_launcher_mono" />
 </adaptive-icon>

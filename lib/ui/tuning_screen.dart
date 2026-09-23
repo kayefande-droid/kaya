@@ -99,12 +99,7 @@ class _TuningScreenState extends State<TuningScreen> {
                     await state.setGameFocus(v);
                     if (!mounted) return;
                     if (v && !state.dndGranted) {
-                      ScaffoldMessenger.of(this.context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Grant Do Not Disturb access so calls and '
-                              'WhatsApp still come through while games are quieted.'),
-                        ),
-                      );
+                      showKayaSnack(this.context, 'Grant Do Not Disturb access so calls and WhatsApp still come through while games are quieted.');
                       await state.bridge.gameFocusDnd();
                     }
                     await state.loadFeatures();
@@ -162,9 +157,7 @@ class _TuningScreenState extends State<TuningScreen> {
                     if (v) {
                       final ok = await state.armBoost();
                       if (!ok && context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('VPN consent is required once.')),
-                        );
+                        showKayaSnack(context, 'VPN consent is required once.');
                       }
                     } else {
                       await state.bridge.vpnStop();
@@ -259,13 +252,9 @@ class _TuningScreenState extends State<TuningScreen> {
                           final ok = await state.bridge.accessibilityEnabled();
                           if (!ok) {
                             if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'Enable Kaya in Accessibility settings first — '
-                                    'it projects controller presses as taps.',
-                                  ),
-                                ),
+                              showKayaSnack(
+                                context,
+                                'Enable Kaya in Accessibility settings first — it projects controller presses as taps.',
                               );
                             }
                             await state.bridge.openAccessibilitySettings();

@@ -1,8 +1,10 @@
 // KAYA — "The app" device choreography.
 // Desktop: the phone is pinned; scroll drives a real session arc —
 // idle → fast lane armed → Game Focus → live route, with the ping
-// countdown synced to the scroll position. Labels fade in per phase.
-// Mobile / reduced-motion: CSS shows the static, fully-armed state.
+// countdown synced to the scroll position. The on-screen UI mirrors
+// the real app: status pill, FAST LANE ring, JITTER/STABILITY stats,
+// LIVE LATENCY sparkline and the DNS Steering Feed. Labels fade in
+// per phase. Mobile / reduced-motion: CSS shows the static live state.
 
 (function () {
   "use strict";
@@ -15,9 +17,15 @@
   var desktop = window.matchMedia("(min-width: 1180px)");
 
   var msEl = document.getElementById("dvMs");
+  var jitEl = document.getElementById("dvJit");
+  var staEl = document.getElementById("dvSta");
   var subEl = document.getElementById("dvBoostSub");
-  var boostEl = device.querySelector(".dv-boost");
-  var netBar = device.querySelector(".dv-bar-net i");
+  var pillEl = document.getElementById("dvPill");
+  var pillText = document.getElementById("dvPillText");
+  var ringEl = document.getElementById("dvRing");
+  var ringLabel = document.getElementById("dvRingLabel");
+  var sparkEl = document.getElementById("dvSparkLine");
+  var feedEl = document.getElementById("dvFeed");
   var labels = [
     document.getElementById("dvL1"),
     document.getElementById("dvL2"),
@@ -28,20 +36,57 @@
   var ticking = false;
   var phase = "";
   var lastMs = -1;
+  var samples = [];          // last N ping samples for the sparkline
+  var SPARK_MAX = 40;        // svg viewBox width units
+  var feedLines = [];
 
   var SUBS = {
     idle: "Engine idle",
-    armed: "Fast lane armed · locks on",
-    focus: "Game focus on · calls allowed",
-    live: "Riding the fastest edge"
+    armed: "Fast lane live: DNS steered, locks held.",
+    focus: "Game Focus on · calls allowed through",
+    live: "Riding the fastest edge · 41 ms session"
+  };
+
+  var FEEDS = {
+    idle: "Nothing resolved yet. Launch a game and the engine will show every matchmaker lookup it steers here.",
+    armed: "◉ matchmaker.demonware.net → Cloudflare edge (anycast) — steered",
+    focus: "◉ Game Focus holding — WhatsApp + calls allowed, rest quieted",
+    live: "◉ session release-us-e4.codm.activision.com → fastest edge — locked"
   };
 
   function setPhase(next) {
     if (next === phase) return;
     phase = next;
-    if (boostEl) boostEl.classList.toggle("active", next !== "idle");
+
+    var live = next !== "idle";
+    if (pillEl) pillEl.classList.toggle("live", live);
+    if (pillText) pillText.textContent = live ? "FAST LANE" : "IDLE";
+    if (ringEl) ringEl.classList.toggle("live", live);
+    if (ringLabel) ringLabel.textContent = live ? "FAST LANE LIVE" : "BOOST";
     if (subEl) subEl.textContent = SUBS[next];
-    if (netBar) netBar.style.width = next === "idle" ? "8%" : next === "live" ? "84%" : "62%";
+    if (feedEl) {
+      feedEl.textContent = FEEDS[next];
+      feedEl.classList.toggle("live", live);
+    }
+    if (jitEl) jitEl.textContent = live ? "3" : "—";
+    if (staEl) staEl.textContent = next === "live" ? "97%" : live ? "88%" : "0%";
+  }
+
+  function drawSpark() {
+    if (!sparkEl) return;
+    var step = SPARK_MAX / Math.max(1, samples.length - 1);
+    var pts = samples.map(function (v, i) {
+      var x = (i * step).toFixed(1);
+      var y = (32 - ((v - 36) / 42) * 28).toFixed(1); // 36–78 ms → 32→4
+      return x + "," + y;
+    }).join(" ");
+    sparkEl.setAttribute("points", pts);
+  }
+
+  function pushSample(ms) {
+    samples.push(ms);
+    if (samples.length > 14) samples.shift();
+    drawSpark();
   }
 
   function msAt(p) {
@@ -60,7 +105,12 @@
       device.style.transform = "";
       setPhase("live"); // static state = fully armed
       labels.forEach(function (l) { if (l) l.classList.add("on"); });
-      if (msEl && lastMs !== 41) { msEl.textContent = "41"; lastMs = 41; }
+      if (lastMs !== 41) {
+        if (msEl) { msEl.textContent = "41"; msEl.classList.remove("dim"); }
+        samples = [64, 61, 58, 55, 52, 49, 47, 45, 44, 43, 42, 41];
+        drawSpark();
+        lastMs = 41;
+      }
       return;
     }
 
@@ -87,6 +137,7 @@
     if (msEl && ms !== lastMs) {
       msEl.textContent = ms < 0 ? "—" : String(ms);
       msEl.classList.toggle("dim", ms < 0);
+      if (ms > 0) pushSample(ms);
       lastMs = ms;
     }
 

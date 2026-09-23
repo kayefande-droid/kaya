@@ -292,18 +292,25 @@
                     <span>5G · 100%</span>
                   </div>
                   <div class="dv-app">
-                    <div class="dv-row"><span class="dv-appid"><img src="/assets/kaya-logo.png" alt="" width="20" height="20" class="dv-applogo"/>Kaya</span><span class="dv-chip">v1.1.1</span></div>
-                    <div class="dv-ping"><b id="dvMs">—</b><small>ms to edge</small></div>
-                    <div class="dv-bars">
-                      <div class="dv-bar"><span>CPU</span><i style="width:41%"></i></div>
-                      <div class="dv-bar"><span>GPU</span><i style="width:57%"></i></div>
-                      <div class="dv-bar dv-bar-net"><span>NET</span><i></i></div>
+                    <div class="dv-apphead">
+                      <span class="dv-appid"><img src="/assets/kaya-logo.png" alt="" width="20" height="20" class="dv-applogo"/>KAYA</span>
+                      <span class="dv-pill" id="dvPill"><i class="dv-dot"></i><b id="dvPillText">IDLE</b></span>
                     </div>
-                    <div class="dv-session"><i class="dv-dot"></i>CODM · ranked<div>Auto-boost armed</div></div>
-                    <div class="dv-boost">BOOST</div>
-                    <p class="dv-boost-sub" id="dvBoostSub">Engine idle</p>
+                    <div class="dv-ring" id="dvRing"><span class="dv-ring-bolt">⚡</span><b id="dvRingLabel">BOOST</b></div>
+                    <div class="dv-stats">
+                      <span class="dv-pchip" id="dvMs">—</span>
+                      <span class="dv-stat"><b id="dvJit">—</b><small>JITTER</small></span>
+                      <span class="dv-stat"><b id="dvSta">0%</b><small>STABILITY</small></span>
+                    </div>
+                    <div class="dv-latency">
+                      <span class="dv-lat-label">LIVE LATENCY</span>
+                      <svg class="dv-spark" viewBox="0 0 210 34" preserveAspectRatio="none" aria-hidden="true"><polyline id="dvSparkLine" points="" fill="none" stroke="#00E56A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </div>
+                    <div class="dv-feedhead"><b>DNS Steering Feed</b><em>Open engine</em></div>
+                    <div class="dv-feed" id="dvFeed">Nothing resolved yet. Launch a game and the engine will show every matchmaker lookup it steers here.</div>
+                    <div class="dv-boostbar" id="dvBoostSub">Engine idle</div>
+                    <div class="dv-nav"><span class="on">⚡</span><span>🎮</span><span>📶</span><span>🎚</span></div>
                   </div>
-                  <div class="dv-gnav"><span class="on">Home</span><span>Games</span><span>Network</span><span>Tuning</span></div>
                 </div>
                 </div>
                 <div class="dv-face dv-back" aria-hidden="true">
