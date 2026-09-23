@@ -153,6 +153,30 @@ object KayaLiveBubble {
             textSize = 11f
             text = ""
         }
+        val refresh = TextView(context).apply {
+            setTextColor(Color.WHITE)
+            textSize = 12f
+            typeface = Typeface.DEFAULT_BOLD
+            text = "↻  Refresh route"
+            setPadding(0, dp(8), 0, 0)
+            setOnClickListener {
+                android.widget.Toast.makeText(
+                    context,
+                    "Re-steering DNS…",
+                    android.widget.Toast.LENGTH_SHORT,
+                ).show()
+                SteeringRules.clearWinners()
+                DnsResponder.clearCache()
+                KayaGuard.bg("bubble-refresh") {
+                    val ms = TcpPinger.ping("cloudflare.com", 443)
+                    if (ms != null) {
+                        pingMs = ms
+                        KayaState.update(ping = ms)
+                    }
+                    mainHandler.post { render() }
+                }
+            }
+        }
         val close = TextView(context).apply {
             setTextColor(0xFFFF5A5A.toInt())
             textSize = 12f
@@ -171,6 +195,7 @@ object KayaLiveBubble {
         cardLayout.addView(title)
         cardLayout.addView(ping)
         cardLayout.addView(state)
+        cardLayout.addView(refresh)
         cardLayout.addView(close)
         cardPing = ping
         cardState = state
@@ -207,7 +232,7 @@ object KayaLiveBubble {
                     downY = ev.rawY
                     startPy = params.y
                     moved = false
-                    false
+                    true // must consume DOWN or MOVE/UP never arrive: tap+drag die
                 }
                 MotionEvent.ACTION_MOVE -> {
                     val dy = (ev.rawY - downY).toInt()

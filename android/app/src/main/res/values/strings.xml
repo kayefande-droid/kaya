@@ -24,6 +24,9 @@
     <string name="widget_ping_pending">… ms</string>
     <string name="widget_ping_value">%1$d ms</string>
     <string name="widget_toast_open_app">Allow the VPN consent in Kaya to finish arming.</string>
+    <string name="widget_refresh">↻  REFRESH ROUTE</string>
+    <string name="widget_refresh_toast">Route refreshed — DNS re-steered.</string>
+    <string name="widget_sub_autopilot">Auto-armed · %1$s</string>
 
     <!-- Updater -->
     <string name="update_channel">Kaya Updates</string>

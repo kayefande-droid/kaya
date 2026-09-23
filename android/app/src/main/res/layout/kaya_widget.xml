@@ -66,6 +66,18 @@
         android:layout_height="0dp"
         android:layout_weight="1" />
 
+    <!-- route refresh: re-learn the fastest resolver path, fresh ping -->
+    <TextView
+        android:id="@+id/widget_refresh"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:gravity="center"
+        android:text="@string/widget_refresh"
+        android:textColor="#9BA3A0"
+        android:textSize="11sp"
+        android:letterSpacing="0.14"
+        android:maxLines="1" />
+
     <!-- lane chip: the whole bar is the toggle -->
     <LinearLayout
         android:id="@+id/widget_chip"

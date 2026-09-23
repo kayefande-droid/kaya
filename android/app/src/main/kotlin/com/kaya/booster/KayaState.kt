@@ -57,6 +57,21 @@ object KayaState {
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getInt(KEY_PING, -1).takeIf { it >= 0 }
 
     /**
+     * Force a widget/session re-render without changing any value — used
+     * after operations that don't produce a new sample (e.g. a route refresh
+     * probe that timed out) so the UI never shows a stuck pending state.
+     */
+    fun touch() {
+        KayaEventHub.emit(
+            "session",
+            mapOf("engine" to engineOn, "boost" to boostOn, "lastPing" to lastPing),
+        )
+        mainHandler.post {
+            appContext?.let { KayaAppWidgetProvider.refreshAll(it) }
+        }
+    }
+
+    /**
      * Record a state change (any subset of engine/boost/ping). Safe to call
      * from any thread; the widget refresh is posted to the main looper.
      */
