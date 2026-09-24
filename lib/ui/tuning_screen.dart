@@ -23,6 +23,9 @@ class _TuningScreenState extends State<TuningScreen> {
   Map<String, Object?>? updateInfo;
   bool checkingUpdate = false;
   int downloadPct = -1; // -1 idle · 0..100 download · 100+ verified/handing off
+  String? updateError; // human-readable reason from the last failed attempt
+  Timer? _outageTimer;
+  bool outageOn = false;
   List<String> logLines = [];
   bool showLog = false;
   String bubbleSide = 'left'; // dock side of the floating live monitor
@@ -49,6 +52,7 @@ class _TuningScreenState extends State<TuningScreen> {
   @override
   void dispose() {
     _evtSub?.cancel();
+    _outageTimer?.cancel();
     super.dispose();
   }
 
@@ -73,6 +77,26 @@ class _TuningScreenState extends State<TuningScreen> {
     }
   }
 
+  /// Diagnostics drill: block upstream DNS for 15 s so the fail-open path
+  /// (stale answers, background races) can be observed without firewall
+  /// tricks. See docs/network-switch-test-plan.md, test T9.
+  Future<void> _toggleOutage() async {
+    if (_outageTimer != null) {
+      _outageTimer?.cancel();
+      _outageTimer = null;
+      await widget.state.bridge.setResolverOutage(false);
+      if (mounted) setState(() => outageOn = false);
+      return;
+    }
+    await widget.state.bridge.setResolverOutage(true);
+    if (mounted) setState(() => outageOn = true);
+    _outageTimer = Timer(const Duration(seconds: 15), () async {
+      await widget.state.bridge.setResolverOutage(false);
+      if (mounted) setState(() => outageOn = false);
+      _outageTimer = null;
+    });
+  }
+
   /// Live download progress for the in-app update, pushed by KayaUpdater
   /// through KayaEventHub ('update' events).
   void _onUpdateEvent(Map<String, Object?> data) {
@@ -83,7 +107,10 @@ class _TuningScreenState extends State<TuningScreen> {
       case 'verified' || 'installing':
         setState(() => downloadPct = 101);
       case 'failed':
-        setState(() => downloadPct = -1);
+        setState(() {
+          downloadPct = -1;
+          updateError = data['reason']?.toString() ?? 'unknown reason';
+        });
     }
   }
 
@@ -492,9 +519,16 @@ class _TuningScreenState extends State<TuningScreen> {
                           ? 'Kaya ${updateInfo!['latestVersion']} is available '
                               '(you have ${updateInfo!['currentVersion']}).'
                           : 'You are on the latest release '
-                              '(${updateInfo!['currentVersion']}).'),
+                              '(you have ${updateInfo!['currentVersion']}).'),
                   style: const TextStyle(height: 1.4),
                 ),
+                if (updateError != null) ...[
+                  const SizedBox(height: 6),
+                  Text(
+                    'Last attempt failed: $updateError',
+                    style: const TextStyle(color: KayaColors.hot, fontSize: 12.5, height: 1.4),
+                  ),
+                ],
                 if (downloadPct >= 0) ...[
                   const SizedBox(height: 10),
                   Row(
@@ -521,7 +555,12 @@ class _TuningScreenState extends State<TuningScreen> {
                   ),
                 ],
                 const SizedBox(height: 10),
-                Row(
+                // Wrap, not Row: with an update available the two buttons no
+                // longer fit one line on narrow screens — the second flows to
+                // the next line instead of overflowing the card.
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
                   children: [
                     FilledButton.icon(
                       style: FilledButton.styleFrom(
@@ -541,8 +580,7 @@ class _TuningScreenState extends State<TuningScreen> {
                           : const Icon(Icons.system_update_alt_rounded),
                       label: const Text('Check for updates'),
                     ),
-                    if (updateInfo?['updateAvailable'] == true) ...[
-                      const SizedBox(width: 10),
+                    if (updateInfo?['updateAvailable'] == true)
                       OutlinedButton.icon(
                         style: OutlinedButton.styleFrom(
                           foregroundColor: KayaColors.lane,
@@ -556,15 +594,15 @@ class _TuningScreenState extends State<TuningScreen> {
                           if (!context.mounted) return;
                           setState(() => downloadPct = -1);
                           if (ok) {
-                            showKayaSnack(context, 'Checksum verified against SHA256SUMS.txt — handing to the installer.');
+                            showKayaSnack(context, 'Checksum verified — handed to the installer. Tap Install on the system prompt.');
                           } else {
-                            showKayaSnack(context, 'Update cancelled: checksum could not be verified. Nothing was installed.');
+                            showKayaSnack(context, 'Update failed — see Tuning → Diagnostics for the reason.');
                           }
+                          _checkUpdate();
                         },
                         icon: const Icon(Icons.download_rounded, size: 18),
                         label: const Text('Download & install'),
                       ),
-                    ],
                   ],
                 ),
               ],
@@ -576,6 +614,20 @@ class _TuningScreenState extends State<TuningScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Fail-open drill: blocks upstream DNS for 15 s so you can
+                // watch the engine serve stale answers instead of dying.
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  value: outageOn,
+                  onChanged: (_) => _toggleOutage(),
+                  title: const Text('Simulate resolver outage'),
+                  subtitle: Text(
+                    outageOn
+                        ? 'Resolvers blocked — watch the DNS feed serve stale answers for 15 more seconds.'
+                        : 'Blocks upstream DNS for 15 s to demonstrate the fail-open engine. Cached sites keep loading.',
+                  ),
+                ),
+                const SizedBox(height: 6),
                 Row(
                   children: [
                     Expanded(

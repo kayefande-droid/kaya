@@ -75,6 +75,12 @@ object UdpForwarder {
             sock.bind(InetSocketAddress(0)) // wildcard: real source IP on send
             sock.soTimeout = 120_000
             protectFn?.invoke(sock)
+            // QoS: mark game packets DSCP EF (Expedited Forwarding). On WMM
+            // Wi-Fi these frames ride the AC_VO queue — the same priority
+            // class as VoIP — so a saturated home network degrades a download
+            // long before it degrades the match. Devices that ignore the
+            // marker lose nothing; there is no downside path.
+            runCatching { sock.trafficClass = 0xB8 }
             sockets[key] = sock
             spawnReplyPump(sock, srcAddr, srcPort, dstAddr, dstPort, key)
         }

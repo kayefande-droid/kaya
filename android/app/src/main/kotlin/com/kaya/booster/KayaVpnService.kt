@@ -170,6 +170,10 @@ class KayaVpnService : VpnService() {
         startReadLoop(fd)
         KayaState.update(engine = true)
         KayaEventHub.emit("vpn", mapOf("state" to "active"))
+        // Gaming: pre-resolve matchmaker domains so the first "Find match"
+        // is served from cache and the fastest edge is pinned before the
+        // game needs it. Sequential, staggered, guarded — never hot.
+        MatchmakerPrewarm.warm()
     }
 
     private fun buildVpnInterface(): ParcelFileDescriptor? {

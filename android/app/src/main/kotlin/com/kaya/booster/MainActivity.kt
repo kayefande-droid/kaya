@@ -379,6 +379,11 @@ class MainActivity : FlutterActivity() {
                     val c = KayaUpdater.check(this)
                     runOnUiThread { result.success(c?.toMap()) }
                 }
+                "setResolverOutage" -> {
+                    val on = call.argument<Boolean>("on") ?: false
+                    DnsRacer.setOutageDrill(on)
+                    finishOnMain(result) { true }
+                }
                 "updateInstall" -> {
                     val url = call.argument<String>("url") ?: ""
                     if (url.startsWith("https://github.com/")) {

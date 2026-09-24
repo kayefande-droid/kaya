@@ -144,7 +144,22 @@ object DnsRacer {
 
     private val inflight = AtomicInteger(0)
 
+    /**
+     * Diagnostics drill (Tuning): when true, every upstream query fails
+     * instantly — simulating a dead-Wi-Fi/captive-portal resolver outage so
+     * the fail-open path (stale answers, background races) can be observed
+     * on any device. Never set outside the drill.
+     */
+    @Volatile var outage: Boolean = false
+        private set
+
+    /** Diagnostics drill switch; name avoids the JVM setter clash. */
+    fun setOutageDrill(on: Boolean) {
+        outage = on
+    }
+
     fun resolve(domain: String, type: Int = DnsProtocol.TYPE_A): RaceResult? {
+        if (outage) return null
         val learned = SteeringRules.winnerFor(domain)
         if (learned != null) {
             val resolver = SteeringRules.RESOLVERS.firstOrNull { it.name == learned }

@@ -88,6 +88,7 @@ class KayaBoostService : Service() {
         runCatching { mitigator.activate() }
         runCatching { observeThermal() }
         runCatching { GameFocusManager.apply(this) } // quiet non-allowlisted noise for the session
+        runCatching { RefreshRateLock.apply(this) } // hold the panel's peak mode for the match
         handler.removeCallbacks(autopilotPoller)
         handler.postDelayed(autopilotPoller, 5_000)
     }
@@ -98,6 +99,7 @@ class KayaBoostService : Service() {
         handler.removeCallbacks(autopilotPoller)
         mitigator.deactivate()
         locks.release()
+        RefreshRateLock.release(this)
         GameFocusManager.restore(this)
         thermalListener?.let { l ->
             runCatching {

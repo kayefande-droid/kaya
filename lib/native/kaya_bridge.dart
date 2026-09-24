@@ -157,6 +157,10 @@ class KayaBridge {
   Future<bool> updateInstall(String url) async =>
       await _invoke<bool>('updateInstall', {'url': url}) ?? false;
 
+  /// Diagnostics: block upstream DNS for N seconds (fail-open drill).
+  Future<void> setResolverOutage(bool on) =>
+      _invoke<void>('setResolverOutage', {'on': on});
+
   // ---- permissions -------------------------------------------------------
   Future<bool> isIgnoringBatteryOptimizations() async =>
       await _invoke<bool>('isIgnoringBatteryOptimizations') ?? true;

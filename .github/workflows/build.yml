@@ -67,28 +67,9 @@ jobs:
             Kaya-arm64.apk
             SHA256SUMS.txt
 
-      - name: Publish to GitHub Releases (tag pushes)
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            Kaya.apk
-            Kaya-arm64.apk
-            SHA256SUMS.txt
-          tag_name: ${{ github.ref_name }}
-          body: |
-            ## ⚡ Kaya ${{ github.ref_name }}
-
-            **Which download?**
-            - `Kaya-arm64.apk` — **recommended**: ~60% smaller & much faster to download (every phone sold since ~2016)
-            - `Kaya.apk` — universal fallback (older 32-bit devices)
-
-            **Install:** download → open → allow "install unknown apps" for your browser when asked.
-            First launch: tap **BOOST** → accept the VPN prompt once → Tuning → Battery: Unrestricted.
-
-            **Play Protect note:** Kaya is an open-source booster you built/installed outside the Play Store.
-            If Play Protect shows an "unknown developer" prompt, tap **More details → Install anyway**.
-            Verify the file against `SHA256SUMS.txt` if you want to be certain.
-
-            Zero servers. Zero accounts. The DNS engine runs on your device.
-          fail_on_unmatched_files: true
+      # NOTE: CI must NEVER publish to GitHub Releases. Without the signing
+      # secret this runner produces a DEBUG-signed APK with a fresh ephemeral
+      # key every build, and publishing it replaces the real keystore-signed
+      # release assets — every installed app then refuses the update with
+      # "App not installed" (signature mismatch). Releases are published
+      # exclusively from local dist/ builds signed with kaya-release.jks.

@@ -2,7 +2,9 @@ package com.kaya.booster
 
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageInfo
 import android.net.Uri
+import android.os.Build
 import androidx.core.content.FileProvider
 import java.io.File
 import java.net.HttpURLConnection
@@ -114,6 +116,17 @@ object KayaUpdater {
      */
     fun install(context: Context, url: String): Boolean {
         return KayaGuard.guard("update-install") {
+            // Pre-flight 1: without "install unknown apps" for Kaya, the system
+            // installer would bounce the handoff with a bare "App not installed"
+            // — surface the real reason instead.
+            val canInstall = if (Build.VERSION.SDK_INT >= 26) {
+                context.packageManager.canRequestPackageInstalls()
+            } else true
+            if (!canInstall) {
+                KayaEventHub.emit("update", mapOf("phase" to "failed", "reason" to "missing install permission"))
+                return@guard false
+            }
+
             val dir = File(context.cacheDir, "updates").apply { mkdirs() }
             val file = File(dir, "kaya-update.apk")
 
@@ -166,6 +179,24 @@ object KayaUpdater {
             }
             KayaEventHub.emit("update", mapOf("phase" to "verified"))
 
+            // Pre-flight 2: never hand the installer an APK that would be a
+            // downgrade (that is rejected with the same cryptic "App not
+            // installed"). Read the versionCode straight out of the downloaded
+            // APK and compare with the installed one.
+            val downloadedCode = apkVersionCode(context, file)
+            val installedCode = installedVersionCode(context)
+            if (downloadedCode != null && downloadedCode < installedCode) {
+                file.delete()
+                KayaEventHub.emit(
+                    "update",
+                    mapOf(
+                        "phase" to "failed",
+                        "reason" to "downloaded build ($downloadedCode) is older than installed ($installedCode)",
+                    ),
+                )
+                return@guard false
+            }
+
             KayaEventHub.emit("update", mapOf("phase" to "installing"))
             val uri: Uri = FileProvider.getUriForFile(
                 context,
@@ -179,6 +210,26 @@ object KayaUpdater {
             context.startActivity(intent)
             true
         } ?: false
+    }
+
+    /** versionCode parsed from a downloaded APK's manifest; null if unreadable. */
+    private fun apkVersionCode(context: Context, file: File): Long? = runCatching {
+        val info = context.packageManager.getPackageArchiveInfo(file.absolutePath, 0)
+        if (info == null) {
+            null
+        } else if (Build.VERSION.SDK_INT >= 28) {
+            info.longVersionCode
+        } else {
+            @Suppress("DEPRECATION")
+            info.versionCode.toLong()
+        }
+    }.getOrNull()
+
+    fun installedVersionCode(context: Context): Long = try {
+        val pi: PackageInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+        if (Build.VERSION.SDK_INT >= 28) pi.longVersionCode else @Suppress("DEPRECATION") pi.versionCode.toLong()
+    } catch (_: Throwable) {
+        0L
     }
 
     /** SHA-256 of [file], streamed so an 18–48 MB APK never sits in memory. */

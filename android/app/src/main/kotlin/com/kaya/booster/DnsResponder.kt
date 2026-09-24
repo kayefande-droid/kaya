@@ -218,4 +218,17 @@ object DnsResponder {
     }
 
     fun clearCache() = cache.clear()
+
+    /** Fresh IPs for [host] if cached, else null — used by the pre-warm. */
+    fun cachedIps(host: String): List<String>? {
+        val e = cache["${DnsProtocol.TYPE_A}|${host.lowercase().trimEnd('.')}"] ?: return null
+        return if (System.currentTimeMillis() - e.at < TTL_MS) e.ips else null
+    }
+
+    /** Seed the cache with a real race result (pre-warm path). */
+    fun putCached(host: String, ips: List<String>, resolver: String) {
+        if (ips.isEmpty()) return
+        cache["${DnsProtocol.TYPE_A}|${host.lowercase().trimEnd('.')}"] =
+            Entry(System.currentTimeMillis(), ips, resolver)
+    }
 }
