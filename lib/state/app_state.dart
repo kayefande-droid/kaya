@@ -81,6 +81,9 @@ class AppState extends ChangeNotifier {
     accessibilityOk = await _bridge.accessibilityEnabled();
     final dns = await _bridge.getPrivateDns();
     if (dns != null) privateDns = dns;
+    // Keep the overlay status fresh too: Tuning shows it inline and the
+    // post-grant bubble flow depends on it being current after a resume.
+    overlayOk = await _bridge.overlayGranted();
     notifyListeners();
   }
 

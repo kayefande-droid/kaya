@@ -112,20 +112,6 @@ class _TuningScreenState extends State<TuningScreen> {
                         : 'Needs one-time Do Not Disturb access.',
                   ),
                 ),
-                if (!state.overlayOk)
-                  ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: const Icon(Icons.picture_in_picture_alt_rounded, color: KayaColors.warn),
-                    title: const Text('Allow display over other apps'),
-                    subtitle: const Text(
-                      'Needed once for the floating live monitor during games.',
-                    ),
-                    trailing: const Icon(Icons.chevron_right_rounded, color: KayaColors.inkFaint),
-                    onTap: () async {
-                      await state.bridge.requestOverlay();
-                      await state.loadFeatures();
-                    },
-                  ),
               ],
             ),
           ),
@@ -134,6 +120,29 @@ class _TuningScreenState extends State<TuningScreen> {
           KayaCard(
             child: Column(
               children: [
+                // Inline overlay status: shows at a glance whether the floating
+                // live monitor will appear during a session, and routes to the
+                // one-tap grant when it won't.
+                _ActionRow(
+                  icon: Icons.picture_in_picture_alt_rounded,
+                  title: 'Live monitor (floating bubble)',
+                  subtitle: state.overlayOk
+                      ? 'Granted — the bubble docks on the left edge whenever a session arms.'
+                      : 'Not granted — tap to allow "display over other apps" once.',
+                  trailing: state.overlayOk
+                      ? const Icon(Icons.check_circle_rounded, color: KayaColors.lane)
+                      : const Icon(Icons.chevron_right_rounded, color: KayaColors.inkFaint),
+                  onTap: () async {
+                    if (state.overlayOk) {
+                      if (context.mounted) {
+                        showKayaSnack(context, 'Overlay ready — the bubble rides over your game, left edge.');
+                      }
+                    } else {
+                      await state.bridge.requestOverlay();
+                      await state.loadFeatures();
+                    }
+                  },
+                ),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   value: state.boostOn,
@@ -418,8 +427,13 @@ class _TuningScreenState extends State<TuningScreen> {
                         ),
                         onPressed: () async {
                           final url = updateInfo?['apkUrl']?.toString();
-                          if (url != null) {
-                            await widget.state.bridge.updateInstall(url);
+                          if (url == null) return;
+                          final ok = await widget.state.bridge.updateInstall(url);
+                          if (!context.mounted) return;
+                          if (ok) {
+                            showKayaSnack(context, 'Checksum verified against SHA256SUMS.txt — handing to the installer.');
+                          } else {
+                            showKayaSnack(context, 'Update cancelled: checksum could not be verified. Nothing was installed.');
                           }
                         },
                         icon: const Icon(Icons.download_rounded, size: 18),

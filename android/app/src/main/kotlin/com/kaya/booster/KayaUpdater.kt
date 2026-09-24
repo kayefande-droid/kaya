@@ -7,15 +7,19 @@ import androidx.core.content.FileProvider
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
+import java.security.MessageDigest
 
 /**
  * In-app updater against GitHub Releases (no third-party deps, no servers of
  * ours — it literally reads the repo's public releases API).
  *
  * Flow: [check] reports current vs latest + the APK asset URL → [install]
- * downloads to cache/updates/ with progress events → hands the APK to the
- * system installer via FileProvider. Play-protect-safe: the user always sees
- * the standard "install this update?" confirmation, signed with Kaya's key.
+ * downloads to cache/updates/, verifies the SHA-256 against the release's
+ * SHA256SUMS.txt, and only then hands the APK to the system installer via
+ * FileProvider. A mismatched, truncated or tampered file is deleted and never
+ * offered for install — the update fails closed. Play-protect-safe: the user
+ * always sees the standard "install this update?" confirmation, signed with
+ * Kaya's key.
  */
 object KayaUpdater {
 
@@ -102,16 +106,26 @@ object KayaUpdater {
         return false
     }
 
-    /** Downloads [url] and hands it to the system installer. Off-main-thread. */
-    fun install(context: Context, url: String) {
-        KayaGuard.bg("update-install") {
+    /**
+     * Downloads [url], verifies its SHA-256 against the matching entry in the
+     * release's SHA256SUMS.txt, and only then hands it to the system installer.
+     * Returns false when the checksum cannot be verified (fail closed: the
+     * downloaded file is deleted, nothing is installed). Off-main-thread.
+     */
+    fun install(context: Context, url: String): Boolean {
+        return KayaGuard.guard("update-install") {
             val dir = File(context.cacheDir, "updates").apply { mkdirs() }
             val file = File(dir, "kaya-update.apk")
+
+            // Same-release manifest: releases/latest/download/<name> → SHA256SUMS.txt.
+            val sumsUrl = url.substringBeforeLast('/') + "/SHA256SUMS.txt"
+
             val conn = URL(url).openConnection() as HttpURLConnection
             conn.connectTimeout = CONNECT_TIMEOUT
             conn.readTimeout = 30_000
             try {
                 val total = conn.contentLengthLong
+                val digest = MessageDigest.getInstance("SHA-256")
                 conn.inputStream.use { input ->
                     file.outputStream().use { out ->
                         val buf = ByteArray(32 * 1024)
@@ -119,6 +133,7 @@ object KayaUpdater {
                         while (true) {
                             val n = input.read(buf)
                             if (n < 0) break
+                            digest.update(buf, 0, n)
                             out.write(buf, 0, n)
                             done += n
                             if (total > 0) {
@@ -133,6 +148,24 @@ object KayaUpdater {
             } finally {
                 conn.disconnect()
             }
+
+            // --- verify before anything touches the package installer ---
+            val actual = digest(file).lowercase()
+            val expected = expectedSha(context, sumsUrl, url.substringAfterLast('/'))
+            val verified = expected != null && expected.equals(actual, ignoreCase = true)
+            if (!verified) {
+                file.delete()
+                KayaEventHub.emit(
+                    "update",
+                    mapOf(
+                        "phase" to "failed",
+                        "reason" to if (expected == null) "checksum unavailable" else "checksum mismatch",
+                    ),
+                )
+                return@guard false
+            }
+            KayaEventHub.emit("update", mapOf("phase" to "verified"))
+
             KayaEventHub.emit("update", mapOf("phase" to "installing"))
             val uri: Uri = FileProvider.getUriForFile(
                 context,
@@ -144,6 +177,45 @@ object KayaUpdater {
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
             }
             context.startActivity(intent)
+            true
+        } ?: false
+    }
+
+    /** SHA-256 of [file], streamed so an 18–48 MB APK never sits in memory. */
+    private fun digest(file: File): String {
+        val md = MessageDigest.getInstance("SHA-256")
+        file.inputStream().use { input ->
+            val buf = ByteArray(32 * 1024)
+            while (true) {
+                val n = input.read(buf)
+                if (n < 0) break
+                md.update(buf, 0, n)
+            }
+        }
+        return md.digest().joinToString("") { "%02x".format(it) }
+    }
+
+    /**
+     * Expected SHA-256 for [assetName] parsed from a `sha256 *name*` manifest
+     * (the sha256sum format this repo publishes). Null if unreachable/absent —
+     * callers treat that as "cannot verify", never as "verify ok".
+     */
+    private fun expectedSha(context: Context, sumsUrl: String, assetName: String): String? {
+        return KayaGuard.guard("update-checksum") {
+            val conn = URL(sumsUrl).openConnection() as HttpURLConnection
+            conn.connectTimeout = CONNECT_TIMEOUT
+            conn.readTimeout = READ_TIMEOUT
+            try {
+                if (conn.responseCode != 200) return@guard null
+                val text = conn.inputStream.bufferedReader().use { it.readText() }
+                text.lineSequence()
+                    .map { it.trim() }
+                    .firstOrNull { it.endsWith(assetName, ignoreCase = true) }
+                    ?.substringBefore(' ')
+                    ?.takeIf { it.length == 64 && it.all { c -> c.isDigit() || c in 'a'..'f' || c in 'A'..'F' } }
+            } finally {
+                conn.disconnect()
+            }
         }
     }
 }

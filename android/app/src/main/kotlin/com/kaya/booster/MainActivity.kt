@@ -333,8 +333,12 @@ class MainActivity : FlutterActivity() {
                 "updateInstall" -> {
                     val url = call.argument<String>("url") ?: ""
                     if (url.startsWith("https://github.com/")) {
-                        runCatching { KayaUpdater.install(this, url) }
-                        finishOnMain(result) { true }
+                        // Download + SHA-256 verify block: keep them off the main
+                        // thread and report the verified result, not a blind true.
+                        bg.execute {
+                            val ok = runCatching { KayaUpdater.install(this, url) }.getOrDefault(false)
+                            finishOnMain(result) { ok }
+                        }
                     } else {
                         finishOnMain(result) { false }
                     }

@@ -192,9 +192,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
           const SizedBox(height: 10),
-          // Bottom inset so the last line never hides under the nav bar.
+          // Bottom inset: clears the 80dp nav bar even when the system inset
+          // is 0 (gesture nav) — and stays readable when a snackbar shows.
           Padding(
-            padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom + 72),
+            padding: EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom + 96),
             child: Text(
               state.batteryExempt
                   ? 'Battery: unrestricted — locks can hold at full performance.'

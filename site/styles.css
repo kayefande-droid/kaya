@@ -467,15 +467,18 @@ h1 {
 .dl-section { text-align: center; }
 .dl-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 18px; max-width: 760px; margin: 0 auto 30px; }
 .dl {
-  position: relative; display: flex; flex-direction: column; gap: 6px; padding: 40px 24px 24px;
+  position: relative; display: flex; flex-direction: column; gap: 6px; padding: 28px 24px 24px;
   border-radius: 16px; text-decoration: none; color: var(--ink);
   background: var(--panel); border: 1px solid var(--line);
   transition: transform .18s, border-color .18s, box-shadow .18s;
 }
 .dl:hover { transform: translateY(-4px); border-color: rgba(0,229,106,.55); box-shadow: 0 20px 60px rgba(0,0,0,.5); }
 .dl-hot { border-color: rgba(0,229,106,.5); }
+/* In-flow badge: absolutely-positioned children are the first thing any
+   overflow:hidden ancestor clips — keeping the pill in the flex flow makes
+   the card physically reserve its space so it can never be cut in half. */
 .dl-badge {
-  position: absolute; top: 12px; left: 20px; font-family: var(--mono); font-size: .7rem;
+  align-self: flex-start; font-family: var(--mono); font-size: .7rem;
   letter-spacing: .12em; text-transform: uppercase; padding: 3px 10px; border-radius: 999px;
   background: var(--neon); color: #04160B; font-weight: 800;
 }
@@ -825,7 +828,11 @@ h1 {
   92%  { opacity: 1; }
   100% { transform: translateX(calc(100cqw + 60px)); opacity: 0; }
 }
-.beam { container-type: size; }
+/* inline-size (not size): size-containment collapses auto-height cards
+   (download tiles) to their padding and clips absolutely-positioned
+   children under overflow:hidden. Horizontal beam travel only needs the
+   inline axis, and cqw keeps resolving against the card. */
+.beam { container-type: inline-size; }
 
 /* ---------- capability marquee ---------- */
 .marquee {
