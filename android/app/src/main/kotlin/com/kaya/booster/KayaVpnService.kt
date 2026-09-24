@@ -17,6 +17,7 @@ import java.net.ServerSocket
 import java.net.Socket
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
+import android.os.SystemClock
 
 /**
  * Kaya's on-device fast lane (VpnService).
@@ -143,9 +144,14 @@ class KayaVpnService : VpnService() {
 
         tun = fd
         tunOut = FileOutputStream(fd.fileDescriptor)
+        // TCP segments are written from background pump threads; give the
+        // proxy the live writeTun so segments never depend on a specific
+        // call stack (DNS replies carry their own per-call writer).
+        TcpProxy.attachWriter { out -> writeTun(out) }
         running.set(true)
 
         startReplyLoop()
+        startWatchdog()
         // Bring the UDP relay up (guarded: a busy port must never take the
         // engine down — packets simply pass through untouched instead).
         var relayPort = fwdUdpPort
@@ -178,10 +184,87 @@ class KayaVpnService : VpnService() {
             .addAddress(tunAddr, 32)
             .addRoute("0.0.0.0", 0)
             .addDnsServer(tunRouter)
+        // Kaya's own traffic (DNS races, TCP handshakes, update downloads)
+        // must take the real network, or it would loop back into the tunnel.
+        // protect() already handles sockets, but excluding our own package
+        // at the interface level makes that guarantee absolute — even for
+        // code paths that forgot to protect a socket.
+        runCatching {
+            builder.addDisallowedApplication(packageName)
+        }
         return try {
             builder.establish()
         } catch (t: Throwable) {
             null
+        }
+    }
+
+    /**
+     * Fail-open watchdog: if the read loop goes quiet for 15 s while apps
+     * keep producing traffic (write failures climbing = clients trapped in
+     * retransmit), or the loop starts throwing in a tight loop, the tunnel
+     * is wedged — establish() raced a network switch, the fd died silently,
+     * an OEM power-tripped the interface. We rebuild the interface in place.
+     * Kaya's promise is "never break the user's internet": a dead engine
+     * must recover itself, not sit there black-holing packets.
+     */
+    @Volatile private var lastTunReadAt: Long = 0L
+    @Volatile private var tunWriteFailures = 0
+    @Volatile private var tunReadErrors = 0
+    @Volatile private var tunGeneration = 0
+    @Volatile private var lastWatchdogActionAt = 0L
+
+    private fun startWatchdog() {
+        lastTunReadAt = SystemClock.elapsedRealtime()
+        KayaGuard.bg("vpn-watchdog") {
+            while (running.get()) {
+                runCatching { Thread.sleep(5_000) }
+                if (!running.get()) break
+                val now = SystemClock.elapsedRealtime()
+                val idleMs = now - lastTunReadAt
+                val errors = tunReadErrors
+                val gen = tunGeneration
+                // Cooldown so a flapping network can't trigger a restart storm.
+                val cooling = now - lastWatchdogActionAt < 20_000
+                val starved = idleMs > 15_000 && tunWriteFailures > 0
+                val thrashing = errors > 250 && idleMs > 5_000
+                if ((starved || thrashing) && !cooling) {
+                    lastWatchdogActionAt = now
+                    tunReadErrors = 0
+                    tunGeneration++ // retire the old read loop
+                    KayaEventHub.emit(
+                        "vpn",
+                        mapOf(
+                            "state" to "watchdog-restart",
+                            "reason" to if (starved) "starved" else "error-loop",
+                            "idleMs" to idleMs,
+                        ),
+                    )
+                    rebuildInterface(gen + 1)
+                }
+            }
+        }
+    }
+
+    /** Rebuild the tunnel fd in place; traffic resumes on the new interface. */
+    private fun rebuildInterface(generation: Int) {
+        if (!running.get()) return
+        KayaGuard.bg("vpn-rebuild") {
+            val fd = try {
+                buildVpnInterface()
+            } catch (_: Throwable) {
+                null
+            }
+            if (fd == null) return@bg // keep the old fd; watchdog retries later
+            runCatching { tunOut?.close() }
+            runCatching { tun?.close() }
+            tun = fd
+            tunOut = FileOutputStream(fd.fileDescriptor)
+            tunWriteFailures = 0
+            TcpProxy.attachWriter { out -> writeTun(out) }
+            lastTunReadAt = SystemClock.elapsedRealtime()
+            startReadLoop(fd, generation)
+            KayaEventHub.emit("vpn", mapOf("state" to "active"))
         }
     }
 
@@ -242,8 +325,8 @@ class KayaVpnService : VpnService() {
         replyThread?.start()
     }
 
-    private fun startReadLoop(fd: ParcelFileDescriptor) {
-        readThread = Thread({
+    private fun startReadLoop(fd: ParcelFileDescriptor, generation: Int = tunGeneration) {
+        val thread = Thread({
             runCatching {
                 android.os.Process.setThreadPriority(
                     android.os.Process.THREAD_PRIORITY_URGENT_AUDIO,
@@ -251,17 +334,23 @@ class KayaVpnService : VpnService() {
             }
             val input = FileInputStream(fd.fileDescriptor)
             val packet = ByteArray(32767)
-            while (running.get()) {
+            while (running.get() && generation == tunGeneration) {
                 try {
                     val len = input.read(packet)
+                    lastTunReadAt = SystemClock.elapsedRealtime()
                     if (len < 20) continue
                     processPacket(packet, len)
                 } catch (t: Throwable) {
-                    if (running.get()) runCatching { Thread.sleep(20) }
+                    tunReadErrors++
+                    if (running.get() && generation == tunGeneration) {
+                        runCatching { Thread.sleep(20) }
+                    }
                 }
             }
+            runCatching { input.close() }
         }, "kaya-tun-read")
-        readThread?.start()
+        readThread = thread
+        thread.start()
     }
 
     private fun processPacket(packet: ByteArray, len: Int) {
@@ -290,7 +379,11 @@ class KayaVpnService : VpnService() {
         val payload = packet.copyOfRange(off, off + payloadLen)
 
         if (dstPort == 53) {
-            DnsResponder.answer(srcIp, srcPort, payload) { out -> writeTun(out) }
+            // Never resolve on the read thread: DnsResponder answers from
+            // cache instantly and races resolvers in the background, so a
+            // slow upstream can delay one lookup but never the tunnel.
+            val query = payload
+            DnsResponder.answer(srcIp, srcPort, query) { out -> writeTun(out) }
             return
         }
 
@@ -355,12 +448,10 @@ class KayaVpnService : VpnService() {
 
         if (dstPort == 53 && (flags and PacketEngine.FLAG_SYN) != 0) {
             // DNS-over-TCP: refuse gracefully; UDP DNS is handled natively.
-            TcpProxy.sendReset(tunOut ?: return, srcIp, srcPort, dstIp, dstPort, seq, ack)
+            TcpProxy.sendReset(srcIp, srcPort, dstIp, dstPort, seq, ack)
             return
         }
-        TcpProxy.handle(
-            tunOut ?: return, srcIp, srcPort, dstIp, dstPort, seq, ack, flags, payload,
-        ) { protectStream(it) }
+        TcpProxy.handle(srcIp, srcPort, dstIp, dstPort, seq, ack, flags, payload) { protectStream(it) }
     }
 
     // ------------------------------------------------------------- ICMP
@@ -387,8 +478,13 @@ class KayaVpnService : VpnService() {
         try {
             tunOut?.write(out)
             tunOut?.flush()
+            tunWriteFailures = 0
         } catch (t: Throwable) {
-            // tunnel closing; the read loop will notice
+            // Tunnel closing or wedged: count it. The watchdog distinguishes
+            // "quiet because idle" from "quiet because dead" via this counter
+            // (apps stuck behind a dead tunnel retransmit constantly, so
+            // writes keep failing), then rebuilds the interface.
+            tunWriteFailures++
         }
     }
 

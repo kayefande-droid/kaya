@@ -56,6 +56,9 @@ body {
 
 main, .nav, .footer { position: relative; z-index: 2; }
 
+/* Anchored sections must land below the sticky nav, not underneath it. */
+section[id] { scroll-margin-top: 76px; }
+
 /* ---------- nav ---------- */
 .nav {
   position: sticky; top: 0; z-index: 50;
@@ -255,7 +258,10 @@ h1 {
 .game-ico {
   width: 34px; height: 34px; margin-bottom: 8px;
   fill: none; stroke: currentColor; stroke-width: 2.4;
-  stroke-linecap: round; stroke-linejoin: round; color: var(--lane);
+  stroke-linecap: round; stroke-linejoin: round;
+  /* --lane was never defined (icons silently fell back to dim gray);
+     --neon is the default, per-tile inline styles still override. */
+  color: var(--neon, #00E56A);
 }
 .game-tile:hover .game-ico { filter: drop-shadow(0 0 7px currentColor); }
 
@@ -495,6 +501,13 @@ h1 {
 .faq summary { cursor: pointer; font-weight: 700; }
 .faq details[open] summary { color: var(--neon); margin-bottom: 8px; }
 .faq p { color: var(--ink-dim); font-size: .95rem; }
+
+/* visible keyboard focus site-wide (was default-only on some engines) */
+a:focus-visible, button:focus-visible, summary:focus-visible {
+  outline: 2px solid var(--neon);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
 
 /* footer */
 .footer {
