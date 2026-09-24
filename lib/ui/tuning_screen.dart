@@ -22,6 +22,7 @@ class _TuningScreenState extends State<TuningScreen> {
   List<Map<String, Object?>> notifs = [];
   Map<String, Object?>? updateInfo;
   bool checkingUpdate = false;
+  int downloadPct = -1; // -1 idle · 0..100 download · 100+ verified/handing off
   List<String> logLines = [];
   bool showLog = false;
   String bubbleSide = 'left'; // dock side of the floating live monitor
@@ -36,6 +37,7 @@ class _TuningScreenState extends State<TuningScreen> {
     _loadBubbleSide();
     _evtSub = widget.state.bridge.events.listen((e) {
       if (e.type == 'notif') _loadNotifs();
+      if (e.type == 'update') _onUpdateEvent(e.data);
     });
   }
 
@@ -66,6 +68,20 @@ class _TuningScreenState extends State<TuningScreen> {
     }
   }
 
+  /// Live download progress for the in-app update, pushed by KayaUpdater
+  /// through KayaEventHub ('update' events).
+  void _onUpdateEvent(Map<String, Object?> data) {
+    if (!mounted) return;
+    switch (data['phase']?.toString()) {
+      case 'progress':
+        setState(() => downloadPct = (data['pct'] as num?)?.toInt() ?? 0);
+      case 'verified' || 'installing':
+        setState(() => downloadPct = 101);
+      case 'failed':
+        setState(() => downloadPct = -1);
+    }
+  }
+
   Future<void> _loadPads() async {
     final pads = await widget.state.bridge.listGamepads();
     if (mounted) setState(() => gamepads = pads);
@@ -86,6 +102,16 @@ class _TuningScreenState extends State<TuningScreen> {
           Text('Tuning', style: Theme.of(context).appBarTheme.titleTextStyle),
           const SizedBox(height: 14),
           const SectionHeader(title: 'Automation'),
+          const _CardHint(
+            topic: 'Automation',
+            explanation:
+                'Engine auto-pilot arms the DNS engine, radio locks and the '
+                'live bubble the moment you launch a boosted game — and '
+                'disarms when you leave it. Game Focus quiets non-essential '
+                'notifications during a session using Android\'s Do Not '
+                'Disturb — while calls ALWAYS ring (from anyone) and call, '
+                'media and game volume are never changed.',
+          ),
           KayaCard(
             child: Column(
               children: [
@@ -114,9 +140,11 @@ class _TuningScreenState extends State<TuningScreen> {
                   title: const Text('Game focus (battery & quiet)'),
                   subtitle: Text(
                     state.dndGranted
-                        ? 'On game launch: battery-friendly locks + DND priority '
-                            'so only calls and WhatsApp break through.'
-                        : 'Needs one-time Do Not Disturb access.',
+                        ? 'On game launch: battery-friendly locks + DND quiet '
+                            'mode. Calls ALWAYS ring — from anyone — and call, '
+                            'media and game volume are never changed.'
+                        : 'Needs one-time Do Not Disturb access. Calls always '
+                            'ring and volumes are never muted.',
                   ),
                 ),
               ],
@@ -239,6 +267,15 @@ class _TuningScreenState extends State<TuningScreen> {
           ),
           const SizedBox(height: 16),
           const SectionHeader(title: 'Battery & data'),
+          const _CardHint(
+            topic: 'Battery & data',
+            explanation:
+                'Battery exemption keeps the boost locks alive when the screen '
+                'locks — without it Android throttles the session mid-match. '
+                'Usage access only counts which apps use bandwidth in the '
+                'background so the live monitor can show it; nothing is read '
+                'beyond usage statistics.',
+          ),
           KayaCard(
             child: Column(
               children: [
@@ -453,6 +490,31 @@ class _TuningScreenState extends State<TuningScreen> {
                               '(${updateInfo!['currentVersion']}).'),
                   style: const TextStyle(height: 1.4),
                 ),
+                if (downloadPct >= 0) ...[
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(6),
+                          child: LinearProgressIndicator(
+                            value: downloadPct >= 100 ? null : downloadPct / 100,
+                            minHeight: 6,
+                            backgroundColor: KayaColors.lane.withValues(alpha: 0.15),
+                            valueColor: const AlwaysStoppedAnimation<Color>(KayaColors.lane),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        downloadPct >= 100
+                            ? 'Checksum verified — installer…'
+                            : '$downloadPct%',
+                        style: const TextStyle(fontSize: 12, color: KayaColors.lane),
+                      ),
+                    ],
+                  ),
+                ],
                 const SizedBox(height: 10),
                 Row(
                   children: [
@@ -484,8 +546,10 @@ class _TuningScreenState extends State<TuningScreen> {
                         onPressed: () async {
                           final url = updateInfo?['apkUrl']?.toString();
                           if (url == null) return;
+                          setState(() => downloadPct = 0);
                           final ok = await widget.state.bridge.updateInstall(url);
                           if (!context.mounted) return;
+                          setState(() => downloadPct = -1);
                           if (ok) {
                             showKayaSnack(context, 'Checksum verified against SHA256SUMS.txt — handing to the installer.');
                           } else {
@@ -568,6 +632,53 @@ class _TuningScreenState extends State<TuningScreen> {
                   style: TextStyle(color: KayaColors.inkDim, fontSize: 12.5, height: 1.45),
                 ),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// One-line explainer above a section card: topic in bold, then the "why".
+/// Cheap, always-visible education so users don't have to leave the screen.
+class _CardHint extends StatelessWidget {
+  const _CardHint({required this.topic, required this.explanation});
+
+  final String topic;
+  final String explanation;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 4, bottom: 6, right: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Icon(Icons.help_outline_rounded, size: 15, color: KayaColors.inkFaint),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: '$topic — ',
+                    style: const TextStyle(
+                      color: KayaColors.inkDim,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 11.5,
+                    ),
+                  ),
+                  TextSpan(
+                    text: explanation,
+                    style: const TextStyle(
+                      color: KayaColors.inkFaint,
+                      fontSize: 11.5,
+                      height: 1.4,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ],

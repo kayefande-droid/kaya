@@ -105,6 +105,19 @@ class KayaBridge {
 
   Future<void> gameFocusDnd() => _invoke<void>('gameFocusDnd');
 
+  // ---- generic prefs (tutorial seen-flag etc.) ------------------------------
+  Future<bool> prefsGetBool(String key) async =>
+      await _invoke<bool>('prefsGetBool', {'key': key}) ?? false;
+  Future<void> prefsSetBool(String key, bool value) =>
+      _invoke<void>('prefsSetBool', {'key': key, 'value': value});
+
+  /// All game benchmark endpoints for the explainer table.
+  Future<List<Map<String, Object?>>> endpointList() async {
+    final raw = await _invoke<List<Object?>>('endpointList');
+    if (raw == null) return [];
+    return raw.map((e) => Map<String, Object?>.from(e as Map)).toList();
+  }
+
   Future<bool> overlayGranted() async => await _invoke<bool>('overlayGranted') ?? false;
   Future<void> requestOverlay() => _invoke<void>('requestOverlay');
   Future<bool> bubbleShow(String label) async =>

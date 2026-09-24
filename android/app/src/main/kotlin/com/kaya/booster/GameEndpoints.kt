@@ -31,12 +31,13 @@ object GameEndpoints {
 
     /**
      * Median of [rounds] real handshakes (drop the unlucky first cold round).
-     * When the steering engine has handshake-pinned a fastest edge for this
-     * host, the probe goes straight to that IP — the benchmark then shows the
-     * exact game-path latency the steered session will use, with zero DNS in
-     * the measurement.
+     * Also returns best and worst so the UI can show jitter spread. When the
+     * steering engine has handshake-pinned a fastest edge for this host, the
+     * probe goes straight to that IP — the benchmark then shows the exact
+     * game-path latency the steered session will use, with zero DNS in the
+     * measurement.
      */
-    fun probe(host: String, port: Int, rounds: Int = 3): Int? {
+    fun probe3(host: String, port: Int, rounds: Int = 5): Triple<Int?, Int?, Int?> {
         val pinned = SteeringRules.pinnedIpFor(host)
         val samples = mutableListOf<Int>()
         for (i in 0 until rounds) {
@@ -44,26 +45,32 @@ object GameEndpoints {
                 ?: continue
             if (i > 0 || rounds == 1) samples.add(ms) // round 0 warms DNS+TLS route
         }
-        if (samples.isEmpty()) return null
-        return samples.sorted()[samples.size / 2]
+        if (samples.isEmpty()) return Triple(null, null, null)
+        val sorted = samples.sorted()
+        return Triple(sorted[sorted.size / 2], sorted.first(), sorted.last())
     }
 
-    /** Race all endpoints in parallel; returns label -> median ms (null = fail). */
-    fun benchmarkAll(rounds: Int = 3): List<Map<String, Any?>> {
+    /** Backwards-compatible single-median probe. */
+    fun probe(host: String, port: Int, rounds: Int = 3): Int? = probe3(host, port, rounds).first
+
+    /** Race all endpoints in parallel; rows carry median + best/worst ms. */
+    fun benchmarkAll(rounds: Int = 5): List<Map<String, Any?>> {
         val out = java.util.concurrent.ConcurrentHashMap<String, Map<String, Any?>>()
         val threads = ENDPOINTS.map { ep ->
             Thread({
-                val ms = probe(ep.host, ep.port, rounds)
+                val (median, best, worst) = probe3(ep.host, ep.port, rounds)
                 out["${ep.game} · ${ep.label}"] = mapOf(
                     "game" to ep.game,
                     "label" to ep.label,
                     "host" to ep.host,
-                    "ms" to ms,
+                    "ms" to median,
+                    "bestMs" to best,
+                    "worstMs" to worst,
                 )
             }, "kaya-ep-${ep.game}")
         }
         threads.forEach { it.start() }
-        threads.forEach { it.join(6_000) }
+        threads.forEach { it.join(8_000) }
         return ENDPOINTS.mapNotNull { ep -> out["${ep.game} · ${ep.label}"] }
     }
 }

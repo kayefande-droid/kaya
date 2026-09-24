@@ -9,6 +9,7 @@ import 'ui/kaya_backdrop.dart';
 import 'ui/network_screen.dart';
 import 'ui/theme.dart';
 import 'ui/tuning_screen.dart';
+import 'ui/tutorial_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -52,6 +53,18 @@ class _KayaShellState extends State<KayaShell> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _maybeShowTutorial();
+  }
+
+  /// First run only: open the tutorial once, then never again (persisted).
+  Future<void> _maybeShowTutorial() async {
+    if (await TutorialScreen.seen(state)) return;
+    if (!mounted) return;
+    await TutorialScreen.markSeen(state); // set early: no loop on back-out
+    if (!mounted) return;
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => TutorialScreen(state: state)),
+    );
   }
 
   @override
@@ -169,6 +182,17 @@ class _KayaShellState extends State<KayaShell> with WidgetsBindingObserver {
                     },
                   ),
                   ListTile(
+                    leading: const Icon(Icons.school_rounded),
+                    title: const Text('How Kaya works'),
+                    onTap: () {
+                      Navigator.of(context).pop();
+                      Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                            builder: (_) => TutorialScreen(state: state)),
+                      );
+                    },
+                  ),
+                  ListTile(
                     leading: const Icon(Icons.verified_user_rounded),
                     title: const Text('Safety & checksums'),
                     onTap: () {
@@ -179,7 +203,7 @@ class _KayaShellState extends State<KayaShell> with WidgetsBindingObserver {
                   const AboutListTile(
                     icon: Icon(Icons.info_outline_rounded),
                     applicationName: 'Kaya',
-                    applicationVersion: '1.1.4',
+                    applicationVersion: '1.1.5',
                     aboutBoxChildren: [
                       Text('Zero servers. Zero accounts. Hand-built.'),
                     ],

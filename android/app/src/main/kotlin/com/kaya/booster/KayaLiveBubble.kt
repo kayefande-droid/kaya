@@ -40,6 +40,7 @@ object KayaLiveBubble {
     private var pillText: TextView? = null
     private var cardPing: TextView? = null
     private var cardState: TextView? = null
+    private var cardToggle: TextView? = null
     private var expanded = false
     private var shown = false
     private var pingMs: Int? = null
@@ -196,6 +197,33 @@ object KayaLiveBubble {
                 }
             }
         }
+        val toggle = TextView(context).apply {
+            setTextColor(0xFF5AC8FF.toInt())
+            textSize = 12f
+            typeface = Typeface.DEFAULT_BOLD
+            text = if (KayaState.engineOn) "⏻  Fast lane OFF" else "⏻  Fast lane ON"
+            setOnClickListener {
+                if (KayaState.engineOn) {
+                    KayaVpnService.stop(context)
+                    android.widget.Toast.makeText(
+                        context,
+                        "Fast lane stopping — steering ends",
+                        android.widget.Toast.LENGTH_SHORT,
+                    ).show()
+                } else {
+                    // VPN consent was granted when the session was first armed;
+                    // the service itself re-checks and fails safe if not.
+                    KayaVpnService.start(context)
+                    android.widget.Toast.makeText(
+                        context,
+                        "Arming fast lane…",
+                        android.widget.Toast.LENGTH_SHORT,
+                    ).show()
+                }
+                // Re-render the toggle label once state settles.
+                mainHandler.postDelayed({ render() }, 1200)
+            }
+        }
         val close = TextView(context).apply {
             setTextColor(0xFFFF5A5A.toInt())
             textSize = 12f
@@ -215,9 +243,11 @@ object KayaLiveBubble {
         cardLayout.addView(ping)
         cardLayout.addView(state)
         cardLayout.addView(refresh)
+        cardLayout.addView(toggle)
         cardLayout.addView(close)
         cardPing = ping
         cardState = state
+        cardToggle = toggle
         card = cardLayout
 
         // ---- container --------------------------------------------------
@@ -312,6 +342,7 @@ object KayaLiveBubble {
                 append(" · ")
                 append(if (KayaState.boostOn) "locks ON" else "locks off")
             }
+            cardToggle?.text = if (KayaState.engineOn) "⏻  Fast lane OFF" else "⏻  Fast lane ON"
         }
     }
 

@@ -14,10 +14,12 @@ import android.provider.Settings
  * everything that is NOT on the user's allowlist (calls + WhatsApp by
  * default). Honest, root-free mechanics:
  *
- *  - Do Not Disturb in PRIORITY mode with the allowlisted apps starred:
- *    calls still ring, allowlisted app notifications still come through,
- *    everything else (social feeds, games, marketing) is silenced for the
- *    duration of the session. This is a real, OS-enforced quiet mode.
+ *  - Do Not Disturb in PRIORITY mode tuned so that CALLS ALWAYS RING (any
+ *    sender, not just starred contacts), alarms and media volume are
+ *    explicitly exempted, and allowlisted app notifications still come
+ *    through; everything else (social feeds, marketing) is silenced for the
+ *    duration of the session. This is a real, OS-enforced quiet mode that
+ *    never touches call, ring, media or game audio volume.
  *  - An aggressive one-shot background stall hint via ActivityManager's
  *    kill-background-processes is NOT used (Play safety: never touch other
  *    apps). Instead the existing BackgroundMitigator keeps sampling so the
@@ -73,12 +75,19 @@ object GameFocusManager {
         val nm = context.getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
         if (nm != null && nm.isNotificationPolicyAccessGranted) {
             runCatching {
-                // Priority-only DND: stars (favorited contacts/apps) + calls pass.
+                // Priority-only DND, tuned so callers are NEVER silenced:
+                //  - all calls pass (PRIORITY_SENDERS_ANY — not just starred
+                //    contacts; any contact or unknown number still rings)
+                //  - alarms and media audio are explicitly exempted so the
+                //    game's own volume and the user's alarms are untouched
+                //    (several OEM ROMs otherwise suppress them under DND)
                 nm.notificationPolicy = NotificationManager.Policy(
                     NotificationManager.Policy.PRIORITY_CATEGORY_CALLS or
                         NotificationManager.Policy.PRIORITY_CATEGORY_CONVERSATIONS or
-                        NotificationManager.Policy.PRIORITY_CATEGORY_MESSAGES,
-                    NotificationManager.Policy.PRIORITY_SENDERS_STARRED, // calls from contacts
+                        NotificationManager.Policy.PRIORITY_CATEGORY_MESSAGES or
+                        NotificationManager.Policy.PRIORITY_CATEGORY_ALARMS or
+                        NotificationManager.Policy.PRIORITY_CATEGORY_MEDIA,
+                    NotificationManager.Policy.PRIORITY_SENDERS_ANY, // every call rings
                     NotificationManager.Policy.PRIORITY_SENDERS_ANY, // messages pass silently->banner-free
                     0,
                 )

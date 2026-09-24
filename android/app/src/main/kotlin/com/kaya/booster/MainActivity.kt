@@ -252,7 +252,7 @@ class MainActivity : FlutterActivity() {
                     finishOnMain(result) { true }
                 }
                 "gameBenchmark" -> bg.execute {
-                    val rounds = call.argument<Int>("rounds") ?: 3
+                    val rounds = call.argument<Int>("rounds") ?: 5
                     val rows: List<Map<String, Any?>>? = KayaGuard.guard("gameBenchmark") {
                         GameEndpoints.benchmarkAll(rounds.coerceIn(1, 5))
                     }
@@ -320,6 +320,24 @@ class MainActivity : FlutterActivity() {
                 "gameFocusDnd" -> {
                     GameFocusManager.requestDndAccess(this)
                     finishOnMain(result) { true }
+                }
+                "prefsGetBool" -> finishOnMain(result) {
+                    KayaState.prefs(this).getBoolean(
+                        call.argument<String>("key") ?: "",
+                        false,
+                    )
+                }
+                "prefsSetBool" -> {
+                    val key = call.argument<String>("key") ?: return@setMethodCallHandler
+                    KayaState.prefs(this).edit()
+                        .putBoolean(key, call.argument<Boolean>("value") ?: false)
+                        .apply()
+                    finishOnMain(result) { true }
+                }
+                "endpointList" -> finishOnMain(result) {
+                    GameEndpoints.ENDPOINTS.map {
+                        mapOf("game" to it.game, "label" to it.label, "host" to it.host)
+                    }
                 }
                 "notifList" -> finishOnMain(result) {
                     KayaNotificationCenter.list()

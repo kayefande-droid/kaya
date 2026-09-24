@@ -18,6 +18,11 @@ class NetworkScreen extends StatefulWidget {
 class _NetworkScreenState extends State<NetworkScreen> {
   Map<String, int?> benchmarks = {};
   Map<String, int?> gameBench = {};
+  Map<String, int> gameBest = {};
+  Map<String, int> gameWorst = {};
+  Map<String, int>? gameFirstRun; // first benchmark of the session (baseline)
+  Map<String, int>? gameDelta; // median - baseline, per endpoint
+  Map<String, Map<String, String>> endpointHosts = {}; // 'game · label' -> {host}
   List<String> gameHosts = [];
   Map<String, String> winners = {};
   bool benching = false;
@@ -40,6 +45,19 @@ class _NetworkScreenState extends State<NetworkScreen> {
   void initState() {
     super.initState();
     _load();
+    _loadEndpoints();
+  }
+
+  Future<void> _loadEndpoints() async {
+    final rows = await widget.state.bridge.endpointList();
+    if (!mounted) return;
+    setState(() {
+      for (final r in rows) {
+        endpointHosts['${r['game']} · ${r['label']}'] = {
+          'host': (r['host'] ?? '') as String,
+        };
+      }
+    });
   }
 
   Future<void> _load() async {
@@ -69,18 +87,38 @@ class _NetworkScreenState extends State<NetworkScreen> {
 
   Future<void> _gameBenchmark() async {
     setState(() => gameBenching = true);
-    final rows = await widget.state.bridge.gameBenchmark(rounds: 3);
+    final rows = await widget.state.bridge.gameBenchmark(rounds: 5);
     final results = <String, int?>{};
+    final best = <String, int>{};
+    final worst = <String, int>{};
     for (final row in rows) {
       final label = '${row['game']} · ${row['label']}';
       results[label] = (row['ms'] as num?)?.toInt();
+      final b = (row['bestMs'] as num?)?.toInt();
+      final w = (row['worstMs'] as num?)?.toInt();
+      if (b != null) best[label] = b;
+      if (w != null) worst[label] = w;
     }
-    if (mounted) {
-      setState(() {
-        gameBench = results;
-        gameBenching = false;
-      });
-    }
+    if (!mounted) return;
+    setState(() {
+      gameBench = results;
+      gameBest = best;
+      gameWorst = worst;
+      // Delta against the first run of this session (before/after arming).
+      final base = gameFirstRun;
+      if (base == null) {
+        gameFirstRun = Map<String, int>.from(
+          results..removeWhere((_, v) => v == null),
+        );
+        gameDelta = null;
+      } else {
+        gameDelta = {
+          for (final e in results.entries)
+            if (e.value != null && base[e.key] != null) e.key: e.value! - base[e.key]!,
+        };
+      }
+      gameBenching = false;
+    });
   }
 
   @override
@@ -157,12 +195,32 @@ class _NetworkScreenState extends State<NetworkScreen> {
               children: [
                 const Text(
                   'Real TCP handshakes from this device to each game\'s public '
-                  'edge, median of 3. Run before and after arming the Fast Lane '
-                  'to see the difference steering makes. In-game ping still '
+                  'edge — median of 5, plus best/worst (jitter spread). Run '
+                  'once with the Fast Lane off, then again armed: the first '
+                  'run of the session is kept as the baseline and every later '
+                  'run shows the delta per endpoint. In-game ping still '
                   'depends on the matchmaker\'s datacenter pick.',
                   style: TextStyle(color: KayaColors.inkDim, fontSize: 12.5, height: 1.45),
                 ),
                 const SizedBox(height: 10),
+                if (gameDelta != null) ...[
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: KayaColors.slate,
+                      borderRadius: BorderRadius.circular(KayaRadius.chip),
+                    ),
+                    child: Text(
+                      'vs baseline (first run this session): '
+                      '${gameDelta!.values.where((d) => d < 0).length} improved · '
+                      '${gameDelta!.values.where((d) => d == 0).length} same · '
+                      '${gameDelta!.values.where((d) => d > 0).length} worse',
+                      style: const TextStyle(fontSize: 12, color: KayaColors.inkDim),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                ],
                 if (gameBench.isNotEmpty)
                   for (final e in gameBench.entries)
                     Padding(
@@ -170,13 +228,55 @@ class _NetworkScreenState extends State<NetworkScreen> {
                       child: Row(
                         children: [
                           Expanded(
-                            child: Text(
-                              e.key,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(fontSize: 13),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  e.key,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(fontSize: 13),
+                                ),
+                                if (endpointHosts[e.key]?['host']?.isNotEmpty == true)
+                                  Text(
+                                    endpointHosts[e.key]!['host']!,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                        fontSize: 10.5, color: KayaColors.inkFaint),
+                                  ),
+                              ],
                             ),
                           ),
+                          if (gameBest[e.key] != null &&
+                              gameWorst[e.key] != null &&
+                              gameWorst[e.key]! - gameBest[e.key]! > 0)
+                            Padding(
+                              padding: const EdgeInsets.only(right: 6),
+                              child: Text(
+                                '±${gameWorst[e.key]! - gameBest[e.key]!}',
+                                style: const TextStyle(
+                                    fontSize: 10.5, color: KayaColors.inkFaint),
+                              ),
+                            ),
+                          if (gameDelta?[e.key] != null)
+                            Padding(
+                              padding: const EdgeInsets.only(right: 6),
+                              child: Text(
+                                gameDelta![e.key]! <= 0
+                                    ? '${gameDelta![e.key]!}'
+                                    : '+${gameDelta![e.key]!}',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  color: gameDelta![e.key]! < 0
+                                      ? KayaColors.lane
+                                      : (gameDelta![e.key]! == 0
+                                          ? KayaColors.inkFaint
+                                          : KayaColors.hot),
+                                ),
+                              ),
+                            ),
                           _BenchBadge(ms: e.value),
                         ],
                       ),

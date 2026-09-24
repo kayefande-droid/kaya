@@ -17,6 +17,10 @@ import android.os.Looper
 object KayaState {
 
     private const val PREFS = "kaya_state"
+
+    /** Shared prefs handle for simple flags (tutorial seen, etc.). */
+    fun prefs(context: Context) =
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
     private const val KEY_ENGINE = "engine_on"
     private const val KEY_BOOST = "boost_on"
     private const val KEY_PING = "last_ping"
