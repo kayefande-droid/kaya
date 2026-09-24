@@ -212,7 +212,16 @@ class MainActivity : FlutterActivity() {
                     SteeringRules.RESOLVERS.map { mapOf("name" to it.name, "primary" to it.primary) }
                 }
                 "getGameHosts" -> finishOnMain(result) { SteeringRules.GAME_HOSTS.toList() }
-                "getSteeringWinners" -> finishOnMain(result) { SteeringRules.allWinners() }
+                "getSteeringWinners" -> finishOnMain(result) {
+                    // Winner per domain, plus the handshake-pinned game edge
+                    // (⚑) when the edge race has measured one this session.
+                    val out = SteeringRules.allWinners().toMutableMap()
+                    SteeringRules.allPins().forEach { (host, ip) ->
+                        val base = out[host]
+                        out[host] = if (base.isNullOrBlank()) "⚑ $ip" else "$base ⚑ $ip"
+                    }
+                    out
+                }
                 "clearDnsCache" -> {
                     DnsResponder.clearCache()
                     SteeringRules.clearWinners()

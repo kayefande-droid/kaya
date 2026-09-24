@@ -21,6 +21,7 @@ object KayaState {
     private const val KEY_BOOST = "boost_on"
     private const val KEY_PING = "last_ping"
     private const val KEY_BUBBLE_SIDE = "bubble_side"
+    private const val KEY_EDGE_PINS = "edge_pins"
 
     private val mainHandler = Handler(Looper.getMainLooper())
     private var appContext: Context? = null
@@ -43,8 +44,35 @@ object KayaState {
         engineOn = prefs.getBoolean(KEY_ENGINE, false)
         boostOn = prefs.getBoolean(KEY_BOOST, false)
         lastPing = prefs.getInt(KEY_PING, -1).takeIf { it >= 0 }
+        // Handshake-pinned game edges survive process restarts: re-learning
+        // them costs a second of probing at the next lookup, and keeping the
+        // old winners makes the first match after a restart land on the same
+        // fast edge instead of re-rolling.
+        SteeringRules.restorePins(parsePins(prefs.getString(KEY_EDGE_PINS, null)))
         // Boot with the widgets in sync (no-op if none placed yet).
         KayaAppWidgetProvider.refreshAll(app)
+    }
+
+    /** Persist the current handshake pins ("host|ip;host|ip"). */
+    fun persistPins() {
+        val ctx = appContext ?: return
+        val encoded = SteeringRules.allPins().entries.joinToString(";") { "${it.key}|${it.value}" }
+        ctx.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_EDGE_PINS, encoded)
+            .apply()
+    }
+
+    private fun parsePins(raw: String?): Map<String, String> {
+        if (raw.isNullOrBlank()) return emptyMap()
+        val out = mutableMapOf<String, String>()
+        for (pair in raw.split(';')) {
+            val parts = pair.split('|')
+            if (parts.size == 2 && parts[0].contains('.') && parts[1].contains('.')) {
+                out[parts[0]] = parts[1]
+            }
+        }
+        return out
     }
 
     /** Persisted mirrors, read by the widget provider when the process is dead. */

@@ -164,10 +164,43 @@ object DnsRacer {
         threads.forEach { it.start() }
         threads.forEach { it.join(1600) }
         val winnerEntry = results.entries.minByOrNull { it.value.second }
-        return winnerEntry?.let { (name, pair) ->
+        var race = winnerEntry?.let { (name, pair) ->
             SteeringRules.recordWinner(domain, name)
             RaceResult(domain, name, pair.first, pair.second, pair.second)
         }
+
+        // Game-path tuning: for hosts we steer aggressively, a fast DNS
+        // answer is not the goal — a fast GAME EDGE is. Measure a real TCP
+        // handshake to every candidate IP and pin the fastest one for the
+        // session. The resolved list stays untouched (no fake answers);
+        // the benchmark and the user-facing numbers use the pinned edge.
+        if (race != null && SteeringRules.GAME_HOSTS.any { SteeringRules.matches(domain, it) }) {
+            val ips = race.addresses
+            if (ips.size > 1) {
+                val handshakes = ConcurrentHashMap<String, Int>()
+                val probes = ips.map { ip ->
+                    Thread({
+                        TcpPinger.pingIp(ip, 443, 1200)?.let { handshakes[ip] = it }
+                    }, "kaya-edge-$ip")
+                }
+                probes.forEach { it.start() }
+                probes.forEach { it.join(1500) }
+                handshakes.entries.minByOrNull { it.value }?.let { (bestIp, ms) ->
+                    SteeringRules.pinHost(domain, bestIp)
+                    KayaState.persistPins() // survive process restarts
+                    race = race.copy(winnerMs = ms)
+                }
+            } else if (ips.size == 1) {
+                // Single candidate: measure it so the number shown is the
+                // game-path handshake, and pin it for consistency.
+                TcpPinger.pingIp(ips[0], 443, 1200)?.let {
+                    SteeringRules.pinHost(domain, ips[0])
+                    KayaState.persistPins() // survive process restarts
+                    race = race.copy(winnerMs = it)
+                }
+            }
+        }
+        return race
     }
 
     private fun queryOne(domain: String, type: Int, server: String, timeoutMs: Int): Pair<List<String>, Int>? {
@@ -247,6 +280,30 @@ object TcpPinger {
         // into the tunnel — otherwise the UI benchmark would measure the
         // loopback and (on some OEM stacks) dead-lock and return nothing,
         // leaving the LIVE LATENCY panel empty exactly while the lane runs.
+        KayaVpnServiceHolder.vpn?.protectStream(socket)
+        return try {
+            val started = System.nanoTime()
+            socket.connect(InetSocketAddress(addr, port), timeoutMs)
+            ((System.nanoTime() - started) / 1_000_000).toInt()
+        } catch (_: Throwable) {
+            null
+        } finally {
+            runCatching { socket.close() }
+        }
+    }
+
+    /**
+     * Handshake probe to a literal IP — zero DNS in the hot path. Used by the
+     * edge race: every millisecond spent resolving would skew the very number
+     * we're trying to compare across candidate edges.
+     */
+    fun pingIp(ip: String, port: Int, timeoutMs: Int = 1200): Int? {
+        val addr = try {
+            InetAddress.getByName(ip)
+        } catch (_: Throwable) {
+            return null
+        }
+        val socket = Socket()
         KayaVpnServiceHolder.vpn?.protectStream(socket)
         return try {
             val started = System.nanoTime()

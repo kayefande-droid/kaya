@@ -61,13 +61,41 @@ object SteeringRules {
     /** Per-domain learned winner: domain -> resolver name. */
     private val winners = ConcurrentHashMap<String, String>()
 
+    /**
+     * Handshake-pinned edge IPs per game host: host -> best IP. Chosen by
+     * measuring a real TCP handshake to every candidate IP the DNS race
+     * returned — because a resolver that answers fastest is not necessarily
+     * the one whose edge accepts handshakes fastest (DNS speed != route speed).
+     */
+    private val pinnedHosts = ConcurrentHashMap<String, String>()
+
     fun recordWinner(domain: String, resolverName: String) {
         winners[domain] = resolverName
     }
 
     fun winnerFor(domain: String): String? = winners[domain]
 
+    /** Remember [ip] as the measured-fastest edge for [host]. */
+    fun pinHost(host: String, ip: String) {
+        pinnedHosts[host.lowercase().trimEnd('.')] = ip
+    }
+
+    /** The pinned fastest edge for [host], if a handshake race picked one. */
+    fun pinnedIpFor(host: String): String? =
+        pinnedHosts[host.lowercase().trimEnd('.')]
+
+    /** Restore pinned hosts after a process restart (session-scoped data). */
+    fun restorePins(pins: Map<String, String>) {
+        pins.forEach { (h, ip) -> pinnedHosts[h.lowercase().trimEnd('.')] = ip }
+    }
+
+    /** Pinned hosts for persistence. */
+    fun allPins(): Map<String, String> = pinnedHosts.toMap()
+
     fun allWinners(): Map<String, String> = winners.toMap()
 
-    fun clearWinners() = winners.clear()
+    fun clearWinners() {
+        winners.clear()
+        pinnedHosts.clear()
+    }
 }

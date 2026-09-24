@@ -37,8 +37,18 @@ object DnsResponder {
             }
         }
 
-        val ips = entry?.ips ?: emptyList()
+        val ips0 = entry?.ips ?: emptyList()
         val resolver = entry?.resolver ?: "unresolved"
+        // Put the handshake-pinned fastest edge first when we have one. This
+        // only reorders the answer the resolver actually gave us — Kaya never
+        // invents addresses — but games typically try the first A record, so
+        // first place is where the measured-fastest edge belongs.
+        val pin = SteeringRules.pinnedIpFor(question.name)
+        val ips = if (pin != null && ips0.size > 1 && pin in ips0) {
+            listOf(pin) + ips0.filter { it != pin }
+        } else {
+            ips0
+        }
         val response = buildResponse(msg.id, question, ips, negative = ips.isEmpty())
 
         KayaEventHub.emit(

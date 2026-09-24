@@ -3,7 +3,7 @@ description: >-
   Kaya — a hand-built fast lane & launcher for mobile FPS gaming.
   Smart Anycast DNS steering, ping HUD, boost locks. Zero servers, 100% on-device.
 publish_to: "none"
-version: 1.1.3+9
+version: 1.1.4+10
 
 environment:
   sdk: ">=3.3.0 <4.0.0"

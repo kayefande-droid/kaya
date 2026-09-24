@@ -29,11 +29,19 @@ object GameEndpoints {
         Endpoint("General", "Anycast reference", "cloudflare.com", 443),
     )
 
-    /** Median of [rounds] real handshakes (drop the unlucky first cold round). */
+    /**
+     * Median of [rounds] real handshakes (drop the unlucky first cold round).
+     * When the steering engine has handshake-pinned a fastest edge for this
+     * host, the probe goes straight to that IP — the benchmark then shows the
+     * exact game-path latency the steered session will use, with zero DNS in
+     * the measurement.
+     */
     fun probe(host: String, port: Int, rounds: Int = 3): Int? {
+        val pinned = SteeringRules.pinnedIpFor(host)
         val samples = mutableListOf<Int>()
         for (i in 0 until rounds) {
-            val ms = TcpPinger.ping(host, port) ?: continue
+            val ms = (if (pinned != null) TcpPinger.pingIp(pinned, port) else TcpPinger.ping(host, port))
+                ?: continue
             if (i > 0 || rounds == 1) samples.add(ms) // round 0 warms DNS+TLS route
         }
         if (samples.isEmpty()) return null
