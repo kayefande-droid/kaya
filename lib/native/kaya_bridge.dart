@@ -111,6 +111,13 @@ class KayaBridge {
       await _invoke<bool>('bubbleShow', {'label': label}) ?? false;
   Future<void> bubbleHide() => _invoke<void>('bubbleHide');
 
+  /// Dock side of the floating live monitor: "left" (default) or "right".
+  Future<String> bubbleSide() async => await _invoke<String>('bubbleSide') ?? 'left';
+
+  /// Persists the side and re-docks a visible bubble immediately.
+  Future<void> setBubbleSide(String side) =>
+      _invoke<void>('setBubbleSide', {'side': side});
+
   // ---- notification center ---------------------------------------------------
   Future<List<Map<String, Object?>>> notifList() async {
     final raw = await _invoke<List<Object?>>('notifList');

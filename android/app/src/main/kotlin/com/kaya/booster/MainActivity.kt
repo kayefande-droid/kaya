@@ -273,6 +273,15 @@ class MainActivity : FlutterActivity() {
                     KayaLiveBubble.hide(this)
                     finishOnMain(result) { true }
                 }
+                "bubbleSide" -> finishOnMain(result) { KayaState.storedBubbleSide(this) }
+                "setBubbleSide" -> {
+                    val side = call.argument<String>("side") ?: "left"
+                    finishOnMain(result) {
+                        KayaState.setBubbleSide(this, side)
+                        KayaLiveBubble.reDock(this) // move live, no flicker
+                        KayaState.storedBubbleSide(this)
+                    }
+                }
                 "autopilotGet" -> finishOnMain(result) {
                     mapOf(
                         "enabled" to GameAutoPilot.isEnabled(this),

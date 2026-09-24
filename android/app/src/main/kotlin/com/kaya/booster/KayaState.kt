@@ -20,6 +20,7 @@ object KayaState {
     private const val KEY_ENGINE = "engine_on"
     private const val KEY_BOOST = "boost_on"
     private const val KEY_PING = "last_ping"
+    private const val KEY_BUBBLE_SIDE = "bubble_side"
 
     private val mainHandler = Handler(Looper.getMainLooper())
     private var appContext: Context? = null
@@ -55,6 +56,21 @@ object KayaState {
 
     fun storedPing(context: Context): Int? =
         context.getSharedPreferences(PREFS, Context.MODE_PRIVATE).getInt(KEY_PING, -1).takeIf { it >= 0 }
+
+    /**
+     * Dock side of the floating live monitor: "left" (default) or "right".
+     * Survives process restarts so the bubble re-docks where the user chose.
+     */
+    fun storedBubbleSide(context: Context): String =
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .getString(KEY_BUBBLE_SIDE, "left") ?: "left"
+
+    fun setBubbleSide(context: Context, side: String) {
+        context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
+            .edit()
+            .putString(KEY_BUBBLE_SIDE, if (side == "right") "right" else "left")
+            .apply()
+    }
 
     /**
      * Force a widget/session re-render without changing any value — used

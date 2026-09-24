@@ -24,6 +24,7 @@ class _TuningScreenState extends State<TuningScreen> {
   bool checkingUpdate = false;
   List<String> logLines = [];
   bool showLog = false;
+  String bubbleSide = 'left'; // dock side of the floating live monitor
   StreamSubscription? _evtSub;
 
   @override
@@ -32,6 +33,7 @@ class _TuningScreenState extends State<TuningScreen> {
     _loadPads();
     _loadNotifs();
     _loadLog();
+    _loadBubbleSide();
     _evtSub = widget.state.bridge.events.listen((e) {
       if (e.type == 'notif') _loadNotifs();
     });
@@ -67,6 +69,11 @@ class _TuningScreenState extends State<TuningScreen> {
   Future<void> _loadPads() async {
     final pads = await widget.state.bridge.listGamepads();
     if (mounted) setState(() => gamepads = pads);
+  }
+
+  Future<void> _loadBubbleSide() async {
+    final side = await widget.state.bridge.bubbleSide();
+    if (mounted) setState(() => bubbleSide = side);
   }
 
   @override
@@ -127,7 +134,7 @@ class _TuningScreenState extends State<TuningScreen> {
                   icon: Icons.picture_in_picture_alt_rounded,
                   title: 'Live monitor (floating bubble)',
                   subtitle: state.overlayOk
-                      ? 'Granted — the bubble docks on the left edge whenever a session arms.'
+                      ? 'Granted — docks on the $bubbleSide edge whenever a session arms.'
                       : 'Not granted — tap to allow "display over other apps" once.',
                   trailing: state.overlayOk
                       ? const Icon(Icons.check_circle_rounded, color: KayaColors.lane)
@@ -135,7 +142,7 @@ class _TuningScreenState extends State<TuningScreen> {
                   onTap: () async {
                     if (state.overlayOk) {
                       if (context.mounted) {
-                        showKayaSnack(context, 'Overlay ready — the bubble rides over your game, left edge.');
+                        showKayaSnack(context, 'Overlay ready — the bubble rides over your game on the $bubbleSide edge.');
                       }
                     } else {
                       await state.bridge.requestOverlay();
@@ -143,6 +150,55 @@ class _TuningScreenState extends State<TuningScreen> {
                     }
                   },
                 ),
+                // Dock side: left (default) or right edge of the screen.
+                // Applied live — a visible bubble re-docks instantly.
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.swap_horiz_rounded, color: KayaColors.lane),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Live monitor dock side',
+                              style: TextStyle(fontWeight: FontWeight.w700),
+                            ),
+                            Text(
+                              bubbleSide == 'right'
+                                  ? 'Right edge — still draggable up and down.'
+                                  : 'Left edge — still draggable up and down.',
+                              style: const TextStyle(fontSize: 12.5),
+                            ),
+                          ],
+                        ),
+                      ),
+                      SegmentedButton<String>(
+                        segments: const [
+                          ButtonSegment(
+                            value: 'left',
+                            icon: Icon(Icons.align_horizontal_left_rounded, size: 18),
+                            label: Text('Left'),
+                          ),
+                          ButtonSegment(
+                            value: 'right',
+                            icon: Icon(Icons.align_horizontal_right_rounded, size: 18),
+                            label: Text('Right'),
+                          ),
+                        ],
+                        selected: {bubbleSide},
+                        onSelectionChanged: (sel) async {
+                          final side = sel.first;
+                          setState(() => bubbleSide = side);
+                          await widget.state.bridge.setBubbleSide(side);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 8),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   value: state.boostOn,

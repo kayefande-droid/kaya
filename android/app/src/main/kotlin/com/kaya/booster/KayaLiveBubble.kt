@@ -16,13 +16,14 @@ import android.widget.LinearLayout
 import android.widget.TextView
 
 /**
- * Floating live monitor: a tiny pill docked to the LEFT edge over the game,
- * showing the real measured handshake latency every 2 seconds (TcpPinger to
+ * Floating live monitor: a tiny pill docked to the LEFT or RIGHT edge (per the
+ * Tuning "Dock side" setting, persisted in KayaState) over the game, showing
+ * the real measured handshake latency every 2 seconds (TcpPinger to
  * Cloudflare's anycast edge — the same honest probe the app's HUD uses; no
  * simulated numbers). Tap the pill to expand it into a mini card (ping,
  * jitter, engine + boost state); tap again to collapse; the ✕ on the card
  * removes the bubble for this session. The pill can be dragged vertically
- * along the left edge so it never covers critical game HUD elements.
+ * along its edge so it never covers critical game HUD elements.
  *
  * Needs the SYSTEM_ALERT_WINDOW permission (already in the manifest); on
  * Android 6+ the user grants "Display over other apps" once in Settings —
@@ -34,6 +35,7 @@ object KayaLiveBubble {
 
     private var wm: WindowManager? = null
     private var root: LinearLayout? = null
+    private var rootParams: WindowManager.LayoutParams? = null
     private var card: LinearLayout? = null
     private var pillText: TextView? = null
     private var cardPing: TextView? = null
@@ -88,6 +90,7 @@ object KayaLiveBubble {
             // view already detached
         }
         root = null
+        rootParams = null
         card = null
         pillText = null
         cardPing = null
@@ -96,6 +99,22 @@ object KayaLiveBubble {
     }
 
     fun isShowing(): Boolean = shown
+
+    /**
+     * Re-read the dock side from [KayaState] and move a visible bubble live —
+     * no flicker, no re-adding the view. No-op while hidden.
+     */
+    @Synchronized
+    fun reDock(context: Context) {
+        val view = root ?: return
+        val params = rootParams ?: return
+        params.gravity = (if (KayaState.storedBubbleSide(context) == "right") {
+            Gravity.RIGHT
+        } else {
+            Gravity.LEFT
+        }) or Gravity.CENTER_VERTICAL
+        runCatching { wm?.updateViewLayout(view, params) }
+    }
 
     private fun buildUi(context: Context, windowManager: WindowManager, gameLabel: String?) {
         wm = windowManager
@@ -217,10 +236,17 @@ object KayaLiveBubble {
                 WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
             PixelFormat.TRANSLUCENT,
         ).apply {
-            gravity = Gravity.START or Gravity.CENTER_VERTICAL
+            // Absolute LEFT/RIGHT (not START/END) so RTL locales can't mirror
+            // the dock side away from what the user picked in Tuning.
+            gravity = (if (KayaState.storedBubbleSide(context) == "right") {
+                Gravity.RIGHT
+            } else {
+                Gravity.LEFT
+            }) or Gravity.CENTER_VERTICAL
             x = dp(10)
             y = 0
         }
+        rootParams = params
 
         // drag along the left edge + tap to expand/collapse
         var downY = 0f
