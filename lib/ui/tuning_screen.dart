@@ -35,6 +35,11 @@ class _TuningScreenState extends State<TuningScreen> {
     _loadNotifs();
     _loadLog();
     _loadBubbleSide();
+    // Auto check-once when the user reaches Tuning: the update card is
+    // usually below the fold, so surface availability without a tap.
+    Future<void>.delayed(const Duration(seconds: 2), () {
+      if (mounted && updateInfo == null && !checkingUpdate) _checkUpdate();
+    });
     _evtSub = widget.state.bridge.events.listen((e) {
       if (e.type == 'notif') _loadNotifs();
       if (e.type == 'update') _onUpdateEvent(e.data);

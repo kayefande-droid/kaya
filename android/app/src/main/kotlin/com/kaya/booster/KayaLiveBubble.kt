@@ -41,6 +41,7 @@ object KayaLiveBubble {
     private var cardPing: TextView? = null
     private var cardState: TextView? = null
     private var cardToggle: TextView? = null
+    private var cardFeed: TextView? = null
     private var expanded = false
     private var shown = false
     private var pingMs: Int? = null
@@ -239,15 +240,27 @@ object KayaLiveBubble {
                 ).show()
             }
         }
+        val feed = TextView(context).apply {
+            setTextColor(0xFF9BA3A0.toInt())
+            textSize = 10f
+            typeface = Typeface.MONOSPACE
+            text = ""
+            setOnClickListener {
+                // Peek is passive; tapping it re-renders immediately.
+                render()
+            }
+        }
         cardLayout.addView(title)
         cardLayout.addView(ping)
         cardLayout.addView(state)
+        cardLayout.addView(feed)
         cardLayout.addView(refresh)
         cardLayout.addView(toggle)
         cardLayout.addView(close)
         cardPing = ping
         cardState = state
         cardToggle = toggle
+        cardFeed = feed
         card = cardLayout
 
         // ---- container --------------------------------------------------
@@ -343,6 +356,34 @@ object KayaLiveBubble {
                 append(if (KayaState.boostOn) "locks ON" else "locks off")
             }
             cardToggle?.text = if (KayaState.engineOn) "⏻  Fast lane OFF" else "⏻  Fast lane ON"
+            cardFeed?.text = feedText()
+        }
+    }
+
+    /**
+     * Real DNS lookups this engine answered, newest first — straight from
+     * [DnsFeed]'s ring. Empty until the game (or system) actually queries.
+     * ⚑ marks a handshake-pinned edge; ⟳ marks a 60s-cache hit.
+     */
+    private fun feedText(): String = buildString {
+        val rows = DnsFeed.recent()
+        if (rows.isEmpty()) {
+            append("DNS feed: waiting for lookups…")
+            return@buildString
+        }
+        append("DNS feed · ")
+        append(DnsFeed.hits()).append(" cached · ")
+        append(DnsFeed.misses()).append(" raced\n")
+        for (e in rows.take(3)) {
+            val age = ((System.currentTimeMillis() - e.at) / 1000).coerceAtLeast(0)
+            val flag = when {
+                e.pinned -> "⚑ "
+                e.cached -> "⟳ "
+                else -> "  "
+            }
+            append(flag).append(e.domain.take(22))
+            e.ip?.let { append(" → ").append(it) }
+            append(" ").append(age).append("s\n")
         }
     }
 

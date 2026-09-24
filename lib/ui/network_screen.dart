@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 import '../state/app_state.dart';
@@ -20,8 +22,9 @@ class _NetworkScreenState extends State<NetworkScreen> {
   Map<String, int?> gameBench = {};
   Map<String, int> gameBest = {};
   Map<String, int> gameWorst = {};
-  Map<String, int>? gameFirstRun; // first benchmark of the session (baseline)
+  Map<String, int>? gameFirstRun; // first benchmark baseline (persisted)
   Map<String, int>? gameDelta; // median - baseline, per endpoint
+  static const baselineKey = 'bench_baseline_v1';
   Map<String, Map<String, String>> endpointHosts = {}; // 'game · label' -> {host}
   List<String> gameHosts = [];
   Map<String, String> winners = {};
@@ -46,6 +49,28 @@ class _NetworkScreenState extends State<NetworkScreen> {
     super.initState();
     _load();
     _loadEndpoints();
+    _loadBaseline();
+  }
+
+  /// Baseline survives restarts: "before" keeps meaning before, even if the
+  /// app was killed between the two runs.
+  Future<void> _loadBaseline() async {
+    final raw = await widget.state.bridge.prefsGetString(baselineKey);
+    if (raw == null || !mounted) return;
+    try {
+      final decoded = (jsonDecode(raw) as Map).cast<String, dynamic>().map(
+            (k, v) => MapEntry(k, (v as num).toInt()),
+          );
+      setState(() => gameFirstRun = decoded);
+    } catch (_) {
+      // Corrupt baseline: ignore, next run becomes the new baseline.
+    }
+  }
+
+  Future<void> _saveBaseline() async {
+    final base = gameFirstRun;
+    if (base == null) return;
+    await widget.state.bridge.prefsSetString(baselineKey, jsonEncode(base));
   }
 
   Future<void> _loadEndpoints() async {
@@ -100,25 +125,29 @@ class _NetworkScreenState extends State<NetworkScreen> {
       if (w != null) worst[label] = w;
     }
     if (!mounted) return;
+    // Delta against the persisted first run (before/after arming).
+    var becameBaseline = false;
+    Map<String, int>? delta;
+    final base = gameFirstRun;
+    if (base == null) {
+      gameFirstRun = Map<String, int>.from(
+        results..removeWhere((_, v) => v == null),
+      );
+      becameBaseline = true;
+    } else {
+      delta = {
+        for (final e in results.entries)
+          if (e.value != null && base[e.key] != null) e.key: e.value! - base[e.key]!,
+      };
+    }
     setState(() {
       gameBench = results;
       gameBest = best;
       gameWorst = worst;
-      // Delta against the first run of this session (before/after arming).
-      final base = gameFirstRun;
-      if (base == null) {
-        gameFirstRun = Map<String, int>.from(
-          results..removeWhere((_, v) => v == null),
-        );
-        gameDelta = null;
-      } else {
-        gameDelta = {
-          for (final e in results.entries)
-            if (e.value != null && base[e.key] != null) e.key: e.value! - base[e.key]!,
-        };
-      }
+      gameDelta = delta;
       gameBenching = false;
     });
+    if (becameBaseline) await _saveBaseline();
   }
 
   @override
@@ -220,6 +249,26 @@ class _NetworkScreenState extends State<NetworkScreen> {
                     ),
                   ),
                   const SizedBox(height: 8),
+                ] else if (gameFirstRun != null) ...[
+                  Text(
+                    'Baseline stored (${gameFirstRun!.length} endpoints) — '
+                    'arm the Fast Lane and run again to compare.',
+                    style: const TextStyle(fontSize: 12, color: KayaColors.inkFaint),
+                  ),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () async {
+                        await widget.state.bridge.prefsSetString(baselineKey, '');
+                        setState(() {
+                          gameFirstRun = null;
+                          gameDelta = null;
+                        });
+                      },
+                      child: const Text('Clear baseline',
+                          style: TextStyle(fontSize: 12)),
+                    ),
+                  ),
                 ],
                 if (gameBench.isNotEmpty)
                   for (final e in gameBench.entries)

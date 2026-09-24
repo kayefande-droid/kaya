@@ -334,6 +334,19 @@ class MainActivity : FlutterActivity() {
                         .apply()
                     finishOnMain(result) { true }
                 }
+                "prefsGetString" -> finishOnMain(result) {
+                    KayaState.prefs(this).getString(
+                        call.argument<String>("key") ?: "",
+                        null,
+                    )
+                }
+                "prefsSetString" -> {
+                    val key = call.argument<String>("key") ?: return@setMethodCallHandler
+                    KayaState.prefs(this).edit()
+                        .putString(key, call.argument<String>("value"))
+                        .apply()
+                    finishOnMain(result) { true }
+                }
                 "endpointList" -> finishOnMain(result) {
                     GameEndpoints.ENDPOINTS.map {
                         mapOf("game" to it.game, "label" to it.label, "host" to it.host)

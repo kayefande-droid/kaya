@@ -110,6 +110,10 @@ class KayaBridge {
       await _invoke<bool>('prefsGetBool', {'key': key}) ?? false;
   Future<void> prefsSetBool(String key, bool value) =>
       _invoke<void>('prefsSetBool', {'key': key, 'value': value});
+  Future<String?> prefsGetString(String key) async =>
+      await _invoke<String>('prefsGetString', {'key': key});
+  Future<void> prefsSetString(String key, String value) =>
+      _invoke<void>('prefsSetString', {'key': key, 'value': value});
 
   /// All game benchmark endpoints for the explainer table.
   Future<List<Map<String, Object?>>> endpointList() async {

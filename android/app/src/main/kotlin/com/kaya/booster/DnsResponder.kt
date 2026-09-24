@@ -24,7 +24,9 @@ object DnsResponder {
         val key = "${question.type}|${question.name.lowercase()}"
 
         val cached = cache[key]
+        var cacheHit = false
         val entry: Entry? = if (cached != null && System.currentTimeMillis() - cached.at < TTL_MS) {
+            cacheHit = true
             cached
         } else {
             val result = DnsRacer.resolve(question.name, question.type)
@@ -60,6 +62,14 @@ object DnsResponder {
                 "ips" to ips,
                 "ttl" to (TTL_MS / 1000).toInt(),
             ),
+        )
+        // Process-local ring for the bubble's DNS-feed peek (zero-IPC).
+        DnsFeed.record(
+            domain = question.name,
+            resolver = resolver,
+            ip = ips.firstOrNull(),
+            pinned = pin != null && ips.firstOrNull() == pin,
+            cached = cacheHit,
         )
 
         // Wrap: UDP(53 -> clientPort) + IPv4(virtual router -> client)
