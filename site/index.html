@@ -38,7 +38,7 @@
     "operatingSystem": "Android 8.0+",
     "applicationCategory": "GameApplication",
     "description": "Open-source Android game booster: on-device Smart Anycast DNS steering, Wi-Fi low-latency locks, background mitigation and a controller-to-touch bridge. No servers, no accounts.",
-    "softwareVersion": "1.1.8",
+    "softwareVersion": "1.1.9",
     "fileSize": "18MB",
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
     "author": { "@type": "Person", "name": "kayefande", "alternateName": "kayefande-droid", "url": "https://github.com/kayefande-droid" },
@@ -103,7 +103,7 @@
     <section class="hero">
       <div class="hero-copy">
         <p class="chip-row load">
-          <span class="chip">v1.1.8</span>
+          <span class="chip">v1.1.9</span>
           <span class="chip chip-green">● engines hot</span>
           <span class="chip">open source</span>
         </p>
@@ -353,7 +353,7 @@
       <ol class="timeline">
         <li>
           <span class="t-num">01</span>
-          <div><h3>Arm the fast lane</h3><p>One tap starts the on-device DNS engine and boost locks. Android asks for VPN permission once — that's the engine's TUN interface, not a VPN tunnel to anywhere.</p></div>
+          <div><h3>Arm the fast lane</h3><p>One tap starts the on-device DNS engine and boost locks. Android asks for VPN permission once — that's the engine's TUN interface, not a VPN tunnel to anywhere. Only DNS lookups are routed through it; your game's actual connections go straight out over WiFi/mobile data, untouched.</p></div>
         </li>
         <li>
           <span class="t-num">02</span>
@@ -429,7 +429,7 @@
     <section id="tech" class="section alt">
       <h2 class="sec-title">// under the hood</h2>
       <div class="spec-grid">
-        <div class="spec"><b>DNS engine</b><span>VpnService TUN · RFC 1035 wire format · parallel resolver racing · 60s cache · fully async, fail-open (a slow resolver delays one lookup, never your internet) · stale-cache fallback when resolvers die</span></div>
+        <div class="spec"><b>DNS engine</b><span>DNS-only VpnService TUN — no default route, so game data never enters the tunnel · RFC 1035 wire format · parallel resolver racing · 60s cache · fully async, fail-open (a slow resolver delays one lookup, never your internet) · stale-cache fallback when resolvers die</span></div>
         <div class="spec"><b>UDP fast path</b><span>per-flow sockets, protected from the tunnel · zero-copy packet build</span></div>
         <div class="spec"><b>TCP terminator</b><span>full SYN/ACK state machine · MTU-matched MSS · checksummed segments · background pumps so a stalled upload can't freeze the tunnel</span></div>
         <div class="spec"><b>ICMP responder</b><span>in-tunnel echo replies so in-game ping displays stay truthful</span></div>
@@ -447,12 +447,12 @@
         <a class="dl dl-hot beam" href="https://github.com/kayefande-droid/kaya/releases/latest/download/Kaya-arm64.apk">
           <span class="dl-badge">recommended</span>
           <span class="dl-title">Kaya-arm64.apk</span>
-          <span class="dl-sub">v1.1.8 · ~18 MB · every phone since 2016</span>
+          <span class="dl-sub">v1.1.9 · ~18 MB · every phone since 2016</span>
         </a>
         <a class="dl beam" href="https://github.com/kayefande-droid/kaya/releases/latest/download/Kaya.apk">
           <span class="dl-badge">universal</span>
           <span class="dl-title">Kaya.apk</span>
-          <span class="dl-sub">v1.1.8 · ~48 MB · older 32-bit devices</span>
+          <span class="dl-sub">v1.1.9 · ~48 MB · older 32-bit devices</span>
         </a>
         <a class="dl beam" href="https://github.com/kayefande-droid/kaya/releases">
           <span class="dl-badge">all versions</span>
@@ -475,7 +475,7 @@
         <li>Games → mark your title <strong>Auto-boost</strong> — from then on, launching the game arms everything automatically and the live bubble rides along.</li>
       </ol>
       <p class="fineprint">Permalinks always serve the newest release · verify with
-      <a href="https://github.com/kayefande-droid/kaya/releases" target="_blank" rel="noopener">SHA256SUMS.txt</a> · in-app updates verify the SHA-256 automatically and refuse to install on mismatch (v1.1.2+ · live-monitor dock side is switchable in Tuning → Automation, v1.1.3 · update downloads show live progress, v1.1.5 · live bubble shows the real DNS feed, v1.1.6 · fail-open engine: DNS can never stall or break your internet, v1.1.7 · in-app updates pre-check version & permissions with clear failure reasons, matchmaker pre-warm, DSCP game-traffic priority, peak refresh-rate hold, v1.1.8)</p>
+      <a href="https://github.com/kayefande-droid/kaya/releases" target="_blank" rel="noopener">SHA256SUMS.txt</a> · in-app updates verify the SHA-256 automatically and refuse to install on mismatch (v1.1.2+ · live-monitor dock side is switchable in Tuning → Automation, v1.1.3 · update downloads show live progress, v1.1.5 · live bubble shows the real DNS feed, v1.1.6 · fail-open engine: DNS can never stall or break your internet, v1.1.7 · in-app updates pre-check version & permissions with clear failure reasons, matchmaker pre-warm, DSCP game-traffic priority, peak refresh-rate hold, v1.1.8 · DNS-only routing: games' WiFi &amp; mobile-data connections never touch the tunnel — fixes games failing to start with a “no connection” error, v1.1.9)</p>
     </section>
 
     <!-- ================= FAQ ================= -->
@@ -516,12 +516,7 @@
         </details>
         <details>
           <summary>Can the engine break my internet?</summary>
-          <p>That's the one thing v1.1.7 is built to never do. DNS resolves in the
-          background, so a slow resolver delays one lookup instead of stalling all
-          traffic; if every resolver fails, Kaya keeps serving the last working
-          answer rather than killing the domain; and a watchdog rebuilds the tunnel
-          on its own if the interface ever wedges. Kaya's own traffic is excluded
-          from the tunnel at the OS level, so it can't loop into itself either.</p>
+          <p>That's the one thing v1.1.7 is built to never do — and v1.1.9 makes it structural. The tunnel routes DNS only: your game's actual data connections never pass through it, so a wedged engine cannot black-hole your WiFi or mobile data. DNS resolves in the background, so a slow resolver delays one lookup instead of stalling traffic; if every resolver fails, Kaya keeps serving the last working answer rather than killing the domain; and a watchdog rebuilds the interface on its own. Kaya's own traffic is excluded at the OS level, so it can't loop into itself either.</p>
         </details>
         <details>
           <summary>Will Game Focus block my messages?</summary>

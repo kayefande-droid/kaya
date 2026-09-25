@@ -203,7 +203,7 @@ class _KayaShellState extends State<KayaShell> with WidgetsBindingObserver {
                   const AboutListTile(
                     icon: Icon(Icons.info_outline_rounded),
                     applicationName: 'Kaya',
-                    applicationVersion: '1.1.8',
+                    applicationVersion: '1.1.9',
                     aboutBoxChildren: [
                       Text('Zero servers. Zero accounts. Hand-built.'),
                     ],

@@ -627,6 +627,14 @@ class _TuningScreenState extends State<TuningScreen> {
                         : 'Blocks upstream DNS for 15 s to demonstrate the fail-open engine. Cached sites keep loading.',
                   ),
                 ),
+                const SizedBox(height: 10),
+                const Text(
+                  'DNS-only routing: the engine tunnel carries name lookups '
+                  'only. Your games\u2019 actual WiFi and mobile-data connections '
+                  'never pass through it, so Kaya can never block a game from '
+                  'reaching its servers.',
+                  style: TextStyle(color: KayaColors.inkDim, fontSize: 12.5, height: 1.4),
+                ),
                 const SizedBox(height: 6),
                 Row(
                   children: [

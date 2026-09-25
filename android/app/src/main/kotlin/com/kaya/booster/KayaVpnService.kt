@@ -30,6 +30,12 @@ import android.os.SystemClock
  *    (DNS answered in-process, UDP passes through untouched) instead of dying.
  *  - The TUN read loop is launched only after establish() returns non-null.
  *  - onRevoke() and onDestroy() are fully idempotent.
+ *
+ * Routing model (v1.1.9): DNS-ONLY tunnel. No default route is added, so
+ * game/app data traffic never enters the TUN — it flows directly over WiFi
+ * and mobile data. Only DNS lookups (to 198.18.0.1) are intercepted and
+ * steered; the UdpForwarder/TcpProxy relays stay fail-open for stray
+ * packets but normally receive nothing.
  */
 class KayaVpnService : VpnService() {
 
@@ -176,17 +182,24 @@ class KayaVpnService : VpnService() {
         MatchmakerPrewarm.warm()
     }
 
+    /**
+     * DNS-only mode (v1.1.9). We deliberately do NOT add a default route
+     * (the old `addRoute("0.0.0.0", 0)` full tunnel is gone). Only packets
+     * addressed to the DNS router 198.18.0.1 — i.e. name lookups — enter the
+     * TUN; every game connection (UDP and TCP) leaves directly through the
+     * real WiFi/mobile-data interface. Full-tunnel interception black-holed
+     * games that refuse tunneled devices, sent IPv6 into an unhandled void
+     * and broke connectivity on network switches; DNS steering needs none of
+     * that — the pinned IPs ride in the DNS answers themselves.
+     */
     private fun buildVpnInterface(): ParcelFileDescriptor? {
         val builder = Builder()
             .setSession("Kaya Fast Lane")
-            // 1280 (IPv6 minimum) instead of 1500: smaller packets fragment
-            // less on lossy/congested radio links, which trims serialization
-            // delay and jitter spikes — the visible effect is steadier game
-            // ms. The relay reassembles nothing; payloads just travel in
-            // right-sized frames.
             .setMtu(1280)
             .addAddress(tunAddr, 32)
-            .addRoute("0.0.0.0", 0)
+            // Host route ONLY for the DNS server — the single route on this
+            // interface. Nothing else can enter the tunnel by construction.
+            .addRoute(tunRouter, 32)
             .addDnsServer(tunRouter)
         // Kaya's own traffic (DNS races, TCP handshakes, update downloads)
         // must take the real network, or it would loop back into the tunnel.
@@ -450,9 +463,18 @@ class KayaVpnService : VpnService() {
             packet.copyOfRange(ipHeaderLen + tcpHeaderLen, ipHeaderLen + tcpHeaderLen + payloadLen)
         } else ByteArray(0)
 
-        if (dstPort == 53 && (flags and PacketEngine.FLAG_SYN) != 0) {
-            // DNS-over-TCP: refuse gracefully; UDP DNS is handled natively.
-            TcpProxy.sendReset(srcIp, srcPort, dstIp, dstPort, seq, ack)
+        if (dstPort == 53 || dstPort == 853) {
+            // DNS-over-TCP (53) and DNS-over-TLS (853): refuse IMMEDIATELY.
+            // Android's opportunistic Private-DNS mode probes :853 on every
+            // validation; letting that SYN sit in a TCP handshake that can
+            // never complete stalls each lookup for seconds before the OS
+            // falls back to cleartext UDP:53 (which Kaya answers natively).
+            // An instant RST makes the fallback happen in milliseconds.
+            // (Everything else TCP entering the tunnel is a stray packet:
+            // with DNS-only routing the proxy path stays fail-open.)
+            if ((flags and PacketEngine.FLAG_SYN) != 0) {
+                TcpProxy.sendReset(srcIp, srcPort, dstIp, dstPort, seq, ack)
+            }
             return
         }
         TcpProxy.handle(srcIp, srcPort, dstIp, dstPort, seq, ack, flags, payload) { protectStream(it) }

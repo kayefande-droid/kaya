@@ -5,8 +5,11 @@ plugins {
 }
 
 // Versioning follows pubspec.yaml via the flutter tool's local.properties
-// (flutter.versionCode / flutter.versionName), so the in-app updater's
+// (flutter.versionName / flutter.versionCode), so the in-app updater's
 // current-vs-latest comparison is always accurate.
+// versionCode = 2000 + pubspec build number (1.1.7+13→2013, 1.1.8+14→2014,
+// 1.1.9+15→2015): monotonic across versionName bumps, and never collides
+// with the raw build numbers the flutter tool writes into local.properties.
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file("local.properties")
 if (localPropertiesFile.exists()) {
@@ -38,7 +41,7 @@ android {
         applicationId = "com.kaya.booster"
         minSdk = 26
         targetSdk = 34
-        versionCode = localProperties.getProperty("flutter.versionCode")?.toInteger() ?: 1
+        versionCode = 2000 + (localProperties.getProperty("flutter.versionCode")?.toInteger() ?: 0)
         versionName = localProperties.getProperty("flutter.versionName") ?: "1.0.0"
         ndkVersion = "28.2.13676358"
     }
